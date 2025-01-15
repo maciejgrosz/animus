@@ -23,6 +23,10 @@ def process_audio():
 
         audio_data = data['audio_data']
 
+        logging.info(f"Received audio data length: {len(audio_data)}")
+        if len(audio_data) == 0:
+            logging.error("Empty audio data received on backend.")
+
         if not isinstance(audio_data, list) or not all(isinstance(i, (int, float)) for i in audio_data):
             return jsonify({"error": "'audio_data' must be a list of numbers"}), 400
 
@@ -30,52 +34,32 @@ def process_audio():
         max_val = max(abs(min(audio_data)), max(audio_data))
         normalized_audio = [x / max_val for x in audio_data] if max_val > 0 else audio_data
 
-        # Raw amplitude range
-        raw_amplitude_range = max(audio_data) - min(audio_data)
-
-        # Calculate metrics
+        # Metrics for Visualization
         peak_amplitude = max(abs(x) for x in normalized_audio)
         energy = sum(x**2 for x in normalized_audio) / len(normalized_audio)
         zcr = sum(1 for i in range(1, len(normalized_audio)) if normalized_audio[i-1] * normalized_audio[i] < 0) / len(normalized_audio)
 
-        # Signal-to-Noise Ratio (SNR)
-        noise_threshold = 0.01
-        signal_power = np.mean(np.square(normalized_audio))
-        noise_power = np.mean(np.square([x for x in normalized_audio if abs(x) < noise_threshold]))
-        snr = 10 * np.log10(max(signal_power, 1e-10) / max(noise_power, 1e-10))
-
-        # Dominant frequency
+        # FFT for frequency spectrum
         fft_data = np.fft.fft(normalized_audio)
-        frequencies = np.fft.fftfreq(len(normalized_audio), d=1/44100)  # Assume 44.1 kHz sample rate
+        frequencies = np.fft.fftfreq(len(normalized_audio), d=1 / 44100)  # Assume 44.1 kHz sample rate
         magnitude_spectrum = np.abs(fft_data)
-        valid_indices = (frequencies > 0) & (frequencies < 22050)  # Limit to valid range
+        valid_indices = (frequencies >= 0) & (frequencies < 22050)  # Only positive frequencies below Nyquist
         dominant_frequency = frequencies[valid_indices][np.argmax(magnitude_spectrum[valid_indices])]
 
-        # Determine sound type
-        if raw_amplitude_range > 1:  # Clearly loud
-            sound_type = "Loud (e.g., clap)"
-        elif raw_amplitude_range < 0.1:  # Clearly quiet
-            sound_type = "Quiet (e.g., silence)"
-        else:
-            # Ambiguous case - refine with energy and SNR
-            if energy > 0.005 or snr > 20:
-                sound_type = "Loud (e.g., clap)"
-            else:
-                sound_type = "Quiet (e.g., silence)"
+        # Prepare frequency bands for visualization (reduce resolution)
+        bands = np.linspace(0, len(magnitude_spectrum[valid_indices]) - 1, 32, dtype=int)  # 32 bands
+        band_energies = [np.mean(magnitude_spectrum[valid_indices][b:b + 1]) for b in bands]
 
-        # Logging
+        # Construct response
         response = {
-            "raw_amplitude_range": float(raw_amplitude_range),
             "peak_amplitude": float(peak_amplitude),
             "energy": float(energy),
             "zcr": float(zcr),
-            "snr": float(snr),
             "dominant_frequency": float(dominant_frequency),
-            "sound_type": sound_type
+            "frequency_bands": [float(energy) for energy in band_energies]
         }
-        logging.info(
-            f"Classification Decision: raw_amplitude_range={raw_amplitude_range}, energy={energy}, snr={snr}, sound_type={sound_type}")
 
+        logging.info(f"Audio Analysis: {response}")
         return jsonify(response), 200
 
     except Exception as e:

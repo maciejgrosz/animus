@@ -3,18 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio-Based Animations</title>
+    <title>Live Audio Visualization</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #444;
+        }
+
+        .controls {
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        button:disabled {
+            background-color: #bbb;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .status {
+            margin: 20px;
+            font-size: 18px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .mode-selector {
+            margin: 10px;
+        }
+    </style>
 </head>
 <body>
-<h1>Audio Recorder</h1>
-<button id="record-btn">Start Recording</button>
-<button id="stop-btn" disabled>Stop Recording</button>
-<div>
-    <p>Status: <span id="status">Idle</span></p>
-    <p>Amplitude: <span id="amplitude">N/A</span></p>
-</div>
-
-<!-- Load external JavaScript -->
-<script src="/static/js/audioProcessor.js"></script>
+    <h1>Live Audio Visualization</h1>
+    <div class="controls">
+        <button id="record-btn">Start Recording</button>
+        <button id="stop-btn" disabled>Stop Recording</button>
+    </div>
+    <div class="mode-selector">
+        <label for="mode-selector">Choose Visualization Mode:</label>
+        <select id="mode-selector">
+            <option value="waveform">Waveform</option>
+            <option value="frequency">Frequency Bars</option>
+            <option value="radial">Radial Pattern</option>
+        </select>
+    </div>
+    <div class="status">
+        Status: <span id="status">Idle</span>
+    </div>
+    <canvas id="audio-visualizer" width="800" height="300"></canvas>
+    <script src="/static/js/audioProcessor.js"></script>
 </body>
 </html>
