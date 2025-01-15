@@ -3,13 +3,14 @@ const stopBtn = document.getElementById('stop-btn');
 const statusDisplay = document.getElementById('status');
 const canvas = document.getElementById('audio-visualizer');
 const canvasCtx = canvas.getContext('2d');
+const modeSelector = document.getElementById('mode-selector');
 
 let audioContext;
 let analyser;
 let dataArray;
 let bufferLength;
 let animationFrameId;
-let visualizationMode = 'waveform'; // Default mode
+let visualizationMode = 'frequency'; // Default mode
 
 // Set up audio context and analyser
 const setupAudioContext = (stream) => {
@@ -17,35 +18,49 @@ const setupAudioContext = (stream) => {
     const source = audioContext.createMediaStreamSource(stream);
 
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 2048; // FFT resolution
+    analyser.fftSize = 2048;
     bufferLength = analyser.frequencyBinCount;
     dataArray = new Uint8Array(bufferLength);
 
     source.connect(analyser);
 };
 
-// Start visualization loop
+// Visualization loop
 const visualize = () => {
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (visualizationMode === 'waveform') {
-        analyser.getByteTimeDomainData(dataArray);
-        drawWaveform();
-    } else if (visualizationMode === 'frequency') {
-        analyser.getByteFrequencyData(dataArray);
+    if (visualizationMode === 'frequency') {
         drawFrequencyBars();
+    } else if (visualizationMode === 'waveform') {
+        drawWaveform();
     } else if (visualizationMode === 'radial') {
-        analyser.getByteFrequencyData(dataArray);
-        drawRadialPattern();
+        drawRadialBurst();
     }
 
     animationFrameId = requestAnimationFrame(visualize);
 };
 
+// Draw frequency bars
+const drawFrequencyBars = () => {
+    analyser.getByteFrequencyData(dataArray);
+
+    const barWidth = (canvas.width / bufferLength) * 2.5;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+        const barHeight = dataArray[i];
+        const color = `rgb(${barHeight + 100}, 50, 150)`;
+
+        canvasCtx.fillStyle = color;
+        canvasCtx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+
+        x += barWidth + 1;
+    }
+};
+
 // Draw waveform
 const drawWaveform = () => {
-    canvasCtx.fillStyle = 'rgb(240, 240, 240)';
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+    analyser.getByteTimeDomainData(dataArray);
 
     canvasCtx.lineWidth = 2;
     canvasCtx.strokeStyle = 'rgb(0, 123, 255)';
@@ -71,27 +86,10 @@ const drawWaveform = () => {
     canvasCtx.stroke();
 };
 
-// Draw frequency bars
-const drawFrequencyBars = () => {
-    canvasCtx.fillStyle = 'rgb(0, 0, 0)';
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+// Draw radial burst
+const drawRadialBurst = () => {
+    analyser.getByteFrequencyData(dataArray);
 
-    const barWidth = (canvas.width / bufferLength) * 2.5;
-    let x = 0;
-
-    for (let i = 0; i < bufferLength; i++) {
-        const barHeight = dataArray[i];
-        const color = `rgb(${barHeight + 100}, 50, 150)`;
-
-        canvasCtx.fillStyle = color;
-        canvasCtx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
-
-        x += barWidth + 1;
-    }
-};
-
-// Draw radial pattern
-const drawRadialPattern = () => {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -120,7 +118,7 @@ recordBtn.addEventListener('click', async () => {
         recordBtn.disabled = true;
         stopBtn.disabled = false;
     } catch (error) {
-        console.error('Error accessing the microphone', error);
+        console.error('Error accessing the microphone:', error);
         statusDisplay.textContent = 'Microphone access denied.';
     }
 });
@@ -136,7 +134,7 @@ stopBtn.addEventListener('click', () => {
     stopBtn.disabled = true;
 });
 
-// Visualization mode selection
-document.getElementById('mode-selector')?.addEventListener('change', (event) => {
+// Update visualization mode
+modeSelector.addEventListener('change', (event) => {
     visualizationMode = event.target.value;
 });
