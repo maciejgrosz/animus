@@ -1,0 +1,13 @@
+INFO:root:Audio Analysis: {'raw_amplitude_range': 2.0473830699920654, 'peak_amplitude': 1.0, 'energy': 0.006925994726881486,
+ 'zcr': 0.06359579636670891, 'snr': 28.50678409642849, 'dominant_frequency': 806.962927756654, 'sound_type': 'Loud (e.g., clap)'}
+INFO:werkzeug:127.0.0.1 - - [15/Jan/2025 21:03:05] "POST /process-audio HTTP/1.1" 200 - short loud
+
+INFO:root:Audio Analysis: {'raw_amplitude_range': 0.03443261608481407, 'peak_amplitude': 1.0, 'energy': 0.0014782834943403253, 'zcr': 0.057494588744588744, 'snr': 16.846144365618166, 'dominant_frequency': 194.22348484848484, 'sound_type': 'Quiet (e.g., silence)'}
+INFO:werkzeug:127.0.0.1 - - [15/Jan/2025 21:03:45] "POST /process-audio HTTP/1.1" 200  - short silence
+
+
+INFO:root:Audio Analysis: {'raw_amplitude_range': 0.02524564042687416, 'peak_amplitude': 1.0, 'energy': 0.00391479538811388, 'zcr': 0.06636729374433363, 'snr': 21.264565314920812, 'dominant_frequency': 188.03972121486856, 'sound_type': 'Loud (e.g., clap)'}
+INFO:werkzeug:127.0.0.1 - - [15/Jan/2025 21:04:08] "POST /process-audio HTTP/1.1" 200  - again short silence
+
+INFO:root:Audio Analysis: {'raw_amplitude_range': 2.136423707008362, 'peak_amplitude': 1.0, 'energy': 0.008018030939871084, 'zcr': 0.11391662656400385, 'snr': 31.51252303072592, 'dominant_frequency': 1477.6046679499518, 'sound_type': 'Loud (e.g., clap)'}
+INFO:werkzeug:127.0.0.1 - - [15/Jan/2025 21:04:45] "POST /process-audio HTTP/1.1" 200 - short clap
