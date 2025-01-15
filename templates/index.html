@@ -9,27 +9,30 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: #111;
+            color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-        }
-
-        h1 {
-            color: #444;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .controls {
-            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 10px;
+            position: absolute;
+            top: 10px;
+            z-index: 10; /* Ensure controls stay on top */
         }
 
-        button {
+        button, select {
             padding: 10px 20px;
             font-size: 16px;
-            margin: 0 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -47,39 +50,45 @@
             background-color: #0056b3;
         }
 
-        .status {
-            margin: 20px;
-            font-size: 18px;
-        }
-
         canvas {
-            border: 1px solid #ccc;
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 90vw;   /* 90% of viewport width */
+            height: 80vh;  /* 80% of viewport height */
+            transform: translate(-50%, -50%);
+            border: 2px solid #444;
             border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .mode-selector {
-            margin: 10px;
+        .status {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Live Audio Visualization</h1>
     <div class="controls">
         <button id="record-btn">Start Recording</button>
         <button id="stop-btn" disabled>Stop Recording</button>
-    </div>
-    <div class="mode-selector">
-        <label for="mode-selector">Choose Visualization Mode:</label>
         <select id="mode-selector">
             <option value="frequency">Frequency Bars</option>
             <option value="waveform">Waveform</option>
             <option value="radial">Radial Burst</option>
         </select>
     </div>
+    <canvas id="audio-visualizer"></canvas>
     <div class="status">
         Status: <span id="status">Idle</span>
     </div>
-    <canvas id="audio-visualizer" width="800" height="300"></canvas>
     <script src="/static/js/audioProcessor.js"></script>
 </body>
 </html>

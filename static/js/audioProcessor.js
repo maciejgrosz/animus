@@ -27,6 +27,8 @@ const setupAudioContext = (stream) => {
 
 // Visualization loop
 const visualize = () => {
+    canvas.width = window.innerWidth * 0.9 * devicePixelRatio; // 90% of viewport width
+    canvas.height = window.innerHeight * 0.8 * devicePixelRatio; // 80% of viewport height
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (visualizationMode === 'frequency') {
@@ -37,12 +39,13 @@ const visualize = () => {
         drawRadialBurst();
     }
 
-    animationFrameId = requestAnimationFrame(visualize);
+    animationFrameId = requestAnimationFrame(visualize); // smooth visualization
 };
 
 // Draw frequency bars
 const drawFrequencyBars = () => {
     analyser.getByteFrequencyData(dataArray);
+
 
     const barWidth = (canvas.width / bufferLength) * 2.5;
     let x = 0;
