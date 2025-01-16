@@ -92,9 +92,13 @@
         <span id="sensitivity-value">1.00</span>
     </div>
     <canvas id="audio-visualizer"></canvas>
+
+    <!-- Load JavaScript -->
+    <script type="module" src="./static/js/main.js"></script>
     <div class="status">
         Status: <span id="status">Idle</span>
     </div>
-    <script src="/static/js/audioProcessor.js"></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
 </html>
