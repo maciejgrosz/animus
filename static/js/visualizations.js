@@ -5,9 +5,29 @@ import { drawFrequencyBars } from './visualizations/frequencyBars.js';
 import { drawRadialBurst } from './visualizations/radialBurst.js';
 import { drawSpiral } from './visualizations/spiral.js';
 import { drawWaveform } from './visualizations/waveform.js';
+import { drawGradientBackground } from './visualizations/background.js';
+
 
 let visualizationMode = 'frequency'; // Default mode
 let animationFrameId;
+
+export const drawCombinedVisualizations = (analyser, dataArray, bufferLength) => {
+    // Clear the canvas
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Calculate amplitude for dynamic background
+    const amplitude = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+
+    // Draw the background
+    drawGradientBackground(amplitude);
+
+    // Draw the waveform
+    drawWaveform(analyser, dataArray, bufferLength);
+
+    // Draw the particle system
+    drawParticleSystem(analyser, dataArray, bufferLength);
+};
+
 
 export const setVisualizationMode = (mode) => {
     visualizationMode = mode;
@@ -47,6 +67,9 @@ export const visualize = () => {
             break;
         case 'particle':
             drawParticleSystem(analyser, dataArray, bufferLength);
+            break;
+        case 'combined':
+            drawCombinedVisualizations(analyser, dataArray, bufferLength);
             break;
     }
 

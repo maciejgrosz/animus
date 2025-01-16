@@ -31,27 +31,36 @@ const particles = [];
 
 export const drawParticleSystem = (analyser, dataArray, bufferLength) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
 
+    // Enable additive blending for particles
+    canvasCtx.globalCompositeOperation = 'lighter';
+
+    // Create new particles
     for (let i = 0; i < dataArray.length; i += 5) {
-        const intensity = (dataArray[i] / 255) * sensitivity;
-        const size = intensity * 10;
-        const speedX = (Math.random() - 0.5) * 4 * sensitivity;
-        const speedY = (Math.random() - 0.5) * 4 * sensitivity;
-        const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+        const intensity = (dataArray[i] / 255); // Normalize intensity
+        const size = intensity * 10; // Particle size based on intensity
+        const speedX = (Math.random() - 0.5) * 4; // Random horizontal movement
+        const speedY = (Math.random() - 0.5) * 4; // Random vertical movement
+        const color = `hsl(${Math.random() * 360}, 100%, 50%)`; // Random color
 
-        particles.push(new Particle(canvas.width / 4, canvas.height / 4, size, color, speedX, speedY));
+        particles.push(
+            new Particle(canvas.width / 4, canvas.height / 4, size, color, speedX, speedY)
+        );
     }
 
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
+    // Update and draw particles
     for (let i = particles.length - 1; i >= 0; i--) {
         const particle = particles[i];
         if (particle.size <= 0) {
-            particles.splice(i, 1);
+            particles.splice(i, 1); // Remove faded particles
         } else {
             particle.update();
-            particle.draw(canvasCtx);
+            particle.draw(canvasCtx); // Draw particle with blending
         }
     }
+
+    // Reset to default blending
+    canvasCtx.globalCompositeOperation = 'source-over';
 };
+
+
