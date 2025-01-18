@@ -3,102 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Audio Visualization</title>
+    <title>Sound-to-Animation Sync</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #111;
-            color: #fff;
+            background: linear-gradient(120deg, #000428, #004e92);
+            color: #ffffff;
+            text-align: center;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
-            overflow: hidden;
         }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin: 10px;
-            position: absolute;
-            top: 10px;
-            z-index: 10; /* Ensure controls stay on top */
+        header {
+            margin-bottom: 20px;
         }
-
-        button, select {
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        p {
+            font-size: 1.2em;
+            margin: 10px 0 30px;
+        }
+        a.button {
+            display: inline-block;
+            text-decoration: none;
+            background: #ff4b2b;
+            color: #ffffff;
             padding: 10px 20px;
-            font-size: 16px;
-            border: none;
+            font-size: 1.2em;
             border-radius: 5px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s ease;
+            transition: background 0.3s;
         }
-
-        button:disabled {
-            background-color: #bbb;
-            cursor: not-allowed;
-        }
-
-        button:hover:not(:disabled) {
-            background-color: #0056b3;
-        }
-
-        canvas {
-            display: block;
-            position: absolute;
-            width: 90vw; /* 90% of viewport width */
-            height: 90vh; /* 90% of viewport height */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px solid #444;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .status {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 18px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
+        a.button:hover {
+            background: #ff3c1a;
         }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <button id="record-btn">Start Recording</button>
-        <button id="stop-btn" disabled>Stop Recording</button>
-        <select id="mode-selector">
-            <option value="frequency">Frequency Bars</option>
-            <option value="waveform">Waveform</option>
-            <option value="radial">Radial Burst</option>
-            <option value="spiral">Spiral</option>
-            <option value="particle">Particle System</option>
-            <option value="combined">Combined</option>
-        </select>
-        <label for="sensitivity-slider">Sensitivity:</label>
-        <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1">
-        <span id="sensitivity-value">1.00</span>
-    </div>
-    <canvas id="audio-visualizer"></canvas>
-
-    <!-- Load JavaScript -->
-    <script type="module" src="./static/js/main.js"></script>
-    <div class="status">
-        Status: <span id="status">Idle</span>
-    </div>
-    <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
-
+<header>
+    <h1>Welcome to Sound-to-Animation Sync</h1>
+    <p>Experience the magic of synchronized audio and visual art.</p>
+</header>
+<main>
+    <a href="/live-animation" class="button">Go to Live Animation</a>
+</main>
 </body>
 </html>

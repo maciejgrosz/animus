@@ -1,4 +1,4 @@
-import { adjustCanvasSize } from './canvasUtils.js';
+ import { adjustCanvasSize } from './canvasUtils.js';
 import { setupAudioContext } from './audioSetup.js';
 import { visualize, setVisualizationMode, stopVisualization } from './visualizations.js';
 import { updateSensitivity } from './canvasUtils.js';
