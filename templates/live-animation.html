@@ -21,23 +21,26 @@
             background-color: #222;
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            padding: 20px 10px;
+            align-items: center;
+            padding: 20px;
             gap: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
             z-index: 10;
             justify-content: space-between;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 10px;
         }
 
         .sidebar button, .sidebar select {
             width: 90%;
-            margin: 10px auto;
+            margin: 5%;
             padding: 15px;
             font-size: 18px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            background-color: #007bff;
+            background-color: #0c6a12;
             color: white;
             transition: background-color 0.3s ease;
             height: 50px;
@@ -56,6 +59,8 @@
             font-size: 18px;
             padding: 10px;
             height: 50px;
+            text-align: center;
+            text-align-last: center;
         }
 
         .sidebar input[type="range"] {
@@ -83,12 +88,18 @@
         .main-content {
             flex-grow: 1;
             position: relative;
+            padding: 20px;
+            border: 2px solid #444;
+            border-radius: 10px;
+            margin: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         canvas {
             width: 100%;
             height: 100%;
             display: block;
+            border-radius: 10px;
         }
 
         .status {
@@ -105,9 +116,8 @@
 </head>
 <body>
 <div class="sidebar">
-    <div>
-        <button id="record-btn">Start Recording</button>
-        <button id="stop-btn" disabled>Stop Recording</button>
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <button id="toggle-btn">Start</button>
         <select id="mode-selector">
             <option value="frequency">Frequency Bars</option>
             <option value="waveform">Waveform</option>
@@ -115,6 +125,9 @@
             <option value="spiral">Spiral</option>
             <option value="particle">Particle System</option>
             <option value="combined">Combined</option>
+            <option value="mandelbrot">Mandelbrot Fractal</option>
+            <option value="julia">Julia Fractal</option>
+            <option value="dynamic-fractal">Dynamic Fractal</option>
         </select>
         <label for="sensitivity-slider">Sensitivity:</label>
         <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1">

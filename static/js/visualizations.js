@@ -6,7 +6,7 @@ import { drawRadialBurst } from './visualizations/radialBurst.js';
 import { drawSpiral } from './visualizations/spiral.js';
 import { drawWaveform } from './visualizations/waveform.js';
 import { drawGradientBackground } from './visualizations/background.js';
-
+import { drawMandelbrot, drawJulia, drawDynamicMandelbrot, drawFractalWithWorker } from './visualizations/fractals.js';
 
 let visualizationMode = 'frequency'; // Default mode
 let animationFrameId;
@@ -27,7 +27,6 @@ export const drawCombinedVisualizations = (analyser, dataArray, bufferLength) =>
     // Draw the particle system
     drawParticleSystem(analyser, dataArray, bufferLength);
 };
-
 
 export const setVisualizationMode = (mode) => {
     visualizationMode = mode;
@@ -71,6 +70,17 @@ export const visualize = () => {
         case 'combined':
             drawCombinedVisualizations(analyser, dataArray, bufferLength);
             break;
+        case 'mandelbrot':
+            drawMandelbrot(canvas, canvasCtx);
+            break;
+        case 'julia':
+            drawJulia(canvas, canvasCtx, -0.7, 0.27015);
+            break;
+        case 'dynamic-fractal':
+            drawFractalWithWorker(canvas, canvasCtx, analyser, dataArray);
+            break;
+        default:
+            console.error(`Unknown visualization mode: ${visualizationMode}`);
     }
 
     animationFrameId = requestAnimationFrame(visualize);
