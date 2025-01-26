@@ -4,127 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Audio Visualization</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #111;
-            color: #fff;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const popup = document.getElementById('instruction-popup');
+            const closeButton = document.getElementById('close-popup');
 
-        .sidebar {
-            width: 25%;
-            background-color: #222;
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 20px 10px;
-            gap: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            justify-content: space-between;
-        }
-
-        .sidebar button, .sidebar select {
-            width: 90%;
-            margin: 10px auto;
-            padding: 15px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            transition: background-color 0.3s ease;
-            height: 50px;
-        }
-
-        .sidebar button:disabled {
-            background-color: #bbb;
-            cursor: not-allowed;
-        }
-
-        .sidebar button:hover:not(:disabled), .sidebar select:hover {
-            background-color: #0056b3;
-        }
-
-        .sidebar select {
-            font-size: 18px;
-            padding: 10px;
-            height: 50px;
-        }
-
-        .sidebar input[type="range"] {
-            width: 90%;
-            margin: 0 auto;
-        }
-
-        .sidebar .back-button {
-            text-decoration: none;
-            color: white;
-            background-color: #ff4b2b;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-            text-align: center;
-            font-size: 14px;
-            width: 90%;
-            margin: 0 auto;
-        }
-
-        .sidebar .back-button:hover {
-            background-color: #ff3c1a;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        .status {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 18px;
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-    </style>
+            // Ensure button and popup exist
+            if (popup && closeButton) {
+                closeButton.addEventListener('click', () => {
+                    popup.classList.add('hidden'); // Add hidden class to close the popup
+                });
+            }
+        });
+    </script>
 </head>
-<body>
-<div class="sidebar">
-    <div>
-        <button id="record-btn">Start Recording</button>
-        <button id="stop-btn" disabled>Stop Recording</button>
-        <select id="mode-selector">
-            <option value="frequency">Frequency Bars</option>
-            <option value="waveform">Waveform</option>
-            <option value="radial">Radial Burst</option>
-            <option value="spiral">Spiral</option>
-            <option value="particle">Particle System</option>
-            <option value="combined">Combined</option>
-        </select>
-        <label for="sensitivity-slider">Sensitivity:</label>
-        <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1">
-        <span id="sensitivity-value">1.00</span>
+<body class="bg-gray-900 text-white h-screen flex overflow-hidden">
+<div id="instruction-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Instructions</h2>
+        <p class="text-gray-600 mb-6">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.
+        </p>
+        <button id="close-popup" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Got it!</button>
     </div>
-    <a href="/" class="back-button">Back to Home</a>
 </div>
-<div class="main-content">
-    <canvas id="audio-visualizer"></canvas>
-    <div class="status">
+<div class="flex flex-col w-1/4 bg-gray-800 p-4 shadow-lg space-y-4">
+    <button id="record-btn" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Start Recording</button>
+    <button id="stop-btn" class="w-full py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition" disabled>Stop Recording</button>
+
+    <select id="mode-selector" class="w-full py-2 px-3 bg-gray-700 text-white rounded-lg">
+        <option value="frequency">Frequency Bars</option>
+        <option value="waveform">Waveform</option>
+        <option value="radial">Radial Burst</option>
+        <option value="spiral">Spiral</option>
+        <option value="particle">Particle System</option>
+        <option value="combined">Combined</option>
+        <option value="expanding">Expanding</option>
+        <option value="rotating">Rotating</option>
+        <option value="web">Web</option>
+        <option value="spiral-2">Spiral 2</option>
+        <option value="kaleidoscope">Kaleidoscope</option>
+        <option value="neon-ring">Neon Ring</option>
+        <option value="tunel">Tunel</option>
+        <option value="vortex">Vortex</option>
+        <option value="pulsating-stars">Pulsating Stars</option>
+        <option value="symmetric-burst">Symmetric Burst</option>
+    </select>
+
+    <div>
+        <label for="sensitivity-slider" class="block text-sm">Sensitivity:</label>
+        <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1" class="w-full">
+        <span id="sensitivity-value" class="block text-center mt-2">1.00</span>
+    </div>
+
+    <a href="/" class="block w-full py-2 px-4 text-center bg-red-500 rounded-lg hover:bg-red-600 transition">Back to Home</a>
+</div>
+
+<div class="flex-grow relative">
+    <canvas id="audio-visualizer" class="w-full h-full block"></canvas>
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-75 text-center py-2 px-4 rounded-lg">
         Status: <span id="status">Idle</span>
     </div>
 </div>

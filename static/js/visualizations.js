@@ -6,7 +6,16 @@ import { drawRadialBurst } from './visualizations/radialBurst.js';
 import { drawSpiral } from './visualizations/spiral.js';
 import { drawWaveform } from './visualizations/waveform.js';
 import { drawGradientBackground } from './visualizations/background.js';
-
+import {drawExpandingLineWave} from "./visualizations/expandingLine.js";
+import {drawRotatingLineGrid} from "./visualizations/rotatingLine.js";
+import {drawDynamicLineWeb} from "./visualizations/web.js";
+import {drawFrequencyBarSpiral} from "./visualizations/spiral2.js";
+import {drawKaleidoscope} from "./visualizations/kaleidoscope.js";
+import {drawNeonRings} from "./visualizations/neonRing.js";
+import {drawInfiniteTunnel} from "./visualizations/tunel.js";
+import {drawSpiralVortex} from "./visualizations/vortex.js";
+import {drawPulsatingStars} from "./visualizations/pulsatingStars.js";
+import {drawSymmetricBurst} from "./visualizations/symmetricBurst.js";
 
 let visualizationMode = 'frequency'; // Default mode
 let animationFrameId;
@@ -71,7 +80,37 @@ export const visualize = () => {
         case 'combined':
             drawCombinedVisualizations(analyser, dataArray, bufferLength);
             break;
-    }
+        case 'expanding':
+            drawExpandingLineWave(analyser, dataArray, bufferLength);
+            break;
+        case 'rotating':
+            drawRotatingLineGrid(analyser, dataArray, bufferLength);
+            break;
+        case 'web':
+            drawDynamicLineWeb(analyser, dataArray, bufferLength);
+            break;
+        case 'spiral-2':
+            drawFrequencyBarSpiral(analyser, dataArray, bufferLength);
+            break;
+        case 'kaleidoscope':
+            drawKaleidoscope(analyser, dataArray, bufferLength);
+            break;
+        case 'neon-ring':
+            drawNeonRings(analyser, dataArray, bufferLength);
+            break;
+        case 'tunel':
+            drawInfiniteTunnel(analyser, dataArray, bufferLength);
+            break;
+        case 'vortex':
+            drawSpiralVortex(analyser, dataArray, bufferLength);
+            break;
+        case 'pulsating-stars':
+            drawPulsatingStars(analyser, dataArray, bufferLength);
+            break;
+        case 'symmetric-burst':
+            drawSymmetricBurst(analyser, dataArray, bufferLength);
+            break;
+        }
 
     animationFrameId = requestAnimationFrame(visualize);
 };
