@@ -6,50 +6,27 @@ import { drawRadialBurst } from './visualizations/radialBurst.js';
 import { drawSpiral } from './visualizations/spiral.js';
 import { drawWaveform } from './visualizations/waveform.js';
 import { drawGradientBackground } from './visualizations/background.js';
-import {drawExpandingLineWave} from "./visualizations/expandingLine.js";
-import {drawRotatingLineGrid} from "./visualizations/rotatingLine.js";
-import {drawDynamicLineWeb} from "./visualizations/web.js";
-import {drawFrequencyBarSpiral} from "./visualizations/spiral2.js";
-import {drawKaleidoscope} from "./visualizations/kaleidoscope.js";
-import {drawNeonRings} from "./visualizations/neonRing.js";
-import {drawInfiniteTunnel} from "./visualizations/tunel.js";
-import {drawSpiralVortex} from "./visualizations/vortex.js";
-import {drawPulsatingStars} from "./visualizations/pulsatingStars.js";
-import {drawSymmetricBurst} from "./visualizations/symmetricBurst.js";
+import { drawExpandingLineWave } from "./visualizations/expandingLine.js";
+import { drawRotatingLineGrid } from "./visualizations/rotatingLine.js";
+import { drawDynamicLineWeb } from "./visualizations/web.js";
+import { drawFrequencyBarSpiral } from "./visualizations/spiral2.js";
+import { drawKaleidoscope } from "./visualizations/kaleidoscope.js";
+import { drawNeonRings } from "./visualizations/neonRing.js";
+import { drawInfiniteTunnel } from "./visualizations/tunel.js";
+import { drawSpiralVortex } from "./visualizations/vortex.js";
+import { drawPulsatingStars } from "./visualizations/pulsatingStars.js";
+import { drawSymmetricBurst } from "./visualizations/symmetricBurst.js";
 
-let visualizationMode = 'frequency'; // Default mode
+let visualizationMode = 'frequency'; // Default visualization
 let animationFrameId;
+let lastHue = 0; // Store previous hue for smooth transitions
 
-export const drawCombinedVisualizations = (analyser, dataArray, bufferLength) => {
-    // Clear the canvas
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Calculate amplitude for dynamic background
-    const amplitude = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
-
-    // Draw the background
-    drawGradientBackground(amplitude);
-
-    // Draw the waveform
-    drawWaveform(analyser, dataArray, bufferLength);
-
-    // Draw the particle system
-    drawParticleSystem(analyser, dataArray, bufferLength);
-};
-
-
-export const setVisualizationMode = (mode) => {
-    visualizationMode = mode;
-};
-
-export const stopVisualization = () => {
-    if (animationFrameId !== undefined) {
-        cancelAnimationFrame(animationFrameId); // Cancel the animation loop
-        animationFrameId = undefined; // Reset
-    }
-};
-
-export const visualize = () => {
+/**
+ * Handles visualization rendering.
+ * @param {string} colorMode - The selected color mode (static, frequency, amplitude, rainbow).
+ * @param {string} primaryColor - The selected base color.
+ */
+export const visualize = (colorMode, primaryColor) => {
     const analyser = getAnalyser();
     const dataArray = getDataArray();
     const bufferLength = getBufferLength();
@@ -59,58 +36,121 @@ export const visualize = () => {
         return;
     }
 
+    analyser.getByteFrequencyData(dataArray);
+
+    // 🎨 Determine Color Based on Selected Mode
+    if (colorMode === "static") {
+        primaryColor = primaryColor; // Use user-selected color
+    } else if (colorMode === "frequency") {
+        const avgFrequency = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
+        lastHue = lastHue + ((avgFrequency / 255) * 360 - lastHue) * 0.05; // Smooth transition
+        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+    } else if (colorMode === "amplitude") {
+        const avgAmplitude = dataArray.reduce((sum, val) => sum + Math.abs(val - 128), 0) / bufferLength;
+        lastHue = lastHue + ((avgAmplitude / 128) * 360 - lastHue) * 0.05;
+        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+    } else if (colorMode === "rainbow") {
+        lastHue = (performance.now() / 50) % 360; // Smooth cycling
+        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+    }
+
+    // Clear canvas
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // 🎨 Apply visualization based on mode
     switch (visualizationMode) {
         case 'frequency':
-            drawFrequencyBars(analyser, dataArray, bufferLength);
+            drawFrequencyBars(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'waveform':
-            drawWaveform(analyser, dataArray, bufferLength);
+            drawWaveform(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'radial':
-            drawRadialBurst(analyser, dataArray, bufferLength);
+            drawRadialBurst(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'spiral':
-            drawSpiral(analyser, dataArray, bufferLength);
+            drawSpiral(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'particle':
-            drawParticleSystem(analyser, dataArray, bufferLength);
-            break;
-        case 'combined':
-            drawCombinedVisualizations(analyser, dataArray, bufferLength);
+            drawParticleSystem(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'expanding':
-            drawExpandingLineWave(analyser, dataArray, bufferLength);
+            drawExpandingLineWave(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'rotating':
-            drawRotatingLineGrid(analyser, dataArray, bufferLength);
+            drawRotatingLineGrid(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'web':
-            drawDynamicLineWeb(analyser, dataArray, bufferLength);
+            drawDynamicLineWeb(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'spiral-2':
-            drawFrequencyBarSpiral(analyser, dataArray, bufferLength);
+            drawFrequencyBarSpiral(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'kaleidoscope':
-            drawKaleidoscope(analyser, dataArray, bufferLength);
+            drawKaleidoscope(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'neon-ring':
-            drawNeonRings(analyser, dataArray, bufferLength);
+            drawNeonRings(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'tunel':
-            drawInfiniteTunnel(analyser, dataArray, bufferLength);
+            drawInfiniteTunnel(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'vortex':
-            drawSpiralVortex(analyser, dataArray, bufferLength);
+            drawSpiralVortex(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'pulsating-stars':
-            drawPulsatingStars(analyser, dataArray, bufferLength);
+            drawPulsatingStars(analyser, dataArray, bufferLength, primaryColor);
             break;
         case 'symmetric-burst':
-            drawSymmetricBurst(analyser, dataArray, bufferLength);
+            drawSymmetricBurst(analyser, dataArray, bufferLength, primaryColor);
             break;
-        }
+        case 'combined':
+            drawCombinedVisualizations(analyser, dataArray, bufferLength, primaryColor);
+            break;
+    }
 
-    animationFrameId = requestAnimationFrame(visualize);
+    // 🔄 Keep looping with updated color mode
+    animationFrameId = requestAnimationFrame(() => visualize(colorMode, primaryColor));
+};
+
+/**
+ * Draws a combined visualization of multiple effects.
+ * @param {object} analyser - The audio analyser.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The buffer length.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawCombinedVisualizations = (analyser, dataArray, bufferLength, primaryColor) => {
+    // Clear the canvas
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 🎨 Calculate amplitude for dynamic background
+    const amplitude = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
+
+    // 🎨 Draw the background with smooth color transition
+    drawGradientBackground(amplitude, primaryColor);
+
+    // 🎵 Draw the waveform using dynamic colors
+    drawWaveform(analyser, dataArray, bufferLength, primaryColor);
+
+    // 🌟 Draw the particle system with matching colors
+    drawParticleSystem(analyser, dataArray, bufferLength, primaryColor);
+};
+
+/**
+ * Sets the visualization mode.
+ * @param {string} mode - The selected visualization mode.
+ */
+export const setVisualizationMode = (mode) => {
+    visualizationMode = mode;
+};
+
+/**
+ * Stops the visualization loop.
+ */
+export const stopVisualization = () => {
+    if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId); // Cancel the animation loop
+        animationFrameId = undefined; // Reset
+    }
 };

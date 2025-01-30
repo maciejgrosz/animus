@@ -57,6 +57,20 @@
         <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1" class="w-full">
         <span id="sensitivity-value" class="block text-center mt-2">1.00</span>
     </div>
+    <div>
+        <label for="color-mode" class="block text-sm">Color Mode:</label>
+        <select id="color-mode" class="w-full py-2 px-3 bg-gray-700 text-white rounded-lg">
+            <option value="static">Static Color</option>
+            <option value="frequency">Frequency-Based</option>
+            <option value="amplitude">Amplitude-Based</option>
+            <option value="rainbow">Rainbow Cycle</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="color-picker" class="block text-sm">Primary Color:</label>
+        <input type="color" id="color-picker" value="#ff0000" class="w-full">
+    </div>
 
     <a href="/" class="block w-full py-2 px-4 text-center bg-red-500 rounded-lg hover:bg-red-600 transition">Back to Home</a>
 </div>
