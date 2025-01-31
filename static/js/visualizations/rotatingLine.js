@@ -1,6 +1,13 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawRotatingLineGrid = (analyser, dataArray, bufferLength) => {
+/**
+ * Draws a rotating grid of lines that reacts to the audio frequency.
+ * @param {object} analyser - The Web Audio API analyser node.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The length of the frequency buffer.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawRotatingLineGrid = (analyser, dataArray, bufferLength, primaryColor) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
 
@@ -21,7 +28,7 @@ export const drawRotatingLineGrid = (analyser, dataArray, bufferLength) => {
         canvasCtx.beginPath();
         canvasCtx.moveTo(xStart, yStart);
         canvasCtx.lineTo(xEnd, yEnd);
-        canvasCtx.strokeStyle = `hsl(${i * 10}, 100%, 50%)`;
+        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
         canvasCtx.lineWidth = 1.5;
         canvasCtx.stroke();
     }

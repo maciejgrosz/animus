@@ -29,8 +29,16 @@ class Particle {
 
 const particles = [];
 
-export const drawParticleSystem = (analyser, dataArray, bufferLength) => {
+/**
+ * Draws a particle system that reacts to the audio frequency.
+ * @param {object} analyser - The Web Audio API analyser node.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The length of the frequency buffer.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawParticleSystem = (analyser, dataArray, bufferLength, primaryColor) => {
     analyser.getByteFrequencyData(dataArray);
+    const sensitivity = getSensitivity();
 
     // Enable additive blending for particles
     canvasCtx.globalCompositeOperation = 'lighter';
@@ -38,10 +46,10 @@ export const drawParticleSystem = (analyser, dataArray, bufferLength) => {
     // Create new particles
     for (let i = 0; i < dataArray.length; i += 5) {
         const intensity = (dataArray[i] / 255); // Normalize intensity
-        const size = intensity * 10; // Particle size based on intensity
+        const size = intensity * 10 * sensitivity; // Particle size based on intensity
         const speedX = (Math.random() - 0.5) * 4; // Random horizontal movement
         const speedY = (Math.random() - 0.5) * 4; // Random vertical movement
-        const color = `hsl(${Math.random() * 360}, 100%, 50%)`; // Random color
+        const color = primaryColor; // 🌈 Use color mode from visualize.js
 
         particles.push(
             new Particle(canvas.width / 4, canvas.height / 4, size, color, speedX, speedY)
@@ -62,5 +70,3 @@ export const drawParticleSystem = (analyser, dataArray, bufferLength) => {
     // Reset to default blending
     canvasCtx.globalCompositeOperation = 'source-over';
 };
-
-

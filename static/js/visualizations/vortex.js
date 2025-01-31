@@ -1,8 +1,13 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-let lastHue = 0; // 🔴 Store previous hue for smooth transitions
-
-export const drawSpiralVortex = (analyser, dataArray, bufferLength) => {
+/**
+ * Draws a spiral vortex that reacts to the audio frequency.
+ * @param {object} analyser - The Web Audio API analyser node.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The length of the frequency buffer.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawSpiralVortex = (analyser, dataArray, bufferLength, primaryColor) => {
     analyser.getByteFrequencyData(dataArray);
 
     const centerX = canvas.width / 4;
@@ -11,14 +16,6 @@ export const drawSpiralVortex = (analyser, dataArray, bufferLength) => {
     const sensitivity = getSensitivity();
 
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 🎨 Calculate Dynamic Color Based on Sound Intensity
-    const avgFrequency = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-    const targetHue = (avgFrequency / 255) * 360; // Map frequency to color wheel
-
-    // 🔄 Smoothly transition color using interpolation
-    lastHue = lastHue + (targetHue - lastHue) * 0.05; // Adjust transition speed (0.05 = slow, 0.2 = fast)
-    const primaryColor = `hsl(${lastHue}, 100%, 50%)`; // Convert to HSL color
 
     dataArray.forEach((value, index) => {
         const radius = (value / 255) * maxRadius * sensitivity;
@@ -29,7 +26,7 @@ export const drawSpiralVortex = (analyser, dataArray, bufferLength) => {
 
         canvasCtx.beginPath();
         canvasCtx.arc(x, y, 5, 0, Math.PI * 2);
-        canvasCtx.fillStyle = primaryColor; // 🌈 Apply Smooth Color Transition
+        canvasCtx.fillStyle = primaryColor; // 🌈 Use color mode from visualize.js
         canvasCtx.fill();
     });
 };

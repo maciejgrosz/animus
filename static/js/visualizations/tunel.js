@@ -1,6 +1,13 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawInfiniteTunnel = (analyser, dataArray, bufferLength) => {
+/**
+ * Draws an infinite tunnel effect that reacts to the audio frequency.
+ * @param {object} analyser - The Web Audio API analyser node.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The length of the frequency buffer.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawInfiniteTunnel = (analyser, dataArray, bufferLength, primaryColor) => {
     analyser.getByteFrequencyData(dataArray);
 
     const centerX = canvas.width / 4;
@@ -14,8 +21,12 @@ export const drawInfiniteTunnel = (analyser, dataArray, bufferLength) => {
 
         canvasCtx.beginPath();
         canvasCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        canvasCtx.strokeStyle = `hsl(${radius * 10}, 100%, ${50 - alpha * 20}%)`; // Add color and fade
+        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
+        canvasCtx.globalAlpha = alpha; // Apply fading effect
         canvasCtx.lineWidth = 2;
         canvasCtx.stroke();
     }
+
+    // Reset globalAlpha after drawing to avoid affecting other visualizations
+    canvasCtx.globalAlpha = 1;
 };

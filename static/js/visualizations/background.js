@@ -1,8 +1,15 @@
 import { canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawGradientBackground = (amplitude) => {
+/**
+ * Draws a dynamic gradient background that reacts to sound amplitude.
+ * @param {number} amplitude - The average amplitude of the audio.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawGradientBackground = (amplitude, primaryColor) => {
     const gradient = canvasCtx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, `hsl(${amplitude * 10}, 100%, 50%)`);
+
+    // 🌈 Use primaryColor instead of recalculating HSL
+    gradient.addColorStop(0, primaryColor);
     gradient.addColorStop(1, `hsl(${amplitude * 20}, 80%, 30%)`);
 
     canvasCtx.fillStyle = gradient;
@@ -11,6 +18,9 @@ export const drawGradientBackground = (amplitude) => {
 
 let noiseOffset = 0;
 
+/**
+ * Draws a subtle noise background effect.
+ */
 export const drawNoiseBackground = () => {
     const imageData = canvasCtx.createImageData(canvas.width, canvas.height);
     const data = imageData.data;

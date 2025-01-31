@@ -1,6 +1,13 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength) => {
+/**
+ * Draws a frequency-based spiral of bars that react to audio input.
+ * @param {object} analyser - The Web Audio API analyser node.
+ * @param {Uint8Array} dataArray - The frequency data array.
+ * @param {number} bufferLength - The length of the frequency buffer.
+ * @param {string} primaryColor - The selected color for visualization.
+ */
+export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primaryColor) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
 
@@ -20,7 +27,7 @@ export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength) => {
         canvasCtx.beginPath();
         canvasCtx.moveTo(x, y);
         canvasCtx.lineTo(x, y - barHeight);
-        canvasCtx.strokeStyle = `hsl(${index * 10}, 100%, 60%)`;
+        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
         canvasCtx.lineWidth = barWidth;
         canvasCtx.stroke();
     });

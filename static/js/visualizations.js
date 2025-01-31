@@ -38,20 +38,20 @@ export const visualize = (colorMode, primaryColor) => {
 
     analyser.getByteFrequencyData(dataArray);
 
-    // 🎨 Determine Color Based on Selected Mode
-    if (colorMode === "static") {
-        primaryColor = primaryColor; // Use user-selected color
-    } else if (colorMode === "frequency") {
+    // 🎨 Compute the correct primary color
+    let computedColor = primaryColor; // Default: Use static color
+
+    if (colorMode === "frequency") {
         const avgFrequency = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-        lastHue = lastHue + ((avgFrequency / 255) * 360 - lastHue) * 0.05; // Smooth transition
-        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+        lastHue += ((avgFrequency / 255) * 360 - lastHue) * 0.05; // Smooth transition
+        computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
     } else if (colorMode === "amplitude") {
         const avgAmplitude = dataArray.reduce((sum, val) => sum + Math.abs(val - 128), 0) / bufferLength;
-        lastHue = lastHue + ((avgAmplitude / 128) * 360 - lastHue) * 0.05;
-        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+        lastHue += ((avgAmplitude / 128) * 360 - lastHue) * 0.05;
+        computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
     } else if (colorMode === "rainbow") {
         lastHue = (performance.now() / 50) % 360; // Smooth cycling
-        primaryColor = `hsl(${lastHue}, 100%, 50%)`;
+        computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
     }
 
     // Clear canvas
@@ -60,52 +60,52 @@ export const visualize = (colorMode, primaryColor) => {
     // 🎨 Apply visualization based on mode
     switch (visualizationMode) {
         case 'frequency':
-            drawFrequencyBars(analyser, dataArray, bufferLength, primaryColor);
+            drawFrequencyBars(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'waveform':
-            drawWaveform(analyser, dataArray, bufferLength, primaryColor);
+            drawWaveform(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'radial':
-            drawRadialBurst(analyser, dataArray, bufferLength, primaryColor);
+            drawRadialBurst(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'spiral':
-            drawSpiral(analyser, dataArray, bufferLength, primaryColor);
+            drawSpiral(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'particle':
-            drawParticleSystem(analyser, dataArray, bufferLength, primaryColor);
+            drawParticleSystem(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'expanding':
-            drawExpandingLineWave(analyser, dataArray, bufferLength, primaryColor);
+            drawExpandingLineWave(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'rotating':
-            drawRotatingLineGrid(analyser, dataArray, bufferLength, primaryColor);
+            drawRotatingLineGrid(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'web':
-            drawDynamicLineWeb(analyser, dataArray, bufferLength, primaryColor);
+            drawDynamicLineWeb(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'spiral-2':
-            drawFrequencyBarSpiral(analyser, dataArray, bufferLength, primaryColor);
+            drawFrequencyBarSpiral(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'kaleidoscope':
-            drawKaleidoscope(analyser, dataArray, bufferLength, primaryColor);
+            drawKaleidoscope(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'neon-ring':
-            drawNeonRings(analyser, dataArray, bufferLength, primaryColor);
+            drawNeonRings(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'tunel':
-            drawInfiniteTunnel(analyser, dataArray, bufferLength, primaryColor);
+            drawInfiniteTunnel(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'vortex':
-            drawSpiralVortex(analyser, dataArray, bufferLength, primaryColor);
+            drawSpiralVortex(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'pulsating-stars':
-            drawPulsatingStars(analyser, dataArray, bufferLength, primaryColor);
+            drawPulsatingStars(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'symmetric-burst':
-            drawSymmetricBurst(analyser, dataArray, bufferLength, primaryColor);
+            drawSymmetricBurst(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'combined':
-            drawCombinedVisualizations(analyser, dataArray, bufferLength, primaryColor);
+            drawCombinedVisualizations(analyser, dataArray, bufferLength, computedColor);
             break;
     }
 
