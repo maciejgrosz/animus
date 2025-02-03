@@ -30,12 +30,21 @@ export class Visualizer {
         this.analyser = analyser;
 
         // Default configuration.
-        this.primaryColor = "#ff0000"; // color from the color picker
+        this.primaryColor = "#ff0000"; // from the color picker
         this.sensitivity = getSensitivity(); // initial sensitivity
         this.currentMode = "dynamicLineWeb"; // default animation mode
         this.colorMode = "default"; // default color mode (static)
 
-        // Initialize lastHue for dynamic color modes.
+        // Advanced beat-detection parameters:
+        // Use descriptive property names to avoid confusion.
+        this.beatThresholdFactor = 1.5; // From advanced setting "Beat Threshold Factor"
+        this.beatHistorySize = 43;      // From advanced setting "Beat History Size"
+        this.minBeatInterval = 300;     // From advanced setting "Min Beat Interval (ms)"
+
+        // For beat detection mode transitions.
+        this.lastBeatTime = 0; // last time a beat triggered a mode change (ms)
+
+        // We'll use lastHue for dynamic color modes.
         this.lastHue = 0;
 
         // Prepare audio data storage.
@@ -62,6 +71,15 @@ export class Visualizer {
             "symmetric-burst": drawSymmetricBurst,
         };
 
+        // Per-mode sensitivity storage.
+        this.modeSensitivity = {};
+        Object.keys(this.modes).forEach(mode => {
+            this.modeSensitivity[mode] = this.sensitivity;
+        });
+
+        // Callback for mode changes.
+        this.onModeChange = null;
+
         // Variable to store the requestAnimationFrame ID.
         this.animationFrameId = null;
     }
@@ -85,25 +103,49 @@ export class Visualizer {
         // Clear the canvas.
         this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // (Optional) Integrate beat detection here.
-        // const beat = detectBeat(this.analyser);
-        // if (beat) { /* trigger effects or switch mode */ }
+        // Create an options object for beat detection.
+        const beatOptions = {
+            thresholdFactor: this.beatThresholdFactor,
+            historySize: this.beatHistorySize,
+            minInterval: this.minBeatInterval
+        };
+
+        // Call detectBeat with these options.
+        const beatDetected = detectBeat(this.analyser, this.dataArray, beatOptions);
+        const now = performance.now();
+        // Only transition if enough time has passed since the last transition.
+        if (beatDetected && now - this.lastBeatTime > this.minBeatInterval) {
+            this.lastBeatTime = now;
+            this.transitionMode();
+        }
 
         // Compute the effective color(s) based on the current color mode.
         const { computedColor, colorPalette } = this.computeVisualizationColor();
 
-        // Get the drawing function based on the animation mode.
+        // Look up the sensitivity for the current mode.
+        const currentSensitivity = this.modeSensitivity[this.currentMode] || this.sensitivity;
+
+        // Get the drawing function based on the current animation mode.
         const drawMethod = this.modes[this.currentMode];
         if (drawMethod) {
-            // Pass the computed color (and color palette) along with other parameters.
-            // (Adjust your drawing function signatures as needed.)
-            drawMethod(this.analyser, this.dataArray, this.bufferLength, computedColor, this.sensitivity, colorPalette);
+            drawMethod(this.analyser, this.dataArray, this.bufferLength, computedColor, currentSensitivity, colorPalette);
         } else {
             console.warn(`No drawing method found for animation mode: ${this.currentMode}`);
         }
 
         // Schedule the next frame.
         this.animationFrameId = requestAnimationFrame(() => this.animate());
+    }
+
+    // Transition to the next animation mode.
+    transitionMode() {
+        const modeKeys = Object.keys(this.modes);
+        const currentIndex = modeKeys.indexOf(this.currentMode);
+        const nextIndex = (currentIndex + 1) % modeKeys.length;
+        this.currentMode = modeKeys[nextIndex];
+        if (this.onModeChange) {
+            this.onModeChange(this.currentMode);
+        }
     }
 
     // Public setter: update the animation mode.
@@ -120,9 +162,9 @@ export class Visualizer {
         this.primaryColor = newColor;
     }
 
-    // Public setter: update the sensitivity.
+    // Public setter: update the sensitivity for the current mode.
     setSensitivity(newSensitivity) {
-        this.sensitivity = newSensitivity;
+        this.modeSensitivity[this.currentMode] = newSensitivity;
     }
 
     // Public setter: update the color mode.
@@ -130,17 +172,25 @@ export class Visualizer {
         this.colorMode = newColorMode;
     }
 
+    // Advanced setters for beat detection parameters.
+    setBeatThreshold(newThresholdFactor) {
+        this.beatThresholdFactor = newThresholdFactor;
+    }
+
+    setBeatHistorySize(newSize) {
+        this.beatHistorySize = newSize;
+    }
+
+    setMinBeatInterval(newInterval) {
+        this.minBeatInterval = newInterval;
+    }
+
     /**
      * Compute the effective visualization color and palette based on the current color mode.
-     * For modes "frequency", "amplitude", and "rainbow", use audio data.
-     * For "kaleidoscope", compute a palette.
-     * For any other mode (including "default"), return the primaryColor.
      */
     computeVisualizationColor() {
-        let computedColor = this.primaryColor; // default to the color picker value
-        let colorPalette;
+        let computedColor = this.primaryColor; // default from the color picker
 
-        // For modes that respond to audio.
         if (this.colorMode === "frequency") {
             const avgFrequency = this.dataArray.reduce((sum, val) => sum + val, 0) / this.bufferLength;
             this.lastHue += (((avgFrequency / 255) * 360) - this.lastHue) * 0.05;
@@ -154,7 +204,7 @@ export class Visualizer {
             computedColor = `hsl(${Math.round(this.lastHue)}, 100%, 50%)`;
         }
 
-        // Handle kaleidoscope mode separately.
+        let colorPalette;
         if (this.colorMode === "kaleidoscope") {
             colorPalette = [];
             const baseHue = (performance.now() / 20) % 360;
@@ -163,10 +213,8 @@ export class Visualizer {
                 const hueShift = (baseHue + i * (360 / numReflections)) % 360;
                 colorPalette.push(`hsl(${Math.round(hueShift)}, 100%, 70%)`);
             }
-            // For kaleidoscope mode, you might want the computedColor to be one of the palette colors.
             computedColor = colorPalette[0];
         } else {
-            // For all other color modes, use a single-color palette.
             colorPalette = [computedColor];
         }
 
@@ -176,7 +224,10 @@ export class Visualizer {
     // (Optional) Update multiple settings at once.
     updateSettings(newSettings) {
         if (newSettings.primaryColor) this.primaryColor = newSettings.primaryColor;
-        if (newSettings.sensitivity) this.sensitivity = newSettings.sensitivity;
+        if (newSettings.sensitivity) this.setSensitivity(newSettings.sensitivity);
         if (newSettings.colorMode) this.setColorMode(newSettings.colorMode);
+        if (newSettings.beatThresholdFactor) this.setBeatThreshold(newSettings.beatThresholdFactor);
+        if (newSettings.beatHistorySize) this.setBeatHistorySize(newSettings.beatHistorySize);
+        if (newSettings.minBeatInterval) this.setMinBeatInterval(newSettings.minBeatInterval);
     }
 }

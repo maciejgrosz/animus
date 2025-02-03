@@ -48,7 +48,6 @@
         <option value="radial">Radial Burst</option>
         <option value="spiral">Spiral</option>
         <option value="particle">Particle System</option>
-        <option value="combined">Combined</option>
         <option value="expanding">Expanding</option>
         <option value="rotating">Rotating</option>
         <option value="web">Web</option>
@@ -122,7 +121,7 @@
         <!-- Beat Detection Advanced Options -->
         <div class="mb-4">
             <label for="beat-threshold-factor" class="block text-sm">Beat Threshold Factor:</label>
-            <input type="range" id="beat-threshold-factor" min="1" max="3" step="0.1" value="1.5" class="w-full">
+            <input type="range" id="beat-threshold-factor" min="1" max="10" step="0.1" value="1.5" class="w-full">
             <span id="beat-threshold-factor-value" class="block text-center mt-2">1.5</span>
         </div>
         <div class="mb-4">
@@ -132,7 +131,7 @@
         </div>
         <div class="mb-4">
             <label for="min-beat-interval" class="block text-sm">Min Beat Interval (ms):</label>
-            <input type="range" id="min-beat-interval" min="100" max="1000" step="50" value="300" class="w-full">
+            <input type="range" id="min-beat-interval" min="100" max="10000" step="50" value="300" class="w-full">
             <span id="min-beat-interval-value" class="block text-center mt-2">300</span>
         </div>
         <!-- Additional advanced options can be added here -->

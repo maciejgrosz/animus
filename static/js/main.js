@@ -14,17 +14,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const colorPicker = document.getElementById('color-picker');
     const colorModeSelector = document.getElementById('color-mode');
 
+    // Advanced settings elements
+    const beatThresholdInput = document.getElementById('beat-threshold-factor');
+    const beatThresholdDisplay = document.getElementById('beat-threshold-factor-value');
+    const beatHistoryInput = document.getElementById('beat-history-size');
+    const beatHistoryDisplay = document.getElementById('beat-history-size-value');
+    const minBeatIntervalInput = document.getElementById('min-beat-interval');
+    const minBeatIntervalDisplay = document.getElementById('min-beat-interval-value');
+
     let audioContext;
     let isVisualizing = false; // Track visualization state
     let primaryColor = colorPicker.value;
-    let colorMode = colorModeSelector.value;
     let visualizer;
 
     // Update color mode when user selects a new option.
     colorModeSelector.addEventListener('change', (event) => {
-        const colorMode = event.target.value;
+        const newColorMode = event.target.value;
         if (visualizer) {
-            visualizer.setColorMode(colorMode);
+            visualizer.setColorMode(newColorMode);
         }
     });
 
@@ -36,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Get available visualization modes (for keyboard controls, etc.)
+    // Get available visualization modes.
     const modes = Array.from(modeSelector.options).map(option => option.value);
 
     // Record button: start visualization.
@@ -59,8 +66,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initialize the Visualizer.
             visualizer = new Visualizer(analyser);
             visualizer.setPrimaryColor(primaryColor);
+            // Set the initial sensitivity for the default mode.
             visualizer.setSensitivity(parseFloat(sensitivitySlider.value));
-            visualizer.setMode(modeSelector.value); // Use the current mode selector value
+            // Set the initial animation mode.
+            visualizer.setMode(modeSelector.value);
+
+            // Set initial advanced settings based on slider defaults.
+            visualizer.setBeatThreshold(parseFloat(beatThresholdInput.value));
+            visualizer.setBeatHistorySize(parseInt(beatHistoryInput.value, 10));
+            visualizer.setMinBeatInterval(parseInt(minBeatIntervalInput.value, 10));
+
+            // Register a callback to update the UI when the mode changes.
+            visualizer.onModeChange = (newMode) => {
+                // Update the mode selector to reflect the new mode.
+                modeSelector.value = newMode;
+                // Update the sensitivity slider using the per-mode saved setting.
+                const modeSensitivity = visualizer.modeSensitivity[newMode] || sensitivitySlider.value;
+                sensitivitySlider.value = modeSensitivity;
+                updateSensitivity(modeSensitivity, sensitivityValue);
+            };
 
             visualizer.start();
             isVisualizing = true;
@@ -88,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stopBtn.disabled = true;
     }
 
-    // Toggle visualization (e.g., triggered via keyboard).
+    // Toggle visualization.
     function toggleVisualization() {
         if (isVisualizing) {
             stopVisualizationHandler();
@@ -106,17 +130,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Update visualization mode from the mode selector.
+    // Update visualization mode from the mode selector and synchronize sensitivity.
     modeSelector.addEventListener('change', (event) => {
+        const newMode = event.target.value;
         if (visualizer) {
-            visualizer.setMode(event.target.value);
+            visualizer.setMode(newMode);
+            const modeSensitivity = visualizer.modeSensitivity[newMode] || sensitivitySlider.value;
+            sensitivitySlider.value = modeSensitivity;
+            updateSensitivity(modeSensitivity, sensitivityValue);
         }
     });
 
+    // Advanced settings: Update beat detection parameters.
+    beatThresholdInput.addEventListener('input', (event) => {
+        const newThreshold = parseFloat(event.target.value);
+        beatThresholdDisplay.textContent = newThreshold;
+        if (visualizer) {
+            visualizer.setBeatThreshold(newThreshold);
+        }
+    });
+
+    beatHistoryInput.addEventListener('input', (event) => {
+        const newHistorySize = parseInt(event.target.value, 10);
+        beatHistoryDisplay.textContent = newHistorySize;
+        if (visualizer) {
+            visualizer.setBeatHistorySize(newHistorySize);
+        }
+    });
+
+    minBeatIntervalInput.addEventListener('input', (event) => {
+        const newMinInterval = parseInt(event.target.value, 10);
+        minBeatIntervalDisplay.textContent = newMinInterval;
+        if (visualizer) {
+            visualizer.setMinBeatInterval(newMinInterval);
+        }
+    });
     // Setup keyboard controls for additional interactivity.
     setupKeyboardControls({
         modes,
-        setVisualizationMode: (mode) => { if (visualizer) visualizer.setMode(mode); },
+        setVisualizationMode: (mode) => {
+            if (visualizer) {
+                visualizer.setMode(mode);
+                modeSelector.value = mode;
+                const modeSensitivity = visualizer.modeSensitivity[mode] || sensitivitySlider.value;
+                sensitivitySlider.value = modeSensitivity;
+                updateSensitivity(modeSensitivity, sensitivityValue);
+            }
+        },
         toggleVisualization,
         modeSelector,
     });
