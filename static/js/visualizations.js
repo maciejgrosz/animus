@@ -16,48 +16,92 @@ import { drawInfiniteTunnel } from "./visualizations/tunel.js";
 import { drawSpiralVortex } from "./visualizations/vortex.js";
 import { drawPulsatingStars } from "./visualizations/pulsatingStars.js";
 import { drawSymmetricBurst } from "./visualizations/symmetricBurst.js";
+import { detectBeat } from './beatDetection.js';
 
 let visualizationMode = 'frequency'; // Default visualization
 let animationFrameId;
 let lastHue = 0; // Store previous hue for smooth transitions
+let colorPalette = []; // 🔹 Ensure it resets properly each frame
 
 /**
  * Handles visualization rendering.
- * @param {string} colorMode - The selected color mode (static, frequency, amplitude, rainbow).
+ * @param {string} colorMode - The selected color mode (static, frequency, amplitude, rainbow, kaleidoscope).
  * @param {string} primaryColor - The selected base color.
  */
-export const visualize = (colorMode, primaryColor) => {
-    const analyser = getAnalyser();
-    const dataArray = getDataArray();
-    const bufferLength = getBufferLength();
 
-    if (!analyser || !dataArray || !bufferLength) {
-        console.error('Analyser or data array is not set up');
-        return;
-    }
 
-    analyser.getByteFrequencyData(dataArray);
+// Define an array of visualization modes to cycle through.
+const animationModes = [
+    "frequency",
+    "waveform",
+    "radial",
+    "spiral",
+    "particle",
+    "expanding",
+    "rotating",
+    "web",
+    "spiral-2",
+    "kaleidoscope",
+    "neon-ring",
+    "tunel",
+    "vortex",
+    "pulsating-stars",
+    "symmetric-burst",
+    "combined"
+];
 
-    // 🎨 Compute the correct primary color
-    let computedColor = primaryColor; // Default: Use static color
+// Global variables to track the current mode and beat-based transition.
+let currentAnimationIndex = 0;          // Index in the animationModes array.
+let beatCounter = 0;                    // Count beats until a transition is triggered.
+const BEAT_THRESHOLD = 10;              // Change animation every 10 beats.
 
-    if (colorMode === "frequency") {
+function computeVisualizationColor(currentColorMode, getPrimaryColor, dataArray, bufferLength) {
+    let computedColor = getPrimaryColor();
+
+    if (currentColorMode === "frequency") {
         const avgFrequency = dataArray.reduce((sum, val) => sum + val, 0) / bufferLength;
-        lastHue += ((avgFrequency / 255) * 360 - lastHue) * 0.05; // Smooth transition
+        lastHue += ((avgFrequency / 255) * 360 - lastHue) * 0.05;
         computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
-    } else if (colorMode === "amplitude") {
+    } else if (currentColorMode === "amplitude") {
         const avgAmplitude = dataArray.reduce((sum, val) => sum + Math.abs(val - 128), 0) / bufferLength;
         lastHue += ((avgAmplitude / 128) * 360 - lastHue) * 0.05;
         computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
-    } else if (colorMode === "rainbow") {
-        lastHue = (performance.now() / 50) % 360; // Smooth cycling
+    } else if (currentColorMode === "rainbow") {
+        lastHue = (performance.now() / 50) % 360;
         computedColor = `hsl(${Math.round(lastHue)}, 100%, 50%)`;
     }
 
-    // Clear canvas
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+    // Handle kaleidoscope mode separately.
+    if (currentColorMode === "kaleidoscope") {
+        colorPalette = [];
+        const baseHue = (performance.now() / 20) % 360;
+        const numReflections = 6;
+        for (let i = 0; i < numReflections; i++) {
+            const hueShift = (baseHue + i * (360 / numReflections)) % 360;
+            colorPalette.push(`hsl(${Math.round(hueShift)}, 100%, 70%)`);
+        }
+    } else {
+        colorPalette = [computedColor];
+    }
 
-    // 🎨 Apply visualization based on mode
+    return { computedColor, colorPalette };
+}
+
+// Updates the visualization mode based on beat detection.
+function updateVisualizationMode(analyser) {
+    const beat = detectBeat(analyser);
+    if (beat) {
+        beatCounter++;
+        if (beatCounter >= BEAT_THRESHOLD) {
+            currentAnimationIndex = (currentAnimationIndex + 1) % animationModes.length;
+            visualizationMode = animationModes[currentAnimationIndex];
+            beatCounter = 0;
+        }
+    }
+}
+
+// Renders the visualization based on the current mode.
+function renderVisualization(visualizationMode, analyser, dataArray, bufferLength, computedColor, colorPalette) {
     switch (visualizationMode) {
         case 'frequency':
             drawFrequencyBars(analyser, dataArray, bufferLength, computedColor);
@@ -87,7 +131,7 @@ export const visualize = (colorMode, primaryColor) => {
             drawFrequencyBarSpiral(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'kaleidoscope':
-            drawKaleidoscope(analyser, dataArray, bufferLength, computedColor);
+            drawKaleidoscope(analyser, dataArray, bufferLength, colorPalette);
             break;
         case 'neon-ring':
             drawNeonRings(analyser, dataArray, bufferLength, computedColor);
@@ -105,12 +149,45 @@ export const visualize = (colorMode, primaryColor) => {
             drawSymmetricBurst(analyser, dataArray, bufferLength, computedColor);
             break;
         case 'combined':
-            drawCombinedVisualizations(analyser, dataArray, bufferLength, computedColor);
+            drawCombinedVisualizations(analyser, dataArray, bufferLength, colorPalette);
             break;
+        default:
+            console.warn("Unknown visualization mode:", visualizationMode);
+    }
+}
+
+// --- Main Visualization Function ---
+export const visualize = (getColorMode, getPrimaryColor) => {
+    // Retrieve current settings.
+    const currentColorMode = getColorMode();
+    const analyser = getAnalyser();
+    const dataArray = getDataArray();
+    const bufferLength = getBufferLength();
+
+    if (!analyser || !dataArray || !bufferLength) {
+        console.error('Analyser or data array is not set up');
+        return;
     }
 
-    // 🔄 Keep looping with updated color mode
-    animationFrameId = requestAnimationFrame(() => visualize(colorMode, primaryColor));
+    // Update audio data.
+    analyser.getByteFrequencyData(dataArray);
+
+    // Compute colors.
+    const { computedColor, colorPalette } = computeVisualizationColor(
+        currentColorMode, getPrimaryColor, dataArray, bufferLength
+    );
+
+    // Update mode based on beat detection.
+    updateVisualizationMode(analyser);
+
+    // Clear canvas.
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Render the current visualization.
+    renderVisualization(visualizationMode, analyser, dataArray, bufferLength, computedColor, colorPalette);
+
+    // Continue animation loop.
+    animationFrameId = requestAnimationFrame(() => visualize(getColorMode, getPrimaryColor));
 };
 
 /**
@@ -118,9 +195,9 @@ export const visualize = (colorMode, primaryColor) => {
  * @param {object} analyser - The audio analyser.
  * @param {Uint8Array} dataArray - The frequency data array.
  * @param {number} bufferLength - The buffer length.
- * @param {string} primaryColor - The selected color for visualization.
+ * @param {Array} colorPalette - The selected colors for visualization.
  */
-export const drawCombinedVisualizations = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawCombinedVisualizations = (analyser, dataArray, bufferLength, colorPalette) => {
     // Clear the canvas
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -128,13 +205,13 @@ export const drawCombinedVisualizations = (analyser, dataArray, bufferLength, pr
     const amplitude = dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length;
 
     // 🎨 Draw the background with smooth color transition
-    drawGradientBackground(amplitude, primaryColor);
+    drawGradientBackground(amplitude, colorPalette[0]);
 
     // 🎵 Draw the waveform using dynamic colors
-    drawWaveform(analyser, dataArray, bufferLength, primaryColor);
+    drawWaveform(analyser, dataArray, bufferLength, colorPalette[0]);
 
     // 🌟 Draw the particle system with matching colors
-    drawParticleSystem(analyser, dataArray, bufferLength, primaryColor);
+    drawParticleSystem(analyser, dataArray, bufferLength, colorPalette[0]);
 };
 
 /**

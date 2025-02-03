@@ -1,13 +1,6 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-/**
- * Draws a kaleidoscope effect that reacts to the audio frequency.
- * @param {object} analyser - The Web Audio API analyser node.
- * @param {Uint8Array} dataArray - The frequency data array.
- * @param {number} bufferLength - The length of the frequency buffer.
- * @param {string} primaryColor - The selected color for visualization.
- */
-export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawKaleidoscope = (analyser, dataArray, bufferLength, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
 
@@ -16,7 +9,8 @@ export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor
 
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const numShapes = 12;
+    const numShapes = 12; // Number of symmetry reflections
+
     dataArray.forEach((value, index) => {
         const radius = value * sensitivity;
         const angle = (index / bufferLength) * Math.PI * 2;
@@ -29,7 +23,13 @@ export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor
 
             canvasCtx.beginPath();
             canvasCtx.arc(x, y, 10, 0, Math.PI * 2);
-            canvasCtx.fillStyle = primaryColor; // 🌈 Use color mode from visualize.js
+
+            // ✅ Ensure `colorPalette` is valid and doesn't cause undefined colors
+            const colorToApply = colorPalette.length > 1
+                ? colorPalette[index % colorPalette.length]  // Use multiple colors in Kaleidoscope mode
+                : colorPalette[0]; // Fallback to single color for other modes
+
+            canvasCtx.fillStyle = colorToApply;
             canvasCtx.fill();
         }
     });

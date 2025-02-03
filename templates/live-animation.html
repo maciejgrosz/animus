@@ -20,7 +20,7 @@
     </script>
     <script src="../static/js/visualizations/web.js"></script>
 </head>
-<body class="bg-gray-900 text-white h-screen flex overflow-hidden">
+<body class="bg-cover bg-center text-white h-screen flex overflow-hidden" style="background-image: url('/static/img/colorful.jpg');">
 <div id="instruction-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Instructions</h2>
@@ -30,7 +30,7 @@
         <button id="close-popup" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Got it!</button>
     </div>
 </div>
-<div class="flex flex-col w-1/4 bg-gray-800 p-4 shadow-lg space-y-4">
+<div class="flex flex-col w-1/4 bg-gray-800/70 p-4 shadow-lg space-y-4 backdrop-blur-md">
     <button id="record-btn" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Start Recording</button>
     <button id="stop-btn" class="w-full py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition" disabled>Stop Recording</button>
 
@@ -61,10 +61,11 @@
     <div>
         <label for="color-mode" class="block text-sm">Color Mode:</label>
         <select id="color-mode" class="w-full py-2 px-3 bg-gray-700 text-white rounded-lg">
-            <option value="static">Static Color</option>
-            <option value="frequency">Frequency-Based</option>
-            <option value="amplitude">Amplitude-Based</option>
+            <option value="static">Static</option>
+            <option value="frequency">Frequency Reactive</option>
+            <option value="amplitude">Amplitude Reactive</option>
             <option value="rainbow">Rainbow Cycle</option>
+            <option value="kaleidoscope">Kaleidoscope Cycling</option> <!-- 🆕 New Mode -->
         </select>
     </div>
 
@@ -72,6 +73,37 @@
         <label for="color-picker" class="block text-sm">Primary Color:</label>
         <input type="color" id="color-picker" value="#ff0000" class="w-full">
     </div>
+    <div>
+        <label class="block text-sm mb-2">Background:</label>
+        <div class="flex space-x-4">
+            <!-- Colorful Background Preview -->
+            <div id="bg-colorful" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
+                 style="background-image: url('/static/img/colorful.jpg');"
+                 onclick="changeBackground('/static/img/colorful.jpg', 'bg-colorful')">
+            </div>
+            <!-- Dark Background Preview -->
+            <div id="bg-dark" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
+                 style="background-image: url('/static/img/dark_blue.jpg');"
+                 onclick="changeBackground('/static/img/dark_blue.jpg', 'bg-dark')">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeBackground(imagePath, selectedId) {
+            // Change the body background
+            document.body.style.backgroundImage = `url('${imagePath}')`;
+
+            // Remove border highlight from all preview divs
+            document.querySelectorAll('.border-white').forEach(el => {
+                el.classList.remove('border-white');
+            });
+
+            // Highlight the selected background
+            document.getElementById(selectedId).classList.add('border-white');
+        }
+    </script>
+
 
     <a href="/" class="block w-full py-2 px-4 text-center bg-red-500 rounded-lg hover:bg-red-600 transition">Back to Home</a>
 </div>

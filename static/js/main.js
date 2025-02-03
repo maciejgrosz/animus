@@ -34,7 +34,6 @@ const modes = Array.from(modeSelector.options).map(option => option.value);
 recordBtn.addEventListener('click', startVisualization);
 stopBtn.addEventListener('click', stopVisualizationHandler);
 
-// 🎵 Start visualization
 async function startVisualization() {
     if (isVisualizing) return;
 
@@ -42,7 +41,8 @@ async function startVisualization() {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         audioContext = setupAudioContext(stream);
 
-        visualize(colorMode, primaryColor); // ✅ Pass both color mode and color
+        // Pass getter functions for both colorMode and primaryColor.
+        visualize(() => colorMode, () => primaryColor);
         isVisualizing = true;
         statusDisplay.textContent = 'Visualizing...';
         recordBtn.disabled = true;
@@ -52,6 +52,7 @@ async function startVisualization() {
         statusDisplay.textContent = 'Microphone access denied.';
     }
 }
+
 
 // 🎵 Stop visualization
 function stopVisualizationHandler() {
@@ -98,3 +99,4 @@ setupKeyboardControls({
 // 📏 Adjust canvas size on window resize
 window.addEventListener('resize', adjustCanvasSize);
 adjustCanvasSize(); // Initial adjustment
+
