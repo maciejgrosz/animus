@@ -35,8 +35,7 @@ export class Visualizer {
         this.currentMode = "dynamicLineWeb"; // default animation mode
         this.colorMode = "default"; // default color mode (static)
 
-        // Advanced beat-detection parameters:
-        // Use descriptive property names to avoid confusion.
+        // Advanced beat-detection parameters.
         this.beatThresholdFactor = 1.5; // From advanced setting "Beat Threshold Factor"
         this.beatHistorySize = 43;      // From advanced setting "Beat History Size"
         this.minBeatInterval = 300;     // From advanced setting "Min Beat Interval (ms)"
@@ -71,7 +70,7 @@ export class Visualizer {
             "symmetric-burst": drawSymmetricBurst,
         };
 
-        // Per-mode sensitivity storage.
+        // Store per-mode sensitivity.
         this.modeSensitivity = {};
         Object.keys(this.modes).forEach(mode => {
             this.modeSensitivity[mode] = this.sensitivity;
@@ -79,6 +78,9 @@ export class Visualizer {
 
         // Callback for mode changes.
         this.onModeChange = null;
+
+        // New property to enable/disable beat-triggered transitions.
+        this.beatTransitionEnabled = true;
 
         // Variable to store the requestAnimationFrame ID.
         this.animationFrameId = null;
@@ -103,26 +105,24 @@ export class Visualizer {
         // Clear the canvas.
         this.canvasCtx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Create an options object for beat detection.
-        const beatOptions = {
-            thresholdFactor: this.beatThresholdFactor,
-            historySize: this.beatHistorySize,
-            minInterval: this.minBeatInterval
-        };
-
-        // Call detectBeat with these options.
-        const beatDetected = detectBeat(this.analyser, this.dataArray, beatOptions);
-        const now = performance.now();
-        // Only transition if enough time has passed since the last transition.
-        if (beatDetected && now - this.lastBeatTime > this.minBeatInterval) {
-            this.lastBeatTime = now;
-            this.transitionMode();
+        // Only perform beat detection if enabled.
+        if (this.beatTransitionEnabled) {
+            const beatOptions = {
+                thresholdFactor: this.beatThresholdFactor,
+                historySize: this.beatHistorySize,
+                minInterval: this.minBeatInterval
+            };
+            // Note: Ensure detectBeat() expects (analyser, this.dataArray, beatOptions)
+            const beatDetected = detectBeat(this.analyser, this.dataArray, beatOptions);
+            const now = performance.now();
+            if (beatDetected && now - this.lastBeatTime > this.minBeatInterval) {
+                this.lastBeatTime = now;
+                this.transitionMode();
+            }
         }
 
         // Compute the effective color(s) based on the current color mode.
         const { computedColor, colorPalette } = this.computeVisualizationColor();
-
-        // Look up the sensitivity for the current mode.
         const currentSensitivity = this.modeSensitivity[this.currentMode] || this.sensitivity;
 
         // Get the drawing function based on the current animation mode.
@@ -148,7 +148,7 @@ export class Visualizer {
         }
     }
 
-    // Public setter: update the animation mode.
+    // Public setters.
     setMode(newMode) {
         if (this.modes[newMode]) {
             this.currentMode = newMode;
@@ -156,40 +156,34 @@ export class Visualizer {
             console.warn(`Animation mode "${newMode}" not found.`);
         }
     }
-
-    // Public setter: update the primary color.
     setPrimaryColor(newColor) {
         this.primaryColor = newColor;
     }
-
-    // Public setter: update the sensitivity for the current mode.
     setSensitivity(newSensitivity) {
         this.modeSensitivity[this.currentMode] = newSensitivity;
     }
-
-    // Public setter: update the color mode.
     setColorMode(newColorMode) {
         this.colorMode = newColorMode;
     }
-
-    // Advanced setters for beat detection parameters.
     setBeatThreshold(newThresholdFactor) {
         this.beatThresholdFactor = newThresholdFactor;
     }
-
     setBeatHistorySize(newSize) {
         this.beatHistorySize = newSize;
     }
-
     setMinBeatInterval(newInterval) {
         this.minBeatInterval = newInterval;
+    }
+    // New setter: enable/disable beat transitions.
+    setBeatTransitionEnabled(enabled) {
+        this.beatTransitionEnabled = enabled;
     }
 
     /**
      * Compute the effective visualization color and palette based on the current color mode.
      */
     computeVisualizationColor() {
-        let computedColor = this.primaryColor; // default from the color picker
+        let computedColor = this.primaryColor;
 
         if (this.colorMode === "frequency") {
             const avgFrequency = this.dataArray.reduce((sum, val) => sum + val, 0) / this.bufferLength;
@@ -221,7 +215,7 @@ export class Visualizer {
         return { computedColor, colorPalette };
     }
 
-    // (Optional) Update multiple settings at once.
+    // Update multiple settings at once.
     updateSettings(newSettings) {
         if (newSettings.primaryColor) this.primaryColor = newSettings.primaryColor;
         if (newSettings.sensitivity) this.setSensitivity(newSettings.sensitivity);
