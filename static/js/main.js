@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioContext;
     let isVisualizing = false;
     let primaryColor = colorPicker.value;
+    // Store the Visualizer instance so we can reuse it.
     let visualizer;
 
     // Update color mode.
@@ -50,29 +51,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Record button: start visualization.
     recordBtn.addEventListener('click', startVisualization);
-    // Stop button: stop visualization.
-    stopBtn.addEventListener('click', stopVisualizationHandler);
+    // Stop button: pause visualization.
+    stopBtn.addEventListener('click', pauseVisualizationHandler);
 
     async function startVisualization() {
         if (isVisualizing) return;
+
+        // If we already have a visualizer, simply restart the animation.
+        if (visualizer) {
+            visualizer.start();
+            isVisualizing = true;
+            statusDisplay.textContent = 'Visualizing...';
+            recordBtn.disabled = true;
+            stopBtn.disabled = false;
+            return;
+        }
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Create audioContext only once.
             audioContext = setupAudioContext(stream);
             const analyser = audioContext.createAnalyser();
             const source = audioContext.createMediaStreamSource(stream);
             source.connect(analyser);
 
+            // Create a new Visualizer instance.
             visualizer = new Visualizer(analyser);
             visualizer.setPrimaryColor(primaryColor);
             visualizer.setSensitivity(parseFloat(sensitivitySlider.value));
             visualizer.setMode(modeSelector.value);
 
-            // Set advanced beat detection settings.
+            // Set advanced settings.
             visualizer.setBeatThreshold(parseFloat(beatThresholdInput.value));
             visualizer.setBeatHistorySize(parseInt(beatHistoryInput.value, 10));
             visualizer.setMinBeatInterval(parseInt(minBeatIntervalInput.value, 10));
 
-            // Register callback for mode changes.
+            // Register a callback to update UI when the mode changes.
             visualizer.onModeChange = (newMode) => {
                 modeSelector.value = newMode;
                 const modeSensitivity = visualizer.modeSensitivity[newMode] || sensitivitySlider.value;
@@ -91,18 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function stopVisualizationHandler() {
+    // Instead of stopping and closing the audio context, pause the animation.
+    function pauseVisualizationHandler() {
         if (!isVisualizing) return;
         if (visualizer) {
             visualizer.stop();
         }
-        if (audioContext) {
-            audioContext.close();
-        }
         isVisualizing = false;
-        statusDisplay.textContent = 'Stopped visualizing.';
+        statusDisplay.textContent = 'Paused';
         recordBtn.disabled = false;
         stopBtn.disabled = true;
+        // Note: audioContext remains open, preserving visualizer state.
     }
 
     // Sensitivity slider update.
@@ -153,11 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Toggle beat transition using the new button.
     toggleBeatTransitionBtn.addEventListener('click', () => {
         if (!visualizer) return;
-        // Toggle the enabled flag.
         const currentState = visualizer.beatTransitionEnabled;
         visualizer.setBeatTransitionEnabled(!currentState);
         console.log("Beat transition enabled:", !currentState);
-        // Update button text accordingly.
         toggleBeatTransitionBtn.textContent = !currentState ? "Disable Beat Transition" : "Enable Beat Transition";
     });
 
@@ -174,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         toggleVisualization: () => {
             if (isVisualizing) {
-                stopVisualizationHandler();
+                pauseVisualizationHandler();
             } else {
                 startVisualization();
             }
