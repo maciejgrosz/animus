@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
 # This copies everything from the repository root into /app
-COPY . /app/
+COPY .. /app/
 
 # Expose port 8000 which Gunicorn will listen on
 EXPOSE 8000
