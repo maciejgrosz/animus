@@ -29,12 +29,10 @@ jobs:
           tags: registry.digitalocean.com/animus-420/animus:latest
 
       - name: Sync deployment files to Droplet
-        uses: appleboy/rsync-action@v0.1.5
-        with:
-          args: -avz --delete ./deployment/ /var/www/animus/
+        run: |
+          rsync -avz --delete ./deployment/ /var/www/animus/
         env:
           RSYNC_RSH: "ssh -i ${{ secrets.DROPLET_SSH_KEY }} -o StrictHostKeyChecking=no"
-          DESTINATION: ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/path/to/remote/deployment-directory/
 
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v0.1.7
