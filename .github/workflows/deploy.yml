@@ -48,7 +48,10 @@ jobs:
           key: ${{ secrets.DROPLET_SSH_KEY }}
           port: 22
           script: |
+            # Log in to the DigitalOcean Container Registry
+            docker login registry.digitalocean.com -u maciejgrosz -p ${{ secrets.REGISTRY_TOKEN }}
             cd /var/www/animus
             docker-compose pull
             docker-compose up -d
             docker image prune -f
+
