@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             visualizer.setMinBeatInterval(newMinInterval);
         }
     });
-
+    toggleBeatTransitionBtn.textContent = "Enable Beat Transition";
     // Toggle beat transition using the new button.
     toggleBeatTransitionBtn.addEventListener('click', () => {
         if (!visualizer) return;

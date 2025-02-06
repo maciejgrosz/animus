@@ -80,7 +80,7 @@ export class Visualizer {
         this.onModeChange = null;
 
         // New property to enable/disable beat-triggered transitions.
-        this.beatTransitionEnabled = true;
+        this.beatTransitionEnabled = false;
 
         // Variable to store the requestAnimationFrame ID.
         this.animationFrameId = null;
