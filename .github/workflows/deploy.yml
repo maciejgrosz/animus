@@ -28,12 +28,16 @@ jobs:
           dockerfile: Dockerfile
           push: true
           tags: registry.digitalocean.com/animus-420/animus:latest
+      - name: Set up SSH key file for rsync
+        run: |
+          echo "${{ secrets.DROPLET_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
 
       - name: Sync deployment files to Droplet using rsync with sudo
         run: |
           rsync -avz --delete ./deployment/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/var/www/animus/
         env:
-          RSYNC_RSH: "ssh -i ${{ secrets.DROPLET_SSH_KEY }} -o StrictHostKeyChecking=no"
+          RSYNC_RSH: "ssh -i key.pem -o StrictHostKeyChecking=no"
           RSYNC_PATH: "sudo rsync"
 
       - name: Deploy to Droplet via SSH
