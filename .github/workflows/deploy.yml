@@ -27,3 +27,18 @@ jobs:
           push: true
           tags: registry.digitalocean.com/animus-420/animus:latest
 
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/animus
+            # Pull the updated images
+            docker-compose pull
+            # Recreate and start the containers in detached mode
+            docker-compose up -d
+            # Optionally, remove unused images
+            docker image prune -f
