@@ -1,1 +1,23 @@
+# System files
+.bash_history
+.bashrc
+.profile
+.wget-hsts
+
+# Cache and temporary files
+.cache/
+logs.log
+
+# IDE and editor settings
+.idea/
+*.skip
+
+# Python virtual environments
+.venv/
+
+# SSH keys (if accidentally added)
+.ssh/
+
+# Other unwanted files/directories
+.cloud-locale-test.skip
 .idea/*
