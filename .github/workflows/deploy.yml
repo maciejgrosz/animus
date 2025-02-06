@@ -24,8 +24,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
-          dockerfile: deployment/Dockerfile
+          context: ./deployment
+          dockerfile: Dockerfile
           push: true
           tags: registry.digitalocean.com/animus-420/animus:latest
 
