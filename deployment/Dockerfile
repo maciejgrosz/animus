@@ -11,17 +11,14 @@ WORKDIR /app
 # Copy the requirements file from the repository root into the container
 COPY requirements.txt /app/
 
-# Install dependencies from requirements.txt
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code into the container
-# This copies everything from the repository root into /app
-COPY .. /app/
+# Copy the entire repository (which is our build context) into the container
+COPY . /app/
 
-# Expose port 8000 which Gunicorn will listen on
+# Expose port 8000 (Gunicorn listens on this port)
 EXPOSE 8000
 
-# Start Gunicorn to serve the Flask app.
-# This assumes your Flask app is defined in app.py with an application instance named "app"
+# Start Gunicorn (expects app.py with an application instance named "app")
 CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "-m", "007", "app:app"]
-

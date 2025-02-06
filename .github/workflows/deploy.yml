@@ -20,12 +20,11 @@ jobs:
           registry: registry.digitalocean.com
           username: maciejgrosz
           password: ${{ secrets.REGISTRY_TOKEN }}
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: ./deployment
-          dockerfile: Dockerfile
+          context: .
+          dockerfile: deployment/Dockerfile
           push: true
           tags: registry.digitalocean.com/animus-420/animus:latest
       - name: Set up SSH key file for rsync
