@@ -29,11 +29,14 @@ jobs:
           push: true
           tags: registry.digitalocean.com/animus-420/animus:latest
 
-      - name: Sync deployment files to Droplet
+      - name: Sync deployment files to Droplet using rsync with sudo
         run: |
-          rsync -avz --delete ./deployment/ /var/www/animus/
+          rsync -avz --delete ./deployment/ ${{ secrets.DROPLET_USER }}@${{ secrets.DROPLET_HOST }}:/var/www/animus/
         env:
-          RSYNC_RSH: "ssh -i ${{ secrets.DROPLET_SSH_KEY }} -o StrictHostKeyChecking=no"
+        RSYNC_RSH: "ssh -i ${{ secrets.DROPLET_SSH_KEY }} -o StrictHostKeyChecking=no"
+        # Tell rsync to run with sudo on the remote host:
+        # (Make sure your user can run sudo without a password)
+        RSYNC_PATH: "sudo rsync"
 
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v0.1.7
