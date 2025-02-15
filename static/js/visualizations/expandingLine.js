@@ -1,15 +1,8 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-/**
- * Draws an expanding radial wave of lines that reacts to the audio frequency.
- * @param {object} analyser - The Web Audio API analyser node.
- * @param {Uint8Array} dataArray - The frequency data array.
- * @param {number} bufferLength - The length of the frequency buffer.
- * @param {string} primaryColor - The selected color for visualization.
- */
-export const drawExpandingLineWave = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawExpandingLineWave = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
+    const sensitivity = sensitivityParam || getSensitivity();
 
     const centerX = canvas.width / 4;
     const centerY = canvas.height / 4;
@@ -26,7 +19,12 @@ export const drawExpandingLineWave = (analyser, dataArray, bufferLength, primary
         canvasCtx.beginPath();
         canvasCtx.moveTo(xStart, yStart);
         canvasCtx.lineTo(xEnd, yEnd);
-        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
+
+        // Choose stroke color based on the data index.
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[index % colorPalette.length]
+            : primaryColor;
+        canvasCtx.strokeStyle = colorToApply;
         canvasCtx.lineWidth = 2;
         canvasCtx.stroke();
     });

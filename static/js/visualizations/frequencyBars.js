@@ -1,23 +1,21 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-/**
- * Draws frequency bars that react to the audio frequency.
- * @param {object} analyser - The Web Audio API analyser node.
- * @param {Uint8Array} dataArray - The frequency data array.
- * @param {number} bufferLength - The length of the frequency buffer.
- * @param {string} primaryColor - The selected color for visualization.
- */
-export const drawFrequencyBars = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawFrequencyBars = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
+    const sensitivity = sensitivityParam || getSensitivity();
 
     const barWidth = canvas.width / bufferLength;
     let x = 0;
 
     for (let i = 0; i < bufferLength; i++) {
-        const barHeight = dataArray[i] * sensitivity; // Apply sensitivity scaling
+        const barHeight = dataArray[i] * sensitivity;
 
-        canvasCtx.fillStyle = primaryColor; // 🌈 Use color mode from visualize.js
+        // Use the palette if available.
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[i % colorPalette.length]
+            : primaryColor;
+
+        canvasCtx.fillStyle = colorToApply;
         canvasCtx.fillRect(x, canvas.height / 4 - barHeight, barWidth, barHeight);
 
         x += barWidth;

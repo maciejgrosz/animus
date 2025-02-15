@@ -2,14 +2,18 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
 /**
  * Draws a spiral visualization that reacts to the audio frequency.
+ * If a multi-color palette is provided, each dot is drawn in a different color.
+ *
  * @param {object} analyser - The Web Audio API analyser node.
  * @param {Uint8Array} dataArray - The frequency data array.
  * @param {number} bufferLength - The length of the frequency buffer.
  * @param {string} primaryColor - The selected color for visualization.
+ * @param {number} [sensitivityParam] - Optional sensitivity value.
+ * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawSpiral = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawSpiral = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
+    const sensitivity = sensitivityParam || getSensitivity();
 
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -28,7 +32,10 @@ export const drawSpiral = (analyser, dataArray, bufferLength, primaryColor) => {
 
         canvasCtx.beginPath();
         canvasCtx.arc(x, y, 3, 0, Math.PI * 2);
-        canvasCtx.fillStyle = primaryColor; // 🌈 Use color mode from visualize.js
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[index % colorPalette.length]
+            : primaryColor;
+        canvasCtx.fillStyle = colorToApply;
         canvasCtx.fill();
     });
 };
