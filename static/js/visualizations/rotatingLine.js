@@ -6,11 +6,12 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {Uint8Array} dataArray - The frequency data array.
  * @param {number} bufferLength - The length of the frequency buffer.
  * @param {string} primaryColor - The selected color for visualization.
+ * @param {number} [sensitivityParam] - Optional sensitivity value.
+ * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawRotatingLineGrid = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawRotatingLineGrid = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
-
+    const sensitivity = sensitivityParam || getSensitivity();
     const numLines = 20;
     const rotationSpeed = 0.005;
 
@@ -28,7 +29,11 @@ export const drawRotatingLineGrid = (analyser, dataArray, bufferLength, primaryC
         canvasCtx.beginPath();
         canvasCtx.moveTo(xStart, yStart);
         canvasCtx.lineTo(xEnd, yEnd);
-        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
+        // Use multi-color palette if available.
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[i % colorPalette.length]
+            : primaryColor;
+        canvasCtx.strokeStyle = colorToApply;
         canvasCtx.lineWidth = 1.5;
         canvasCtx.stroke();
     }

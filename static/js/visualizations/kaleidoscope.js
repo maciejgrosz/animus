@@ -1,8 +1,8 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
+    const sensitivity = sensitivityParam || getSensitivity();
 
     const centerX = canvas.width / 4;
     const centerY = canvas.height / 4;
@@ -22,7 +22,13 @@ export const drawKaleidoscope = (analyser, dataArray, bufferLength, primaryColor
 
             canvasCtx.beginPath();
             canvasCtx.arc(x, y, 10, 0, Math.PI * 2);
-            canvasCtx.fillStyle = primaryColor;
+
+            // Use the inner loop index to pick a color from the palette if available.
+            const colorToApply = (colorPalette && colorPalette.length > 1)
+                ? colorPalette[i % colorPalette.length]
+                : primaryColor;
+
+            canvasCtx.fillStyle = colorToApply;
             canvasCtx.fill();
         }
     });

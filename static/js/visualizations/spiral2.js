@@ -6,10 +6,12 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {Uint8Array} dataArray - The frequency data array.
  * @param {number} bufferLength - The length of the frequency buffer.
  * @param {string} primaryColor - The selected color for visualization.
+ * @param {number} [sensitivityParam] - Optional sensitivity value.
+ * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
-    const sensitivity = getSensitivity();
+    const sensitivity = sensitivityParam || getSensitivity();
 
     const centerX = canvas.width / 4;
     const centerY = canvas.height / 4;
@@ -17,7 +19,7 @@ export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primar
     const barWidth = 3;
 
     dataArray.forEach((value, index) => {
-        const angle = index * 0.1; // Adjust for tighter or looser spirals
+        const angle = index * 0.1;
         const radius = spiralFactor * index;
         const barHeight = value * sensitivity;
 
@@ -27,7 +29,10 @@ export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primar
         canvasCtx.beginPath();
         canvasCtx.moveTo(x, y);
         canvasCtx.lineTo(x, y - barHeight);
-        canvasCtx.strokeStyle = primaryColor; // 🌈 Use color mode from visualize.js
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[index % colorPalette.length]
+            : primaryColor;
+        canvasCtx.strokeStyle = colorToApply;
         canvasCtx.lineWidth = barWidth;
         canvasCtx.stroke();
     });

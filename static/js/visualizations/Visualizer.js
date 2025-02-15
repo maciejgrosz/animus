@@ -183,32 +183,43 @@ export class Visualizer {
      * Compute the effective visualization color and palette based on the current color mode.
      */
     computeVisualizationColor() {
-        let computedColor = this.primaryColor;
+        let computedColor = this.primaryColor; // default from the color picker
+        let colorPalette = []; // Declare colorPalette before using it
 
         if (this.colorMode === "frequency") {
             const avgFrequency = this.dataArray.reduce((sum, val) => sum + val, 0) / this.bufferLength;
             this.lastHue += (((avgFrequency / 255) * 360) - this.lastHue) * 0.05;
             computedColor = `hsl(${Math.round(this.lastHue)}, 100%, 50%)`;
+            colorPalette = [computedColor];
         } else if (this.colorMode === "amplitude") {
             const avgAmplitude = this.dataArray.reduce((sum, val) => sum + Math.abs(val - 128), 0) / this.bufferLength;
             this.lastHue += (((avgAmplitude / 128) * 360) - this.lastHue) * 0.05;
             computedColor = `hsl(${Math.round(this.lastHue)}, 100%, 50%)`;
+            colorPalette = [computedColor];
         } else if (this.colorMode === "rainbow") {
             this.lastHue = (performance.now() / 50) % 360;
             computedColor = `hsl(${Math.round(this.lastHue)}, 100%, 50%)`;
-        }
-
-        let colorPalette;
-        if (this.colorMode === "kaleidoscope") {
-            colorPalette = [];
-            const baseHue = (performance.now() / 20) % 360;
+            colorPalette = [computedColor];
+        } else if (this.colorMode === "multi") {
+            // New color mode that returns multiple colors.
+            const numColors = 6;
+            const baseHue = (performance.now() / 50) % 360;
+            for (let i = 0; i < numColors; i++) {
+                const hue = (baseHue + i * (360 / numColors)) % 360;
+                colorPalette.push(`hsl(${Math.round(hue)}, 100%, 50%)`);
+            }
+            computedColor = colorPalette[0];
+        } else if (this.colorMode === "kaleidoscope") {
+            // Kaleidoscope mode: generate a multi-color palette.
             const numReflections = 6;
+            const baseHue = (performance.now() / 20) % 360;
             for (let i = 0; i < numReflections; i++) {
                 const hueShift = (baseHue + i * (360 / numReflections)) % 360;
                 colorPalette.push(`hsl(${Math.round(hueShift)}, 100%, 70%)`);
             }
             computedColor = colorPalette[0];
         } else {
+            // Default: use a single color.
             colorPalette = [computedColor];
         }
 

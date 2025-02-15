@@ -35,38 +35,36 @@ const particles = [];
  * @param {Uint8Array} dataArray - The frequency data array.
  * @param {number} bufferLength - The length of the frequency buffer.
  * @param {string} primaryColor - The selected color for visualization.
+ * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawParticleSystem = (analyser, dataArray, bufferLength, primaryColor) => {
+export const drawParticleSystem = (analyser, dataArray, bufferLength, primaryColor, colorPalette) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
 
-    // Enable additive blending for particles
+    // Enable additive blending for particles.
     canvasCtx.globalCompositeOperation = 'lighter';
 
-    // Create new particles
     for (let i = 0; i < dataArray.length; i += 5) {
-        const intensity = (dataArray[i] / 255); // Normalize intensity
-        const size = intensity * 10 * sensitivity; // Particle size based on intensity
-        const speedX = (Math.random() - 0.5) * 4; // Random horizontal movement
-        const speedY = (Math.random() - 0.5) * 4; // Random vertical movement
-        const color = primaryColor; // 🌈 Use color mode from visualize.js
-
-        particles.push(
-            new Particle(canvas.width / 4, canvas.height / 4, size, color, speedX, speedY)
-        );
+        const intensity = dataArray[i] / 255;
+        const size = intensity * 10 * sensitivity;
+        const speedX = (Math.random() - 0.5) * 4;
+        const speedY = (Math.random() - 0.5) * 4;
+        // Use multi-color if available; use Math.floor(i/5) so that groups of particles share colors.
+        const colorToApply = (colorPalette && colorPalette.length > 1)
+            ? colorPalette[Math.floor(i / 5) % colorPalette.length]
+            : primaryColor;
+        particles.push(new Particle(canvas.width / 4, canvas.height / 4, size, colorToApply, speedX, speedY));
     }
 
-    // Update and draw particles
     for (let i = particles.length - 1; i >= 0; i--) {
         const particle = particles[i];
         if (particle.size <= 0) {
-            particles.splice(i, 1); // Remove faded particles
+            particles.splice(i, 1);
         } else {
             particle.update();
-            particle.draw(canvasCtx); // Draw particle with blending
+            particle.draw(canvasCtx);
         }
     }
 
-    // Reset to default blending
     canvasCtx.globalCompositeOperation = 'source-over';
 };
