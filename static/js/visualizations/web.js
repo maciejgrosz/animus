@@ -10,14 +10,18 @@ export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryCol
     const points = [];
     const numPoints = 50;
 
+    // Use responsive center:
+    const centerX = canvas.width < 600 ? canvas.width / 2 : canvas.width / 4;
+    const centerY = canvas.height < 600 ? canvas.height / 2 : canvas.height / 4;
+
     // Generate points in a circular pattern.
     for (let i = 0; i < numPoints; i++) {
         const angle = (i / numPoints) * Math.PI * 2;
         const radius = dataArray[i % bufferLength] * sensitivity;
 
         points.push({
-            x: canvas.width / 4 + Math.cos(angle) * radius,
-            y: canvas.height / 4 + Math.sin(angle) * radius,
+            x: centerX + Math.cos(angle) * radius,
+            y: centerY + Math.sin(angle) * radius,
         });
     }
 
@@ -28,14 +32,11 @@ export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryCol
             canvasCtx.beginPath();
             canvasCtx.moveTo(point.x, point.y);
             canvasCtx.lineTo(points[j].x, points[j].y);
-
-            // If a color palette is provided and has multiple colors,
-            // choose a color based on the index; otherwise, use primaryColor.
-            if (colorPalette && colorPalette.length > 1) {
-                canvasCtx.strokeStyle = colorPalette[i % colorPalette.length];
-            } else {
-                canvasCtx.strokeStyle = primaryColor;
-            }
+            // Cycle through the palette if provided; otherwise, use primaryColor.
+            const colorToApply = (colorPalette && colorPalette.length > 1)
+                ? colorPalette[i % colorPalette.length]
+                : primaryColor;
+            canvasCtx.strokeStyle = colorToApply;
             canvasCtx.stroke();
         }
     });
