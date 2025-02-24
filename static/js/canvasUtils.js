@@ -4,8 +4,8 @@ export const canvasCtx = canvas.getContext('2d');
 export const adjustCanvasSize = () => {
     const dpr = window.devicePixelRatio || 1;
     // Calculate the desired display size (90% of window dimensions)
-    const displayWidth = window.innerWidth * 0.9;
-    const displayHeight = window.innerHeight * 0.9;
+    const displayWidth = window.innerWidth;
+    const displayHeight = window.innerHeight;
 
     // Set the canvas resolution (internal size) to be scaled by the device pixel ratio.
     canvas.width = displayWidth * dpr;

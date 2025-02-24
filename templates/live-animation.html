@@ -197,13 +197,15 @@
     <a href="/" class="block w-full py-2 px-4 text-center bg-red-500 rounded-lg hover:bg-red-600 transition">Back to Home</a>
 </div>
 
-<!-- Visualization Canvas -->
-<div class="flex-grow relative">
+<body class="h-screen flex flex-col m-0 p-0">
+<div class="relative flex-grow">
     <canvas id="audio-visualizer" class="w-full h-full block"></canvas>
     <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-75 text-center py-2 px-4 rounded-lg">
         Status: <span id="status">Idle</span>
     </div>
 </div>
+</body>
+
 
 <!-- Load JavaScript -->
 <script type="module" src="./static/js/main.js"></script>
