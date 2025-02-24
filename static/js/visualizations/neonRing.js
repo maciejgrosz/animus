@@ -1,10 +1,8 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawNeonRings = (analyser, dataArray, bufferLength, primaryColor, colorPalette) => {
+export const drawNeonRings = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
-    const centerX = canvas.width < 600 ? canvas.width / 2 : canvas.width / 4;
-    const centerY = canvas.height < 600 ? canvas.height / 2 : canvas.height / 4;
 
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 

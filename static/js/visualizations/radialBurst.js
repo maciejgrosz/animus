@@ -8,11 +8,10 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {string} primaryColor - The selected color for visualization.
  * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawRadialBurst = (analyser, dataArray, bufferLength, primaryColor, colorPalette) => {
+export const drawRadialBurst = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
+
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = getSensitivity();
-    const centerX = canvas.width / 4;
-    const centerY = canvas.height / 4;
     const maxRadius = Math.min(canvas.width, canvas.height) / 2;
 
     dataArray.forEach((value, index) => {

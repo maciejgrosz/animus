@@ -1,11 +1,8 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawExpandingLineWave = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
+export const drawExpandingLineWave = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = sensitivityParam || getSensitivity();
-
-    const centerX = canvas.width / 4;
-    const centerY = canvas.height / 4;
 
     dataArray.forEach((value, index) => {
         const angle = (index / bufferLength) * Math.PI * 2;
