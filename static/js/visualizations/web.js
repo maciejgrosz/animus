@@ -10,9 +10,9 @@ export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryCol
     const points = [];
     const numPoints = 50;
 
-    // Use responsive center:
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
+    const dpr = window.devicePixelRatio || 1;
+    const centerX = (canvas.width / dpr) / 2;
+    const centerY = (canvas.height / dpr) / 2;
 
     // Generate points in a circular pattern.
     for (let i = 0; i < numPoints; i++) {
