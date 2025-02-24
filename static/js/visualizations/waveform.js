@@ -11,8 +11,19 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {string} primaryColor - The selected color for visualization.
  * @param {number} [sensitivityParam] - Optional sensitivity value.
  * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
+ * @param {number} centerX - The horizontal center of the canvas (for reference, if needed).
+ * @param {number} centerY - The vertical center of the canvas.
  */
-export const drawWaveform = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
+export const drawWaveform = (
+    analyser,
+    dataArray,
+    bufferLength,
+    primaryColor,
+    sensitivityParam,
+    colorPalette,
+    centerX,
+    centerY
+) => {
     // Retrieve time-domain data.
     analyser.getByteTimeDomainData(dataArray);
     const sensitivity = sensitivityParam || getSensitivity();
@@ -20,10 +31,10 @@ export const drawWaveform = (analyser, dataArray, bufferLength, primaryColor, se
     // Clear the canvas.
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Calculate slice width to spread waveform across the entire canvas width.
     const sliceWidth = canvas.width / bufferLength;
 
-    // For a multi-color effect, break the waveform into segments.
-    // We'll group points in blocks (e.g., 10 points per segment).
+    // For multi-color effect, group points into segments.
     const segmentLength = 10;
     const numSegments = Math.floor(bufferLength / segmentLength);
 
@@ -31,7 +42,7 @@ export const drawWaveform = (analyser, dataArray, bufferLength, primaryColor, se
         const start = seg * segmentLength;
         const end = start + segmentLength;
 
-        // Determine the stroke color:
+        // Choose a color: if a palette is provided with more than one color, cycle through it.
         const colorToApply = (colorPalette && colorPalette.length > 1)
             ? colorPalette[seg % colorPalette.length]
             : primaryColor;
@@ -40,10 +51,11 @@ export const drawWaveform = (analyser, dataArray, bufferLength, primaryColor, se
         canvasCtx.strokeStyle = colorToApply;
         canvasCtx.lineWidth = 2;
 
-        // Draw the segment.
         for (let i = start; i < end; i++) {
+            // Calculate a normalized value (centered at 0) and then scale it.
             const v = (dataArray[i] - 128) * sensitivity / 128;
-            const y = (v * canvas.height) / 3 + canvas.height / 4;
+            // Use centerY as the vertical center for the waveform.
+            const y = (v * canvas.height) / 3 + centerY;
             const x = i * sliceWidth;
             if (i === start) {
                 canvasCtx.moveTo(x, y);
