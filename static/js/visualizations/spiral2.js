@@ -9,12 +9,10 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {number} [sensitivityParam] - Optional sensitivity value.
  * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
+export const drawFrequencyBarSpiral = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = sensitivityParam || getSensitivity();
 
-    const centerX = canvas.width / 4;
-    const centerY = canvas.height / 4;
     const spiralFactor = 5; // Controls the spacing between bars
     const barWidth = 3;
 

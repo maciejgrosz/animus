@@ -11,12 +11,9 @@ import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
  * @param {number} [sensitivityParam] - Optional sensitivity value.
  * @param {Array} [colorPalette] - Optional array of colors for multi-color mode.
  */
-export const drawInfiniteTunnel = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
+export const drawInfiniteTunnel = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
     analyser.getByteFrequencyData(dataArray);
     const sensitivity = sensitivityParam || getSensitivity();
-
-    const centerX = canvas.width / 4;
-    const centerY = canvas.height / 4;
 
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
