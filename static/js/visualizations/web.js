@@ -1,20 +1,12 @@
 import { getSensitivity, canvas, canvasCtx } from '../canvasUtils.js';
 
-export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette) => {
-    // Use provided sensitivityParam, or fall back to getSensitivity().
+export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryColor, sensitivityParam, colorPalette, centerX, centerY) => {
     const sensitivity = sensitivityParam || getSensitivity();
-
-    // Update audio data.
     analyser.getByteFrequencyData(dataArray);
 
     const points = [];
     const numPoints = 50;
 
-    const dpr = window.devicePixelRatio || 1;
-    const centerX = (canvas.width / dpr) / 2;
-    const centerY = (canvas.height / dpr) / 2;
-
-    // Generate points in a circular pattern.
     for (let i = 0; i < numPoints; i++) {
         const angle = (i / numPoints) * Math.PI * 2;
         const radius = dataArray[i % bufferLength] * sensitivity;
@@ -25,14 +17,12 @@ export const drawDynamicLineWeb = (analyser, dataArray, bufferLength, primaryCol
         });
     }
 
-    // Connect points using a color from the palette (if available).
     canvasCtx.lineWidth = 1;
     points.forEach((point, i) => {
         for (let j = i + 1; j < points.length; j++) {
             canvasCtx.beginPath();
             canvasCtx.moveTo(point.x, point.y);
             canvasCtx.lineTo(points[j].x, points[j].y);
-            // Cycle through the palette if provided; otherwise, use primaryColor.
             const colorToApply = (colorPalette && colorPalette.length > 1)
                 ? colorPalette[i % colorPalette.length]
                 : primaryColor;

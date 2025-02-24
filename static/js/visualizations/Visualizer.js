@@ -97,7 +97,23 @@ export class Visualizer {
             cancelAnimationFrame(this.animationFrameId);
         }
     }
+    // Getter for the displayed canvas centerX.
+    get centerX() {
+        const dpr = window.devicePixelRatio || 1;
+        // Use canvas.getBoundingClientRect() to get the CSS width:
+        const rect = this.canvas.getBoundingClientRect();
+        return rect.width / 2;
+        // Or, equivalently, if you trust that canvas width is set via CSS:
+        // return (this.canvas.width / dpr) / 2;
+    }
 
+    // Getter for the displayed canvas centerY.
+    get centerY() {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        return rect.height / 2;
+        // Alternatively: return (this.canvas.height / dpr) / 2;
+    }
     // The animation loop.
     animate() {
         // Update audio data.
@@ -121,16 +137,12 @@ export class Visualizer {
             }
         }
 
-        // Compute the effective color(s) based on the current color mode.
         const { computedColor, colorPalette } = this.computeVisualizationColor();
-        const currentSensitivity = this.modeSensitivity[this.currentMode] || this.sensitivity;
-
-        // Get the drawing function based on the current animation mode.
+        const centerX = this.centerX;
+        const centerY = this.centerY;
         const drawMethod = this.modes[this.currentMode];
         if (drawMethod) {
-            drawMethod(this.analyser, this.dataArray, this.bufferLength, computedColor, currentSensitivity, colorPalette);
-        } else {
-            console.warn(`No drawing method found for animation mode: ${this.currentMode}`);
+            drawMethod(this.analyser, this.dataArray, this.bufferLength, computedColor, this.modeSensitivity[this.currentMode] || this.sensitivity, colorPalette, centerX, centerY);
         }
 
         // Schedule the next frame.
