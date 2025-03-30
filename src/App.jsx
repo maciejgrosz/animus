@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import HydraCanvas from "@core/HydraCanvas";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+    const [showUI, setShowUI] = useState(true);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleStart = () => {
+        setShowUI(false);
+    };
+
+    return (
+        <div className="relative w-screen h-screen overflow-hidden">
+            {/* 🔮 Hydra Visuals Background */}
+
+            <HydraCanvas/>
+
+            {/* 🌟 Overlay UI */}
+
+            {showUI && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div
+                        className="bg-black/60 backdrop-blur-md p-8 rounded-2xl text-white text-center max-w-lg pointer-events-auto">
+                        <h1 className="text-4xl font-bold mb-4">🎛️ Animus VJ Tool</h1>
+                        <p className="text-md text-gray-300 mb-6">
+                            Create reactive visuals using sound and code. Welcome to the new era of browser-based VJing.
+                        </p>
+                        <button
+                            onClick={handleStart}
+                            className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition pointer-events-auto"
+                        >
+                            Start Show
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
-
-export default App
