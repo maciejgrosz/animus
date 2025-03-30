@@ -2,6 +2,8 @@ import { adjustCanvasSize, updateSensitivity } from './canvasUtils.js';
 import { setupAudioContext } from './audioSetup.js';
 import { setupKeyboardControls } from './keyboardControls.js';
 import { Visualizer } from './visualizations/Visualizer.js';
+import { setupHydraModeToggle, selectHydraBackground } from './hydraHandler.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const recordBtn = document.getElementById('record-btn');
@@ -23,17 +25,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // New toggle button for beat transition.
     const toggleBeatTransitionBtn = document.getElementById('toggle-beat-transition');
+    // Advanced Settings Panel toggle
+    const advancedToggle = document.getElementById("advanced-settings-toggle");
+    const advancedPanel = document.getElementById("advanced-settings");
+
 
     let audioContext;
     let isVisualizing = false;
     let primaryColor = colorPicker.value;
     // Store the Visualizer instance so we can reuse it.
     let visualizer;
+    const popup = document.getElementById('instruction-popup');
+    const closeButton = document.getElementById('close-popup');
 
-    // Update color mode.
+    if (popup && closeButton) {
+        closeButton.addEventListener('click', () => {
+            popup.classList.add('hidden');
+        });
+    }
+
+    if (advancedToggle && advancedPanel) {
+        advancedToggle.addEventListener("click", () => {
+            advancedPanel.classList.toggle("hidden");
+        });
+    }
+    setupHydraModeToggle();
+    window.selectHydraBackground = selectHydraBackground;
+
+// Mode selector change handler
+    modeSelector.addEventListener('change', (event) => {
+        const newMode = event.target.value;
+
+        // ✅ Skip updating the visualizer if Hydra is selected
+        if (newMode === 'hydra') {
+            return; // Hydra visuals are handled separately
+        }
+
+        if (visualizer) {
+            visualizer.setMode(newMode);
+            const modeSensitivity = visualizer.modeSensitivity[newMode] || sensitivitySlider.value;
+            sensitivitySlider.value = modeSensitivity;
+            updateSensitivity(modeSensitivity, sensitivityValue);
+        }
+    });
+
+// Color mode change handler
     colorModeSelector.addEventListener('change', (event) => {
         const newColorMode = event.target.value;
-        if (visualizer) {
+
+        // ✅ Only update color mode for p5.js visualizer
+        if (visualizer && modeSelector.value !== 'hydra') {
             visualizer.setColorMode(newColorMode);
         }
     });
@@ -196,3 +237,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', adjustCanvasSize);
     adjustCanvasSize();
 });
+
+

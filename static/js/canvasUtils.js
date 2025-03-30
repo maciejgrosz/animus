@@ -26,6 +26,7 @@ let sensitivity = 1; // Default sensitivity
 export const getSensitivity = () => sensitivity;
 
 export const updateSensitivity = (newSensitivity, sensitivityValue) => {
-    sensitivity = newSensitivity;
-    sensitivityValue.textContent = sensitivity.toFixed(2);
+    const numericValue = parseFloat(newSensitivity);
+    const safeValue = isNaN(numericValue) ? 1.0 : numericValue;
+    sensitivityValue.textContent = safeValue.toFixed(2);
 };
