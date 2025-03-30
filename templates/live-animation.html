@@ -1,44 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Live Audio Visualization</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const popup = document.getElementById('instruction-popup');
-            const closeButton = document.getElementById('close-popup');
-
-            // Ensure button and popup exist
-            if (popup && closeButton) {
-                closeButton.addEventListener('click', () => {
-                    popup.classList.add('hidden'); // Add hidden class to close the popup
-                });
-            }
-        });
-    </script>
-    <script type="module" src="../static/js/visualizations/web.js"></script>
+    <script src="https://unpkg.com/hydra-synth"></script>
 </head>
+
 <body class="bg-cover bg-center text-white h-screen flex overflow-hidden" style="background-image: url('/static/img/colorful.jpg');">
 <!-- Instructions Popup -->
 <div id="instruction-popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
         <h2 class="text-2xl font-bold text-gray-800 mb-4">Instructions</h2>
-        <p class="text-gray-600 mb-6">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.
-        </p>
+        <p class="text-gray-600 mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
         <button id="close-popup" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Got it!</button>
     </div>
 </div>
 
-<!-- Toggle Settings Button (small gear icon in top-right) -->
-<button id="toggle-settings" class="fixed top-2 right-2 z-50 bg-purple-500 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-purple-600 transition">
-    ⚙️
-</button>
+<!-- Settings Button -->
+<button id="toggle-settings" class="fixed top-2 right-2 z-50 bg-purple-500 text-white w-8 h-8 flex items-center justify-center rounded hover:bg-purple-600 transition">⚙️</button>
 
-<!-- Quick Settings Panel -->
-<div id="settings-panel" class="flex flex-col w-1/4 bg-gray-800/70 p-4 shadow-lg space-y-4 backdrop-blur-md transition-all">
+<!-- Settings Panel -->
+<div id="settings-panel" class="flex flex-col w-1/4 bg-gray-800/70 p-4 shadow-lg space-y-4 backdrop-blur-md transition-all z-40">
     <button id="record-btn" class="w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">Start Recording</button>
     <button id="stop-btn" class="w-full py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition" disabled>Stop Recording</button>
 
@@ -62,9 +46,10 @@
 
     <div>
         <label for="sensitivity-slider" class="block text-sm">Sensitivity:</label>
-        <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1" class="w-full">
+        <input type="range" id="sensitivity-slider" min="0.1" max="5" step="0.1" value="1" class="w-full" />
         <span id="sensitivity-value" class="block text-center mt-2">1.00</span>
     </div>
+
     <div>
         <label for="color-mode" class="block text-sm">Color Mode:</label>
         <select id="color-mode" class="w-full py-2 px-3 bg-gray-700 text-white rounded-lg">
@@ -79,136 +64,112 @@
 
     <div>
         <label for="color-picker" class="block text-sm">Primary Color:</label>
-        <input type="color" id="color-picker" value="#ff0000" class="w-full">
+        <input type="color" id="color-picker" value="#ff0000" class="w-full" />
     </div>
+
+    <!-- Background Section -->
     <div>
         <label class="block text-sm mb-2">Background:</label>
         <div class="flex flex-wrap gap-2">
-            <!-- Background Previews -->
+            <!-- Previews -->
             <div id="bg-colorful" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/colorful.jpg');"
-                 onclick="changeBackground('/static/img/colorful.jpg', 'bg-colorful')">
-            </div>
+                 onclick="changeBackground('/static/img/colorful.jpg', 'bg-colorful')"></div>
             <div id="bg-dark" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/dark_blue.jpg');"
-                 onclick="changeBackground('/static/img/dark_blue.jpg', 'bg-dark')">
-            </div>
+                 onclick="changeBackground('/static/img/dark_blue.jpg', 'bg-dark')"></div>
             <div id="bg-dark-abstract" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/dark_abstract.jpg');"
-                 onclick="changeBackground('/static/img/dark_abstract.jpg', 'bg-dark-abstract')">
-            </div>
+                 onclick="changeBackground('/static/img/dark_abstract.jpg', 'bg-dark-abstract')"></div>
             <div id="bg-flowers" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/flowers.jpg');"
-                 onclick="changeBackground('/static/img/flowers.jpg', 'bg-flowers')">
-            </div>
+                 onclick="changeBackground('/static/img/flowers.jpg', 'bg-flowers')"></div>
             <div id="bg-minimalist" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/minimalist_view.jpg');"
-                 onclick="changeBackground('/static/img/minimalist_view.jpg', 'bg-minimalist')">
-            </div>
+                 onclick="changeBackground('/static/img/minimalist_view.jpg', 'bg-minimalist')"></div>
             <div id="bg-neon" class="w-10 h-10 rounded-lg cursor-pointer bg-cover bg-center border-2 border-transparent hover:border-white transition"
                  style="background-image: url('/static/img/neon.jpg');"
-                 onclick="changeBackground('/static/img/neon.jpg', 'bg-neon')">
+                 onclick="changeBackground('/static/img/neon.jpg', 'bg-neon')"></div>
+            <!-- Hydra Square -->
+            <div id="bg-hydra"
+                 class="w-10 h-10 rounded-lg cursor-pointer bg-black text-xs text-white flex items-center justify-center border-2 border-transparent hover:border-white transition"
+                 onclick="window.selectHydraBackground?.()">
+                H
             </div>
         </div>
     </div>
 
-    <!-- Advanced Settings Toggle Button -->
-    <button id="advanced-settings-toggle" class="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-        Advanced Settings
-    </button>
+    <!-- Advanced Settings -->
+    <button id="advanced-settings-toggle" class="w-full py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">Advanced Settings</button>
 
-    <!-- Hidden Advanced Settings Panel -->
     <div id="advanced-settings" class="hidden mt-4 p-4 bg-gray-700 rounded-lg">
-        <!-- Beat Detection Advanced Options -->
         <div class="mb-4">
             <label for="beat-threshold-factor" class="block text-sm">Beat Threshold Factor:</label>
-            <input type="range" id="beat-threshold-factor" min="1" max="10" step="0.1" value="1.5" class="w-full">
+            <input type="range" id="beat-threshold-factor" min="1" max="10" step="0.1" value="1.5" class="w-full" />
             <span id="beat-threshold-factor-value" class="block text-center mt-2">1.5</span>
         </div>
         <div class="mb-4">
             <label for="beat-history-size" class="block text-sm">Beat History Size:</label>
-            <input type="range" id="beat-history-size" min="10" max="100" step="1" value="43" class="w-full">
+            <input type="range" id="beat-history-size" min="10" max="100" step="1" value="43" class="w-full" />
             <span id="beat-history-size-value" class="block text-center mt-2">43</span>
         </div>
         <div class="mb-4">
             <label for="min-beat-interval" class="block text-sm">Min Beat Interval (ms):</label>
-            <input type="range" id="min-beat-interval" min="100" max="10000" step="50" value="300" class="w-full">
+            <input type="range" id="min-beat-interval" min="100" max="10000" step="50" value="300" class="w-full" />
             <span id="min-beat-interval-value" class="block text-center mt-2">300</span>
         </div>
-        <!-- Add this button inside your settings panel -->
         <button id="toggle-beat-transition" class="w-full py-2 px-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
             Disable Beat Transition
         </button>
-        <!-- Additional advanced options can be added here -->
     </div>
-
-    <script>
-        function changeBackground(imagePath, selectedId) {
-            // Change the body background
-            document.body.style.backgroundImage = `url('${imagePath}')`;
-
-            // Remove border highlight from all preview divs
-            document.querySelectorAll('.border-white').forEach(el => {
-                el.classList.remove('border-white');
-            });
-
-            // Highlight the selected background
-            document.getElementById(selectedId).classList.add('border-white');
-        }
-
-        // Toggle Advanced Settings Panel
-        const advancedToggle = document.getElementById('advanced-settings-toggle');
-        const advancedPanel = document.getElementById('advanced-settings');
-
-        advancedToggle.addEventListener('click', () => {
-            advancedPanel.classList.toggle('hidden');
-        });
-
-        // Update display for advanced settings inputs in real time.
-        const beatThresholdInput = document.getElementById('beat-threshold-factor');
-        const beatThresholdDisplay = document.getElementById('beat-threshold-factor-value');
-        beatThresholdInput.addEventListener('input', (event) => {
-            beatThresholdDisplay.textContent = event.target.value;
-            // Update your beat detection parameter variable here.
-        });
-
-        const beatHistoryInput = document.getElementById('beat-history-size');
-        const beatHistoryDisplay = document.getElementById('beat-history-size-value');
-        beatHistoryInput.addEventListener('input', (event) => {
-            beatHistoryDisplay.textContent = event.target.value;
-            // Update your history window size variable accordingly.
-        });
-
-        const minBeatIntervalInput = document.getElementById('min-beat-interval');
-        const minBeatIntervalDisplay = document.getElementById('min-beat-interval-value');
-        minBeatIntervalInput.addEventListener('input', (event) => {
-            minBeatIntervalDisplay.textContent = event.target.value;
-            // Update your minimum beat interval variable accordingly.
-        });
-
-        // Toggle Settings Panel Collapse/Expand using the toggle button in the top-right
-        const toggleSettingsBtn = document.getElementById('toggle-settings');
-        const settingsPanel = document.getElementById('settings-panel');
-        toggleSettingsBtn.addEventListener('click', () => {
-            settingsPanel.classList.toggle('hidden');
-        });
-    </script>
 
     <a href="/" class="block w-full py-2 px-4 text-center bg-red-500 rounded-lg hover:bg-red-600 transition">Back to Home</a>
 </div>
 
-<body class="h-screen flex flex-col m-0 p-0">
+<!-- 🔮 Hydra Canvas (background) -->
+<canvas id="hydra-canvas" class="absolute top-0 left-0 w-full h-full z-0 hidden"></canvas>
+
+<!-- 🎵 Audio Visualizer Canvas -->
 <div class="relative flex-grow">
-    <canvas id="audio-visualizer" class="w-full h-full block"></canvas>
-    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-75 text-center py-2 px-4 rounded-lg">
+    <canvas id="audio-visualizer" class="absolute top-0 left-0 w-full h-full z-10 pointer-events-none"></canvas>
+    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-75 text-center py-2 px-4 rounded-lg z-20">
         Status: <span id="status">Idle</span>
     </div>
 </div>
-</body>
 
-
-<!-- Load JavaScript -->
+<!-- Load Scripts -->
 <script type="module" src="./static/js/main.js"></script>
 <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Legacy Inline Script for Instructions + Backgrounds -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const popup = document.getElementById('instruction-popup');
+        const closeButton = document.getElementById('close-popup');
+        const toggleSettingsBtn = document.getElementById('toggle-settings');
+        const settingsPanel = document.getElementById('settings-panel');
+
+        if (popup && closeButton) {
+            closeButton.addEventListener('click', () => popup.classList.add('hidden'));
+        }
+
+        toggleSettingsBtn.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
+    });
+
+    function changeBackground(imagePath, selectedId) {
+        // Set background image
+        document.body.style.backgroundImage = `url('${imagePath}')`;
+
+        // Hide hydra canvas in case it was shown
+        const hydraCanvas = document.getElementById("hydra-canvas");
+        if (hydraCanvas) hydraCanvas.classList.add("hidden");
+
+        // Visually mark the selected box
+        document.querySelectorAll(".border-white").forEach(el => el.classList.remove("border-white"));
+        document.getElementById(selectedId)?.classList.add("border-white");
+
+        // ✅ DO NOT touch `mode-selector.value` here
+    }
+</script>
 </body>
 </html>
