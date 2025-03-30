@@ -1,23 +1,29 @@
-import { useEffect, useRef } from "react";
-import { useHydra } from "@hooks/useHydra"; // ✅ import the custom hook
-import { runDefaultHydraVisual } from "@hydra_presets/default";
+import { useRef, useEffect } from "react";
+import { oliviaJack } from "@hydra_presets/oliviaJack"; // ✅ Import preset
 
 export default function HydraCanvas() {
     const canvasRef = useRef();
-    const { startHydra } = useHydra(runDefaultHydraVisual); // ✅ use the hook inside the component
 
     useEffect(() => {
-        startHydra(); // ✅ start hydra when the canvas is mounted
+        const canvas = canvasRef.current;
+        if (!canvas || !window.Hydra) return;
+
+        const hydra = new window.Hydra({ canvas });
+        hydra.setResolution(window.innerWidth, window.innerHeight);
+        oliviaJack(); // 🔥 Start the default visual
+
 
         const handleResize = () => {
-            const canvas = canvasRef.current;
-            if (canvas && window.Hydra) {
-                const hydra = new window.Hydra({ canvas });
-                hydra.setResolution(window.innerWidth, window.innerHeight);
-            }
+            hydra.setResolution(window.innerWidth, window.innerHeight);
         };
         window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+            try {
+                solid(0, 0, 0, 0).out(); // Clean up the visual
+            } catch {}
+        };
     }, []);
 
     return (
