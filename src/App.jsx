@@ -1,17 +1,31 @@
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import HydraCanvas from "@core/HydraCanvas";
 import TopToolbar from "@core/TopToolbar";
 import { useHydra } from "@hooks/useHydra";
 import { ritchse } from "@hydra_presets/ritchse";
 import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack.js";
 import { florDeFuego } from "@hydra_presets/florDeFuego"
+import { alexandreRangel } from "@hydra_presets/alexandreRangel"
 export default function App() {
     const [showUI, setShowUI] = useState(true);
+    const canvasRef = useRef(null);
     const { initHydra, applyPreset } = useHydra();
+
+    useEffect(() => {
+        const canvas = document.getElementById("hydra-canvas");
+        if (canvas) {
+            initHydra(canvas);
+            applyPreset(alexandreRangel); // ✅ default background preset
+        }
+    }, []);
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
-        setShowUI(false);
+        if (canvas) {
+            setShowUI(false);
+        } else {
+            console.warn("❌ Canvas not found!");
+        }
     };
 
     const handleRandomize = () => {
