@@ -5,20 +5,22 @@ import { useHydra } from "@hooks/useHydra";
 import { alexandreRangel } from "@hydra_presets/alexandreRangel"
 import { presets } from "@hydra_presets/presets";
 import PresetGrid from "@core/PresetGrid";
-
+import { useMicInput } from "@hooks/useMicInput";
+import { micReactive } from "@hydra_presets/micReactive"
     export default function App() {
         const [showUI, setShowUI] = useState(true);
         const [showPresets, setShowPresets] = useState(false);
         const canvasRef = useRef(null);
         const { initHydra, applyPreset } = useHydra();
+        const amplitude = useMicInput();
 
-    useEffect(() => {
-        const canvas = document.getElementById("hydra-canvas");
-        if (canvas) {
-            initHydra(canvas);
-            applyPreset(alexandreRangel); // ✅ default background preset
-        }
-    }, []);
+        useEffect(() => {
+            const canvas = document.getElementById("hydra-canvas");
+            if (canvas) {
+                initHydra(canvas);
+                applyPreset(() => micReactive(() => amplitude)); // ✅ mic-reactive startup
+            }
+        }, [amplitude]); // <-- optional: keep reactive on mount
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
