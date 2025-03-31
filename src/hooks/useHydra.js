@@ -24,18 +24,9 @@ export function useHydra() {
     };
 
     const applyPreset = (presetFn) => {
-
         if (typeof presetFn === "function") {
-            try {
-                presetFn();
-                console.log("🎨 Preset applied successfully.");
-            } catch (e) {
-                console.error("❌ Failed to run preset:", e);
-            }
-        } else {
-            console.warn("⚠️ applyPreset expects a function.");
+            presetFn();
         }
     };
-
     return { initHydra, applyPreset };
 }
