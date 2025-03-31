@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useMicInput() {
+export function useMicInput(sensitivity = 3) { // 👈 You can pass this from the component
     const micRef = useRef(null);
     const [amplitude, setAmplitude] = useState(0);
 
@@ -8,8 +8,8 @@ export function useMicInput() {
         let audioContext;
         let analyser;
         let dataArray;
-        let smoothed = 0; // 🌀 running smoothed value
-        const smoothingFactor = 0.05; // 🧽 tweakable: lower = smoother
+        let smoothed = 0;
+        const smoothingFactor = 0.04; // 🧽 lower = smoother, higher = snappier
 
         async function initMic() {
             try {
@@ -32,13 +32,13 @@ export function useMicInput() {
                     }
                     const raw = Math.sqrt(sum / dataArray.length);
 
-                    // ✨ Apply low-pass smoothing
+                    // 🌀 Smooth and amplify the result
                     smoothed += smoothingFactor * (raw - smoothed);
 
-                    // Clamp between 0–1 just in case (optional)
-                    const clamped = Math.min(1, Math.max(0, smoothed));
+                    // 🔊 Apply sensitivity multiplier
+                    const amplified = Math.min(1, smoothed * sensitivity);
 
-                    setAmplitude(clamped);
+                    setAmplitude(amplified);
                     requestAnimationFrame(update);
                 }
 
@@ -56,7 +56,7 @@ export function useMicInput() {
                 micRef.current.getTracks().forEach((track) => track.stop());
             }
         };
-    }, []);
+    }, [sensitivity]);
 
     return amplitude;
 }

@@ -12,7 +12,7 @@ import { micReactive } from "@hydra_presets/micReactive"
         const [showPresets, setShowPresets] = useState(false);
         const canvasRef = useRef(null);
         const { initHydra, applyPreset } = useHydra();
-        const amplitude = useMicInput();
+        const amplitude = useMicInput(5);
 
         useEffect(() => {
             const canvas = document.getElementById("hydra-canvas");
