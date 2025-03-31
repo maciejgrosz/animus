@@ -2,14 +2,15 @@ import {useEffect, useRef, useState} from "react";
 import HydraCanvas from "@core/HydraCanvas";
 import TopToolbar from "@core/TopToolbar";
 import { useHydra } from "@hooks/useHydra";
-import { ritchse } from "@hydra_presets/ritchse";
-import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack.js";
-import { florDeFuego } from "@hydra_presets/florDeFuego"
 import { alexandreRangel } from "@hydra_presets/alexandreRangel"
-export default function App() {
-    const [showUI, setShowUI] = useState(true);
-    const canvasRef = useRef(null);
-    const { initHydra, applyPreset } = useHydra();
+import { presets } from "@hydra_presets/presets";
+import PresetGrid from "@core/PresetGrid";
+
+    export default function App() {
+        const [showUI, setShowUI] = useState(true);
+        const [showPresets, setShowPresets] = useState(false);
+        const canvasRef = useRef(null);
+        const { initHydra, applyPreset } = useHydra();
 
     useEffect(() => {
         const canvas = document.getElementById("hydra-canvas");
@@ -29,16 +30,38 @@ export default function App() {
     };
 
     const handleRandomize = () => {
-        const presets = [ritchse, oliviaJack, oliviaJack2, florDeFuego];
         const random = presets[Math.floor(Math.random() * presets.length)];
-        applyPreset(random);
-        console.log(random);
+        applyPreset(random.fn);
+        console.log("🎲 Rerolled preset:", random.name);
     };
-
     return (
         <div className="relative w-screen h-screen overflow-hidden">
-            <HydraCanvas />
-            {!showUI && <TopToolbar onRandomize={handleRandomize} />}
+            <canvas
+                ref={canvasRef}
+                id="hydra-canvas"
+                className="fixed top-0 left-0 w-full h-full z-0"
+            />
+
+            {!showUI && (
+                <>
+                    <TopToolbar
+                        onRandomize={handleRandomize}
+                        onTogglePresets={() => setShowPresets(!showPresets)}
+                    />
+
+                    {showPresets && (
+                        <div className="absolute bottom-0 w-full max-h-[50vh] overflow-y-auto bg-black/30 backdrop-blur p-4 z-10">
+                            <PresetGrid
+                                onSelect={(fn) => {
+                                    applyPreset(fn);
+                                    setShowPresets(false); // auto-close grid after selection (optional)
+                                }}
+                            />
+                        </div>
+                    )}
+                </>
+            )}
+
             {showUI && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
                     <div className="bg-black/50 backdrop-blur-md p-8 rounded-2xl text-white text-center max-w-lg">
