@@ -12,15 +12,22 @@ import { micReactive } from "@hydra_presets/micReactive"
         const [showPresets, setShowPresets] = useState(false);
         const canvasRef = useRef(null);
         const { initHydra, applyPreset } = useHydra();
-        const amplitude = useMicInput(5);
+        const amplitude = useMicInput(2);
 
+        // useEffect(() => {
+        //     const canvas = document.getElementById("hydra-canvas");
+        //     if (canvas) {
+        //         initHydra(canvas);
+        //         applyPreset(() => micReactive(() => amplitude)); // ✅ mic-reactive startup
+        //     }
+        // }, [amplitude]); // <-- optional: keep reactive on mount
         useEffect(() => {
             const canvas = document.getElementById("hydra-canvas");
             if (canvas) {
                 initHydra(canvas);
-                applyPreset(() => micReactive(() => amplitude)); // ✅ mic-reactive startup
+                applyPreset(alexandreRangel); // or any other default preset
             }
-        }, [amplitude]); // <-- optional: keep reactive on mount
+        }, []);
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
