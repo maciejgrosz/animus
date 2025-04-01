@@ -1,6 +1,6 @@
 import { Shuffle, Layers } from "lucide-react";
 
-export default function TopToolbar({ onRandomize, onTogglePresets }) {
+export default function TopToolbar({ onRandomize, onTogglePresets, onOpenSettings }) {
     return (
         <div className="absolute top-4 right-4 z-20 flex gap-2">
             <button
@@ -8,14 +8,17 @@ export default function TopToolbar({ onRandomize, onTogglePresets }) {
                 className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-md flex items-center justify-center"
                 title="Randomize"
             >
-                <Shuffle className="w-5 h-5" />
+                <Shuffle className="w-5 h-5"/>
             </button>
             <button
                 onClick={onTogglePresets}
                 className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-md flex items-center justify-center"
                 title="Show Presets"
             >
-                <Layers className="w-5 h-5" />
+                <Layers className="w-5 h-5"/>
+            </button>
+            <button onClick={onOpenSettings} className="hover:text-white text-gray-400">
+                ⚙️
             </button>
         </div>
     );
