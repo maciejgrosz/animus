@@ -13,16 +13,20 @@ export default function App() {
     const [currentSensitivity, setCurrentSensitivity] = useState(5);
     const canvasRef = useRef(null);
     const { initHydra, applyPreset } = useHydra();
-    const amplitude = useMicInput(currentSensitivity);
+    const amplitudeRef = useRef(0);
 
-    // 📡 Listen for messages from the settings window
+    // const amplitude = useMicInput(currentSensitivity);
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
+
         channel.onmessage = (event) => {
-            if (event.data.type === "sensitivity") {
+            if (event.data.type === "amplitude") {
+                amplitudeRef.current = event.data.value;
+            } else if (event.data.type === "sensitivity") {
                 setCurrentSensitivity(event.data.value);
             }
         };
+
         return () => channel.close();
     }, []);
 
@@ -31,9 +35,9 @@ export default function App() {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
             initHydra(canvas);
-            applyPreset(() => micReactive(() => amplitude));
+            applyPreset(() => micReactive(() => amplitudeRef.current));
         }
-    }, [amplitude]); // 🔁 re-apply every time amplitude changes (brute-force but works)
+    }, [amplitudeRef]); // 🔁 re-apply every time amplitude changes (brute-force but works)
 
 
     // 🎲 Random preset button
@@ -60,13 +64,6 @@ export default function App() {
 
     return (
         <div className="relative w-screen h-screen overflow-hidden">
-            {/* Dev-only Amplitude Meter */}
-            {process.env.NODE_ENV === "development" && (
-                <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
-                    Amplitude: {amplitude.toFixed(4)}
-                </div>
-            )}
-
             {/* Hydra canvas */}
             <canvas
                 ref={canvasRef}

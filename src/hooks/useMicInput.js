@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 export function useMicInput(sensitivity = 5) {
     const micRef = useRef(null);
     const [amplitude, setAmplitude] = useState(0);
+    const channel = useRef(null);
+    const lastBroadcast = useRef(0);
 
     useEffect(() => {
         let audioContext;
@@ -10,6 +12,9 @@ export function useMicInput(sensitivity = 5) {
         let dataArray;
         let smoothed = 0;
         const smoothingFactor = 0.1;
+        const BROADCAST_INTERVAL = 100; // ms
+
+        channel.current = new BroadcastChannel("animus-control");
 
         async function initMic() {
             try {
@@ -18,14 +23,10 @@ export function useMicInput(sensitivity = 5) {
                         echoCancellation: false,
                         noiseSuppression: false,
                         autoGainControl: true,
-                    }
+                    },
                 });
 
-                // ✅ Guard against duplicate or closed context
-                if (!audioContext || audioContext.state === "closed") {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                }
-
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const source = audioContext.createMediaStreamSource(stream);
 
                 analyser = audioContext.createAnalyser();
@@ -48,17 +49,23 @@ export function useMicInput(sensitivity = 5) {
                     const amplified = Math.min(1, smoothed * sensitivity);
 
                     setAmplitude(amplified);
+
+                    const now = performance.now();
+                    if (now - lastBroadcast.current > BROADCAST_INTERVAL) {
+                        channel.current.postMessage({ type: "amplitude", value: amplified });
+                        lastBroadcast.current = now;
+                    }
+
                     requestAnimationFrame(update);
                 }
 
                 update();
                 micRef.current = stream;
             } catch (err) {
-                console.error("🎤 Mic access denied or error:", err);
+                console.error("🎤 Mic access error:", err);
             }
         }
 
-        // ⏱ Slight delay to avoid audio device race on hot reload
         const initTimeout = setTimeout(initMic, 150);
 
         return () => {
@@ -69,6 +76,7 @@ export function useMicInput(sensitivity = 5) {
             if (audioContext && audioContext.state !== "closed") {
                 audioContext.close().catch(() => {});
             }
+            channel.current?.close();
         };
     }, [sensitivity]);
 
