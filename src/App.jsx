@@ -12,22 +12,22 @@ import { micReactive } from "@hydra_presets/micReactive"
         const [showPresets, setShowPresets] = useState(false);
         const canvasRef = useRef(null);
         const { initHydra, applyPreset } = useHydra();
-        const amplitude = useMicInput(2);
+        const amplitude = useMicInput(5);
 
-        // useEffect(() => {
-        //     const canvas = document.getElementById("hydra-canvas");
-        //     if (canvas) {
-        //         initHydra(canvas);
-        //         applyPreset(() => micReactive(() => amplitude)); // ✅ mic-reactive startup
-        //     }
-        // }, [amplitude]); // <-- optional: keep reactive on mount
         useEffect(() => {
             const canvas = document.getElementById("hydra-canvas");
             if (canvas) {
                 initHydra(canvas);
-                applyPreset(alexandreRangel); // or any other default preset
+                applyPreset(() => micReactive(() => amplitude)); // ✅ mic-reactive startup
             }
-        }, []);
+        }, [amplitude]); // <-- optional: keep reactive on mount
+        // useEffect(() => {
+        //     const canvas = document.getElementById("hydra-canvas");
+        //     if (canvas) {
+        //         initHydra(canvas);
+        //         applyPreset(alexandreRangel); // or any other default preset
+        //     }
+        // }, []);
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
@@ -45,6 +45,9 @@ import { micReactive } from "@hydra_presets/micReactive"
     };
     return (
         <div className="relative w-screen h-screen overflow-hidden">
+            <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
+                Amplitude: {amplitude.toFixed(4)}
+            </div>
             <canvas
                 ref={canvasRef}
                 id="hydra-canvas"
@@ -59,7 +62,8 @@ import { micReactive } from "@hydra_presets/micReactive"
                     />
 
                     {showPresets && (
-                        <div className="absolute bottom-0 w-full max-h-[50vh] overflow-y-auto bg-black/30 backdrop-blur p-4 z-10">
+                        <div
+                            className="absolute bottom-0 w-full max-h-[50vh] overflow-y-auto bg-black/30 backdrop-blur p-4 z-10">
                             <PresetGrid
                                 onSelect={(fn) => {
                                     applyPreset(fn);
@@ -89,4 +93,4 @@ import { micReactive } from "@hydra_presets/micReactive"
             )}
         </div>
     );
-}
+    }
