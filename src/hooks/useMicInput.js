@@ -9,13 +9,10 @@ export function useMicInput(sensitivity = 5) {
         let analyser;
         let dataArray;
         let smoothed = 0;
-        const smoothingFactor = 0.1; // faster response, still smooth
+        const smoothingFactor = 0.1;
 
         async function initMic() {
             try {
-                // const stream = await navigator.mediaDevices.getUserMedia({
-                //     audio: true // 👈 use default audio settings again
-                // });
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                         echoCancellation: false,
@@ -24,11 +21,15 @@ export function useMicInput(sensitivity = 5) {
                     }
                 });
 
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                // ✅ Guard against duplicate or closed context
+                if (!audioContext || audioContext.state === "closed") {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+
                 const source = audioContext.createMediaStreamSource(stream);
 
                 analyser = audioContext.createAnalyser();
-                analyser.fftSize = 512; // slightly higher resolution
+                analyser.fftSize = 512;
                 dataArray = new Uint8Array(analyser.fftSize);
 
                 source.connect(analyser);
@@ -43,11 +44,7 @@ export function useMicInput(sensitivity = 5) {
                     }
 
                     const raw = Math.sqrt(sum / dataArray.length);
-
-                    // 🌀 Smooth the signal
                     smoothed += smoothingFactor * (raw - smoothed);
-
-                    // 🔊 Boost with sensitivity
                     const amplified = Math.min(1, smoothed * sensitivity);
 
                     setAmplitude(amplified);
@@ -57,15 +54,20 @@ export function useMicInput(sensitivity = 5) {
                 update();
                 micRef.current = stream;
             } catch (err) {
-                console.error("Mic access denied or error:", err);
+                console.error("🎤 Mic access denied or error:", err);
             }
         }
 
-        initMic();
+        // ⏱ Slight delay to avoid audio device race on hot reload
+        const initTimeout = setTimeout(initMic, 150);
 
         return () => {
+            clearTimeout(initTimeout);
             if (micRef.current) {
                 micRef.current.getTracks().forEach((track) => track.stop());
+            }
+            if (audioContext && audioContext.state !== "closed") {
+                audioContext.close().catch(() => {});
             }
         };
     }, [sensitivity]);
