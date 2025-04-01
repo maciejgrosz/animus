@@ -1,13 +1,20 @@
-// src/core/SettingsPanel.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMicInput } from "@hooks/useMicInput"; // if you're using it here
 
 export default function SettingsPanel() {
     const [sensitivity, setSensitivity] = useState(5);
-    const channel = new BroadcastChannel("animus-control");
+    const amplitude = useMicInput(sensitivity);
+    const channel = useRef(new BroadcastChannel("animus-control"));
 
+    // send sensitivity changes
     useEffect(() => {
-        channel.postMessage({ type: "sensitivity", value: sensitivity });
+        channel.current.postMessage({ type: "sensitivity", value: sensitivity });
     }, [sensitivity]);
+
+    // send amplitude continuously
+    useEffect(() => {
+        channel.current.postMessage({ type: "amplitude", value: amplitude });
+    }, [amplitude]);
 
     return (
         <div className="p-4 text-white bg-black h-screen w-full">
@@ -23,6 +30,11 @@ export default function SettingsPanel() {
                 onChange={(e) => setSensitivity(parseFloat(e.target.value))}
                 className="w-full mb-4"
             />
+            {process.env.NODE_ENV === "development" && (
+                <div className="mt-4 text-sm text-gray-400">
+                    Live Amplitude: {amplitude.toFixed(4)}
+                </div>
+            )}
         </div>
     );
 }
