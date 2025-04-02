@@ -4,8 +4,10 @@ import TopToolbar from "@core/TopToolbar";
 import { useHydra } from "@hooks/useHydra";
 import { presets } from "@hydra_presets/presets";
 import PresetGrid from "@core/PresetGrid";
-import { useMicInput } from "@hooks/useMicInput";
 import { micReactive } from "@hydra_presets/micReactive";
+import { amplitudeRef } from "@core/amplitudeRef"; // ✅ shared ref
+import { paintingReactive } from "@hydra_presets/paintingReactive"; // 👈 ADD THIS at the top
+
 
 export default function App() {
     const [showUI, setShowUI] = useState(true);
@@ -13,12 +15,10 @@ export default function App() {
     const [currentSensitivity, setCurrentSensitivity] = useState(5);
     const canvasRef = useRef(null);
     const { initHydra, applyPreset } = useHydra();
-    const amplitudeRef = useRef(0);
 
-    // const amplitude = useMicInput(currentSensitivity);
+    // 📡 Listen for amplitude/sensitivity updates from settings panel
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
-
         channel.onmessage = (event) => {
             if (event.data.type === "amplitude") {
                 amplitudeRef.current = event.data.value;
@@ -26,33 +26,32 @@ export default function App() {
                 setCurrentSensitivity(event.data.value);
             }
         };
-
         return () => channel.close();
     }, []);
 
-    // 🎬 Init hydra & re-apply preset whenever amplitude changes
+    // 🎬 Initialize Hydra once with micReactive as the first preset
     useEffect(() => {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
             initHydra(canvas);
             applyPreset(() => micReactive(() => amplitudeRef.current));
         }
-    }, [amplitudeRef]); // 🔁 re-apply every time amplitude changes (brute-force but works)
+    }, []); // ✅ Only once, not on every amplitude change
 
 
-    // 🎲 Random preset button
+    // 🎲 Random preset trigger
     const handleRandomize = () => {
         const random = presets[Math.floor(Math.random() * presets.length)];
         applyPreset(random.fn);
         console.log("🎲 Rerolled preset:", random.name);
     };
 
-    // ⚙️ Open settings window on second screen
+    // ⚙️ Settings panel on second screen
     const handleOpenSettings = () => {
         window.open("/settings", "_blank", "width=400,height=600");
     };
 
-    // 🎬 Start show button
+    // 🎬 Launch main app
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
@@ -64,22 +63,19 @@ export default function App() {
 
     return (
         <div className="relative w-screen h-screen overflow-hidden">
-            {/* Hydra canvas */}
             <canvas
                 ref={canvasRef}
                 id="hydra-canvas"
                 className="fixed top-0 left-0 w-full h-full z-0"
             />
 
-            {/* Top toolbar and preset grid */}
             {!showUI && (
                 <>
                     <TopToolbar
                         onRandomize={handleRandomize}
                         onTogglePresets={() => setShowPresets(!showPresets)}
-                        onOpenSettings={handleOpenSettings} // ✅ passed in
+                        onOpenSettings={handleOpenSettings}
                     />
-
                     {showPresets && (
                         <div className="absolute bottom-0 w-full max-h-[50vh] overflow-y-auto bg-black/30 backdrop-blur p-4 z-10">
                             <PresetGrid
@@ -93,7 +89,6 @@ export default function App() {
                 </>
             )}
 
-            {/* Launch screen UI */}
             {showUI && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
                     <div className="bg-black/50 backdrop-blur-md p-8 rounded-2xl text-white text-center max-w-lg">

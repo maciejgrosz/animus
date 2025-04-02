@@ -1,6 +1,8 @@
 import { ritchse } from "@hydra_presets/ritchse";
 import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack";
 import { florDeFuego } from "@hydra_presets/florDeFuego";
+import { paintingReactive } from "@hydra_presets/paintingReactive"
+import { amplitudeRef } from "@core/amplitudeRef";
 
 export const presets = [
     {
@@ -36,4 +38,20 @@ export const presets = [
         fn: ritchse,
         preview: new URL('../assets/previews/ritchse.png', import.meta.url).href,
     },
+    // {
+    //     id: "paintingReactive",
+    //     name: "Painting Reactive",
+    //     author: "You 🧠",
+    //     mood: "fluid",
+    //     fn: () => paintingReactive(() => amplitudeRef.current),
+    //     preview: new URL('../../public/assets/textures/bazant.jpg', import.meta.url).href,
+    // },
+    {
+        id: "paintingReactive",
+        name: "Psychedelic Paint Pour",
+        author: "Alexander Grey",
+        mood: "trippy",
+        fn: () => paintingReactive(),
+        preview: new URL("../../public/assets/textures/bazant.jpg", import.meta.url).href,
+    }
 ];
