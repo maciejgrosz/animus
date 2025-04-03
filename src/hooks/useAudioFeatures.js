@@ -1,6 +1,11 @@
 import { useEffect, useRef } from "react";
 
-export function useAudioFeatures(sensitivity = 1.5) {
+export function useAudioFeatures({
+                                     amplitudeGain = 1.5,
+                                     bassGain = 1.5,
+                                     midGain = 1.5,
+                                     trebleGain = 1.5,
+                                 }) {
     const channelRef = useRef(null);
 
     useEffect(() => {
@@ -9,8 +14,10 @@ export function useAudioFeatures(sensitivity = 1.5) {
         let dataArray;
         const smoothingFactor = 0.1;
         let smoothed = 0;
+        let running = true;
 
-        channelRef.current = new BroadcastChannel("animus-control");
+        const channel = new BroadcastChannel("animus-control");
+        channelRef.current = channel;
 
         async function initMic() {
             try {
@@ -19,7 +26,7 @@ export function useAudioFeatures(sensitivity = 1.5) {
                         echoCancellation: false,
                         noiseSuppression: false,
                         autoGainControl: true,
-                    }
+                    },
                 });
 
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -31,34 +38,36 @@ export function useAudioFeatures(sensitivity = 1.5) {
                 source.connect(analyser);
 
                 function update() {
+                    if (!running) return;
+
                     analyser.getByteFrequencyData(dataArray);
 
-                    const rawBass = getBandEnergy(dataArray, 20, 140);
-                    const rawMid = getBandEnergy(dataArray, 140, 400);
-                    const rawTreble = getBandEnergy(dataArray, 400, 2000);
+                    const bass = getBandEnergy(dataArray, 20, 140);
+                    const mid = getBandEnergy(dataArray, 140, 400);
+                    const treble = getBandEnergy(dataArray, 400, 2000);
+                    const avg = (bass + mid + treble) / 3;
 
-                    const avg = (rawBass + rawMid + rawTreble) / 3;
                     smoothed += smoothingFactor * (avg - smoothed);
 
-                    // 🎚 Adjust sensitivity curve: remap UI 5 => effective 1.5–1.8
-                    const effectiveSensitivity = Math.pow(sensitivity / 10, 1.5) * 1.8;
+                    const safePost = () => {
+                        try {
+                            if (channelRef.current) {
+                                channelRef.current.postMessage({
+                                    type: "audioFeatures",
+                                    value: {
+                                        amplitude: Math.min(1, smoothed * amplitudeGain),
+                                        bass: Math.min(1, bass * bassGain),
+                                        mid: Math.min(1, mid * midGain),
+                                        treble: Math.min(1, treble * trebleGain),
+                                    },
+                                });
+                            }
+                        } catch (err) {
+                            console.warn("⚠️ BroadcastChannel postMessage failed:", err);
+                        }
+                    };
 
-                    const boosted = (val) => Math.min(1, val * effectiveSensitivity);
-
-                    try {
-                        channelRef.current?.postMessage({
-                            type: "audioFeatures",
-                            value: {
-                                amplitude: boosted(smoothed),
-                                bass: boosted(rawBass),
-                                mid: boosted(rawMid),
-                                treble: boosted(rawTreble),
-                            },
-                        });
-                    } catch (err) {
-                        console.warn("⚠️ BroadcastChannel postMessage failed:", err);
-                    }
-
+                    safePost();
                     requestAnimationFrame(update);
                 }
 
@@ -71,14 +80,18 @@ export function useAudioFeatures(sensitivity = 1.5) {
         initMic();
 
         return () => {
+            running = false;
             if (channelRef.current) {
-                channelRef.current.close();
+                try {
+                    channelRef.current.close();
+                } catch {}
+                channelRef.current = null;
             }
             if (audioContext && audioContext.state !== "closed") {
                 audioContext.close().catch(() => {});
             }
         };
-    }, [sensitivity]);
+    }, [amplitudeGain, bassGain, midGain, trebleGain]);
 
     function getBandEnergy(data, lowHz, highHz) {
         const lowIndex = Math.floor((lowHz / 22050) * data.length);
