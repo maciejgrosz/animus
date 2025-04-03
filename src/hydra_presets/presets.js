@@ -2,7 +2,7 @@ import { ritchse } from "@hydra_presets/ritchse";
 import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack";
 import { florDeFuego } from "@hydra_presets/florDeFuego";
 import { paintingReactive } from "@hydra_presets/paintingReactive"
-import { amplitudeRef } from "@core/amplitudeRef";
+import { amplitudeRef } from "@core/audioRefs";
 
 export const presets = [
     {

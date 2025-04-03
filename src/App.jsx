@@ -5,8 +5,13 @@ import { useHydra } from "@hooks/useHydra";
 import { presets } from "@hydra_presets/presets";
 import PresetGrid from "@core/PresetGrid";
 import { micReactive } from "@hydra_presets/micReactive";
-import { amplitudeRef } from "@core/amplitudeRef"; // ✅ shared ref
 import { paintingReactive } from "@hydra_presets/paintingReactive"; // 👈 ADD THIS at the top
+import {
+    amplitudeRef,
+    bassRef,
+    midRef,
+    trebleRef,
+} from "@core/audioRefs"; // or whatever file name you choose
 
 
 export default function App() {
@@ -16,14 +21,17 @@ export default function App() {
     const canvasRef = useRef(null);
     const { initHydra, applyPreset } = useHydra();
 
-    // 📡 Listen for amplitude/sensitivity updates from settings panel
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
         channel.onmessage = (event) => {
-            if (event.data.type === "amplitude") {
-                amplitudeRef.current = event.data.value;
-            } else if (event.data.type === "sensitivity") {
-                setCurrentSensitivity(event.data.value);
+            const { type, value } = event.data;
+            if (type === "audioFeatures") {
+                amplitudeRef.current = value.amplitude;
+                bassRef.current = value.bass;
+                midRef.current = value.mid;
+                trebleRef.current = value.treble;
+            } else if (type === "sensitivity") {
+                setCurrentSensitivity(value);
             }
         };
         return () => channel.close();
