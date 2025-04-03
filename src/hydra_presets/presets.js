@@ -18,7 +18,7 @@ export const presets = [
         name: "Olivia Jack 2",
         author: "Olivia Jack",
         mood: "glitchy",
-        fn: oliviaJack2,
+        fn: () => oliviaJack2(() => amplitudeRef.current),
         preview: new URL('../assets/previews/oliviaJack2.png', import.meta.url).href,
     },
     {
@@ -38,20 +38,12 @@ export const presets = [
         fn: ritchse,
         preview: new URL('../assets/previews/ritchse.png', import.meta.url).href,
     },
-    // {
-    //     id: "paintingReactive",
-    //     name: "Painting Reactive",
-    //     author: "You 🧠",
-    //     mood: "fluid",
-    //     fn: () => paintingReactive(() => amplitudeRef.current),
-    //     preview: new URL('../../public/assets/textures/bazant.jpg', import.meta.url).href,
-    // },
     {
         id: "paintingReactive",
         name: "Psychedelic Paint Pour",
         author: "Alexander Grey",
         mood: "trippy",
-        fn: () => paintingReactive(),
+        fn: () => paintingReactive(() => amplitudeRef.current),
         preview: new URL("../../public/assets/textures/bazant.jpg", import.meta.url).href,
     }
 ];
