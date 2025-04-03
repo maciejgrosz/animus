@@ -2,16 +2,24 @@
 //corrupted screensaver
 //by Ritchse
 //instagram.com/ritchse
+//
+export function ritchse(getBass, getMid, getTreble) {
+    const bass = () => getBass?.() ?? 0;
+    const mid = () => getMid?.() ?? 0;
+    const treble = () => getTreble?.() ?? 0;
 
-export function ritchse() {
-    voronoi(350, 0.15)
-        .modulateScale(osc(8).rotate(Math.sin(time)), .5)
-        .thresh(.8)
-        .modulateRotate(osc(7), .4)
-        .thresh(.7)
-        .diff(src(o0).scale(1.8))
-        .modulateScale(osc(2).modulateRotate(o0, .74))
-        .diff(src(o0).rotate([-.012, .01, -.002, 0]).scrollY(0, [-1 / 199800, 0].fast(0.7)))
-        .brightness([-.02, -.17].smooth().fast(.5))
-        .out()
+    voronoi(() => 350 + bass() * 300, 0.15)
+        .modulateScale(osc(() => 8 + mid() * 2).rotate(() => Math.sin(time + treble() * 2)), () => 0.5 + bass() * 0.2)
+        .thresh(0.8)
+        .modulateRotate(osc(7), () => 0.4 + mid() * 0.2)
+        .thresh(0.7)
+        .diff(src(o0).scale(() => 1.8 - bass() * 0.2))
+        .modulateScale(osc(2).modulateRotate(o0, 0.74))
+        .diff(
+            src(o0)
+                .rotate([-.012, .01, -.002, 0])
+                .scrollY(0, [-1 / 199800, 0].fast(0.7))
+        )
+        .brightness(() => [-.02, -.17].smooth().fast(.5)[0] + treble() * 0.3)
+        .out();
 }

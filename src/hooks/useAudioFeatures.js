@@ -5,7 +5,7 @@ export function useAudioFeatures({
                                      bassGain = 1.5,
                                      midGain = 1.5,
                                      trebleGain = 1.5,
-                                 }) {
+                                 } = {}) {
     const channelRef = useRef(null);
 
     useEffect(() => {
@@ -14,10 +14,8 @@ export function useAudioFeatures({
         let dataArray;
         const smoothingFactor = 0.1;
         let smoothed = 0;
-        let running = true;
 
-        const channel = new BroadcastChannel("animus-control");
-        channelRef.current = channel;
+        channelRef.current = new BroadcastChannel("animus-control");
 
         async function initMic() {
             try {
@@ -37,37 +35,45 @@ export function useAudioFeatures({
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
                 source.connect(analyser);
 
-                function update() {
-                    if (!running) return;
+                function getBandEnergy(data, lowHz, highHz) {
+                    const lowIndex = Math.floor((lowHz / 22050) * data.length);
+                    const highIndex = Math.ceil((highHz / 22050) * data.length);
+                    let sum = 0;
+                    for (let i = lowIndex; i < highIndex; i++) {
+                        sum += data[i];
+                    }
+                    return sum / (highIndex - lowIndex) / 255;
+                }
 
+                function boosted(val, gain, base = 0.1) {
+                    return Math.min(1, val * gain * base);
+                }
+
+                function update() {
                     analyser.getByteFrequencyData(dataArray);
 
-                    const bass = getBandEnergy(dataArray, 20, 140);
-                    const mid = getBandEnergy(dataArray, 140, 400);
-                    const treble = getBandEnergy(dataArray, 400, 2000);
-                    const avg = (bass + mid + treble) / 3;
+                    const rawBass = getBandEnergy(dataArray, 20, 140);
+                    const rawMid = getBandEnergy(dataArray, 140, 400);
+                    const rawTreble = getBandEnergy(dataArray, 400, 2000);
+                    const avg = (rawBass + rawMid + rawTreble) / 3;
 
                     smoothed += smoothingFactor * (avg - smoothed);
+                    const amplitude = boosted(smoothed, amplitudeGain, 0.1);
 
-                    const safePost = () => {
-                        try {
-                            if (channelRef.current) {
-                                channelRef.current.postMessage({
-                                    type: "audioFeatures",
-                                    value: {
-                                        amplitude: Math.min(1, smoothed * amplitudeGain),
-                                        bass: Math.min(1, bass * bassGain),
-                                        mid: Math.min(1, mid * midGain),
-                                        treble: Math.min(1, treble * trebleGain),
-                                    },
-                                });
-                            }
-                        } catch (err) {
-                            console.warn("⚠️ BroadcastChannel postMessage failed:", err);
-                        }
-                    };
+                    try {
+                        channelRef.current?.postMessage({
+                            type: "audioFeatures",
+                            value: {
+                                amplitude,
+                                bass: boosted(rawBass, bassGain),
+                                mid: boosted(rawMid, midGain),
+                                treble: boosted(rawTreble, trebleGain),
+                            },
+                        });
+                    } catch (err) {
+                        console.warn("⚠️ BroadcastChannel postMessage failed:", err);
+                    }
 
-                    safePost();
                     requestAnimationFrame(update);
                 }
 
@@ -80,26 +86,12 @@ export function useAudioFeatures({
         initMic();
 
         return () => {
-            running = false;
             if (channelRef.current) {
-                try {
-                    channelRef.current.close();
-                } catch {}
-                channelRef.current = null;
+                channelRef.current.close();
             }
             if (audioContext && audioContext.state !== "closed") {
                 audioContext.close().catch(() => {});
             }
         };
     }, [amplitudeGain, bassGain, midGain, trebleGain]);
-
-    function getBandEnergy(data, lowHz, highHz) {
-        const lowIndex = Math.floor((lowHz / 22050) * data.length);
-        const highIndex = Math.ceil((highHz / 22050) * data.length);
-        let sum = 0;
-        for (let i = lowIndex; i < highIndex; i++) {
-            sum += data[i];
-        }
-        return sum / (highIndex - lowIndex) / 255;
-    }
 }

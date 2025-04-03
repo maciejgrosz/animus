@@ -2,15 +2,20 @@ import { ritchse } from "@hydra_presets/ritchse";
 import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack";
 import { florDeFuego } from "@hydra_presets/florDeFuego";
 import { paintingReactive } from "@hydra_presets/paintingReactive"
-import { amplitudeRef } from "@core/audioRefs";
-
+import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs";
+import { guide } from "@hydra_presets/guide"
 export const presets = [
     {
         id: "oliviaJack",
         name: "Olivia Jack 1",
         author: "Olivia Jack",
         mood: "psychedelic",
-        fn: oliviaJack,
+        fn: () =>
+            oliviaJack(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
         preview: new URL('../assets/previews/oliviaJack1.png', import.meta.url).href,
     },
     {
@@ -18,7 +23,12 @@ export const presets = [
         name: "Olivia Jack 2",
         author: "Olivia Jack",
         mood: "glitchy",
-        fn: () => oliviaJack2(() => amplitudeRef.current),
+        fn: () =>
+            oliviaJack2(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
         preview: new URL('../assets/previews/oliviaJack2.png', import.meta.url).href,
     },
     {
@@ -26,7 +36,12 @@ export const presets = [
         name: "Flor de Fuego",
         author: "Unknown",
         mood: "dreamy",
-        fn: florDeFuego,
+        fn: () =>
+            florDeFuego(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
         preview: new URL('../assets/previews/florDeFuego.png', import.meta.url).href,
 
     },
@@ -35,8 +50,12 @@ export const presets = [
         name: "Ritchse",
         author: "Ritchse",
         mood: "sci-fi",
-        fn: ritchse,
-        preview: new URL('../assets/previews/ritchse.png', import.meta.url).href,
+        fn: () =>
+            ritchse(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),        preview: new URL('../assets/previews/ritchse.png', import.meta.url).href,
     },
     {
         id: "paintingReactive",
@@ -45,5 +64,18 @@ export const presets = [
         mood: "trippy",
         fn: () => paintingReactive(() => amplitudeRef.current),
         preview: new URL("../../public/assets/textures/bazant.jpg", import.meta.url).href,
-    }
+    },
+    {
+        id: "frequencyZonesReactive",
+        name: "Frequency Zones",
+        author: "You 🔊",
+        mood: "responsive",
+        fn: () =>
+            guide(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
+    },
 ];
