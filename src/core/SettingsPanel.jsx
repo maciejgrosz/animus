@@ -3,10 +3,10 @@ import { useAudioFeatures } from "@hooks/useAudioFeatures";
 import LiveAudioChart from "@components/LiveAudioChart";
 
 export default function SettingsPanel() {
-    const [masterSensitivity, setMasterSensitivity] = useState(1.5);
-    const [bassSensitivity, setBassSensitivity] = useState(1.5);
-    const [midSensitivity, setMidSensitivity] = useState(1.5);
-    const [trebleSensitivity, setTrebleSensitivity] = useState(1.5);
+    const [masterSensitivity, setMasterSensitivity] = useState(5);
+    const [bassSensitivity, setBassSensitivity] = useState(5);
+    const [midSensitivity, setMidSensitivity] = useState(5);
+    const [trebleSensitivity, setTrebleSensitivity] = useState(5);
     const [features, setFeatures] = useState({
         amplitude: 0,
         bass: 0,
@@ -87,12 +87,6 @@ export default function SettingsPanel() {
                 onChange={(e) => setTrebleSensitivity(parseFloat(e.target.value))}
                 className="w-full mb-4"
             />
-            <div className="mt-6 text-sm text-gray-400 space-y-1">
-                <div>🎚️ Amplitude: {features.amplitude.toFixed(3)}</div>
-                <div>🎵 Bass: {features.bass.toFixed(3)}</div>
-                <div>🎧 Mid: {features.mid.toFixed(3)}</div>
-                <div>🎶 Treble: {features.treble.toFixed(3)}</div>
-            </div>
             <LiveAudioChart />
         </div>
     );

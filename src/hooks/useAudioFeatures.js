@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 
 export function useAudioFeatures({
-                                     amplitudeGain = 1.5,
-                                     bassGain = 1.5,
-                                     midGain = 1.5,
-                                     trebleGain = 1.5,
+                                     amplitudeGain = 5,
+                                     bassGain = 5,
+                                     midGain = 5,
+                                     trebleGain = 5,
                                  } = {}) {
     const channelRef = useRef(null);
 
@@ -45,7 +45,7 @@ export function useAudioFeatures({
                     return sum / (highIndex - lowIndex) / 255;
                 }
 
-                function boosted(val, gain, base = 0.1) {
+                function boosted(val, gain, base = 0.2) {
                     return Math.min(1, val * gain * base);
                 }
 
