@@ -11,6 +11,7 @@ export default defineConfig({
       '@hooks': path.resolve(__dirname, 'src/hooks'),
       '@hydra_presets': path.resolve(__dirname, 'src/hydra_presets'),
       '@styles': path.resolve(__dirname, 'src/styles'),
+      '@components': path.resolve(__dirname, 'src/components')
     },
   },
   define: {
