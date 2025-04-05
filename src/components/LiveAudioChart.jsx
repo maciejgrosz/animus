@@ -7,12 +7,24 @@ import {
     CategoryScale,
     LinearScale,
 } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale);
+ChartJS.register(BarElement, CategoryScale, LinearScale, ChartDataLabels);
+
+// Gradient coloring based on value (0 → green, 0.5 → yellow, 1 → red)
+const getColor = (value) => {
+    const v = Math.max(0, Math.min(1, value)); // Clamp
+    if (v < 0.5) {
+        const r = Math.round(v * 2 * 255);
+        return `rgb(${r}, 255, 0)`; // Green to Yellow
+    } else {
+        const g = Math.round((1 - (v - 0.5) * 2) * 255);
+        return `rgb(255, ${g}, 0)`; // Yellow to Red
+    }
+};
 
 export default function LiveAudioChart() {
     const [features, setFeatures] = useState({
-        amplitude: 0,
         bass: 0,
         mid: 0,
         treble: 0,
@@ -29,17 +41,20 @@ export default function LiveAudioChart() {
     }, []);
 
     const data = {
-        labels: ["Amplitude", "Bass", "Mid", "Treble"],
+        labels: ["Bass", "Mid", "Treble"],
         datasets: [
             {
-                label: "🔊 Live Audio Values",
+                label: "🔊 Live Frequency Levels",
                 data: [
-                    features.amplitude.toFixed(3),
-                    features.bass.toFixed(3),
-                    features.mid.toFixed(3),
-                    features.treble.toFixed(3),
+                    features.bass,
+                    features.mid,
+                    features.treble,
                 ],
-                backgroundColor: ["#eab308", "#ef4444", "#22c55e", "#3b82f6"],
+                backgroundColor: [
+                    getColor(features.bass),
+                    getColor(features.mid),
+                    getColor(features.treble),
+                ],
             },
         ],
     };
@@ -51,7 +66,16 @@ export default function LiveAudioChart() {
             x: {
                 min: 0,
                 max: 1,
+                ticks: {
+                    stepSize: 0.2,
+                },
             },
+        },
+        plugins: {
+            datalabels: {
+                display: false, // 👈 Hide all data labels
+            },
+            legend: { display: false },
         },
     };
 
