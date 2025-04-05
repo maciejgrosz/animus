@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAudioFeatures } from "@hooks/useAudioFeatures";
+import LiveAudioChart from "@components/LiveAudioChart";
 
 export default function SettingsPanel() {
     const [masterSensitivity, setMasterSensitivity] = useState(1.5);
@@ -92,6 +93,7 @@ export default function SettingsPanel() {
                 <div>🎧 Mid: {features.mid.toFixed(3)}</div>
                 <div>🎶 Treble: {features.treble.toFixed(3)}</div>
             </div>
+            <LiveAudioChart />
         </div>
     );
 }

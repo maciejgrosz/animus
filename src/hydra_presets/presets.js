@@ -4,6 +4,7 @@ import { florDeFuego } from "@hydra_presets/florDeFuego";
 import { paintingReactive } from "@hydra_presets/paintingReactive"
 import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs";
 import { guide } from "@hydra_presets/guide"
+import { waveforms } from "@hydra_presets/waveforms"
 export const presets = [
     {
         id: "oliviaJack",
@@ -72,6 +73,19 @@ export const presets = [
         mood: "responsive",
         fn: () =>
             guide(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
+    },
+    {
+        id: "waveforms",
+        name: "Waveforms Zones",
+        author: "You 🔊",
+        mood: "responsive",
+        fn: () =>
+            waveforms(
                 () => bassRef.current,
                 () => midRef.current,
                 () => trebleRef.current
