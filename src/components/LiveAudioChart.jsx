@@ -11,18 +11,6 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, ChartDataLabels);
 
-// Gradient coloring based on value (0 → green, 0.5 → yellow, 1 → red)
-const getColor = (value) => {
-    const v = Math.max(0, Math.min(1, value)); // Clamp
-    if (v < 0.5) {
-        const r = Math.round(v * 2 * 255);
-        return `rgb(${r}, 255, 0)`; // Green to Yellow
-    } else {
-        const g = Math.round((1 - (v - 0.5) * 2) * 255);
-        return `rgb(255, ${g}, 0)`; // Yellow to Red
-    }
-};
-
 export default function LiveAudioChart() {
     const [features, setFeatures] = useState({
         bass: 0,
@@ -40,6 +28,8 @@ export default function LiveAudioChart() {
         return () => channel.close();
     }, []);
 
+    const clipThreshold = 0.95;
+
     const data = {
         labels: ["Bass", "Mid", "Treble"],
         datasets: [
@@ -51,9 +41,9 @@ export default function LiveAudioChart() {
                     features.treble,
                 ],
                 backgroundColor: [
-                    getColor(features.bass),
-                    getColor(features.mid),
-                    getColor(features.treble),
+                    features.bass >= clipThreshold ? "#dc2626" : "#f97316",
+                    features.mid >= clipThreshold ? "#ca8a04" : "#facc15",
+                    features.treble >= clipThreshold ? "#2563eb" : "#4ade80",
                 ],
             },
         ],
@@ -62,25 +52,24 @@ export default function LiveAudioChart() {
     const options = {
         indexAxis: "y",
         animation: false,
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
             x: {
                 min: 0,
                 max: 1,
-                ticks: {
-                    stepSize: 0.2,
-                },
             },
         },
         plugins: {
             datalabels: {
-                display: false, // 👈 Hide all data labels
+                display: false,
             },
             legend: { display: false },
         },
     };
 
     return (
-        <div className="mt-6">
+        <div className="mt-4 h-28">
             <Bar data={data} options={options} />
         </div>
     );

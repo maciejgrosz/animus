@@ -5,6 +5,9 @@ import { paintingReactive } from "@hydra_presets/paintingReactive"
 import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs";
 import { guide } from "@hydra_presets/guide"
 import { waveforms } from "@hydra_presets/waveforms"
+import { blendPrototype } from "@hydra_presets/blendPrototype";
+import { zachKrall } from "@hydra_presets/zachKrall";
+
 export const presets = [
     {
         id: "oliviaJack",
@@ -59,6 +62,18 @@ export const presets = [
             ),        preview: new URL('../assets/previews/ritchse.png', import.meta.url).href,
     },
     {
+        id: "zachKrall",
+        name: "ZachKrall",
+        author: "ZachKrall",
+        mood: "audio-reactive",
+        fn: () => zachKrall(
+                () => bassRef.current,
+                    () => midRef.current,
+                    () => trebleRef.current
+        ),
+        preview: new URL("../assets/previews/blendPrototype.png", import.meta.url).href,
+    },
+    {
         id: "paintingReactive",
         name: "Psychedelic Paint Pour",
         author: "Alexander Grey",
@@ -92,4 +107,12 @@ export const presets = [
             ),
         preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
     },
+    {
+        id: "blendPrototype",
+        name: "Blend Prototype",
+        author: "Animus AI",
+        mood: "audio-reactive",
+        fn: () => blendPrototype(() => bassRef.current),
+        preview: new URL("../assets/previews/blendPrototype.png", import.meta.url).href,
+    }
 ];

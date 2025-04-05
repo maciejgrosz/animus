@@ -1,65 +1,50 @@
 import { useEffect, useRef, useState } from "react";
 import HydraCanvas from "@core/HydraCanvas";
-import TopToolbar from "@core/TopToolbar";
 import { useHydra } from "@hooks/useHydra";
 import { presets } from "@hydra_presets/presets";
-import PresetGrid from "@core/PresetGrid";
-import { micReactive } from "@hydra_presets/micReactive";
-import { paintingReactive } from "@hydra_presets/paintingReactive"; // 👈 ADD THIS at the top
 import {
-    amplitudeRef,
     bassRef,
     midRef,
     trebleRef,
-} from "@core/audioRefs"; // or whatever file name you choose
-
+} from "@core/audioRefs";
 
 export default function App() {
     const [showUI, setShowUI] = useState(true);
-    const [showPresets, setShowPresets] = useState(false);
-    const [currentSensitivity, setCurrentSensitivity] = useState(5);
     const canvasRef = useRef(null);
     const { initHydra, applyPreset } = useHydra();
 
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
         channel.onmessage = (event) => {
-            const { type, value } = event.data;
+            const { type, value, id } = event.data;
+
             if (type === "audioFeatures") {
-                amplitudeRef.current = value.amplitude;
                 bassRef.current = value.bass;
                 midRef.current = value.mid;
                 trebleRef.current = value.treble;
-            } else if (type === "sensitivity") {
-                setCurrentSensitivity(value);
+            } else if (type === "selectPreset" && id) {
+                const match = presets.find((p) => p.id === id);
+                if (match) {
+                    applyPreset(match.fn);
+                    console.log("🎛️ Switched to preset:", match.name);
+                } else {
+                    console.warn("❌ Preset ID not found:", id);
+                }
             }
         };
+
         return () => channel.close();
     }, []);
 
-    // 🎬 Initialize Hydra once with micReactive as the first preset
     useEffect(() => {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
             initHydra(canvas);
-            applyPreset(() => micReactive(() => amplitudeRef.current));
+            // 🎬 You can apply any default preset here
+            applyPreset(presets[0].fn);
         }
-    }, []); // ✅ Only once, not on every amplitude change
+    }, []);
 
-
-    // 🎲 Random preset trigger
-    const handleRandomize = () => {
-        const random = presets[Math.floor(Math.random() * presets.length)];
-        applyPreset(random.fn);
-        console.log("🎲 Rerolled preset:", random.name);
-    };
-
-    // ⚙️ Settings panel on second screen
-    const handleOpenSettings = () => {
-        window.open("/settings", "_blank", "width=400,height=600");
-    };
-
-    // 🎬 Launch main app
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
@@ -67,6 +52,10 @@ export default function App() {
         } else {
             console.warn("❌ Canvas not found!");
         }
+    };
+
+    const handleOpenSettings = () => {
+        window.open("/settings", "_blank", "width=400,height=600");
     };
 
     return (
@@ -77,25 +66,12 @@ export default function App() {
                 className="fixed top-0 left-0 w-full h-full z-0"
             />
 
-            {!showUI && (
-                <>
-                    <TopToolbar
-                        onRandomize={handleRandomize}
-                        onTogglePresets={() => setShowPresets(!showPresets)}
-                        onOpenSettings={handleOpenSettings}
-                    />
-                    {showPresets && (
-                        <div className="absolute bottom-0 w-full max-h-[50vh] overflow-y-auto bg-black/30 backdrop-blur p-4 z-10">
-                            <PresetGrid
-                                onSelect={(fn) => {
-                                    applyPreset(fn);
-                                    setShowPresets(false);
-                                }}
-                            />
-                        </div>
-                    )}
-                </>
-            )}
+            <button
+                onClick={handleOpenSettings}
+                className="absolute top-4 right-4 z-20 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm backdrop-blur transition"
+            >
+                Settings
+            </button>
 
             {showUI && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
