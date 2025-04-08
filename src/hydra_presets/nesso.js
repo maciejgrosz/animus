@@ -1,10 +1,13 @@
 // licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
 // clouds of passage — by Nesso | www.nesso.xyz
 
-export function nesso(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
+
+export function nesso() {
+
+    const bass = () => getSmoothedBass() ;
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble()* 0.1;
 
     shape([4, 5, 6].fast(0.1).smooth(1), 0.000001 + bass() * 0.01, [0.2 + mid() * 0.2, 0.7].smooth(1))
         .color(0.2 + treble() * 0.2, 0.4, 0.3 + mid() * 0.2)

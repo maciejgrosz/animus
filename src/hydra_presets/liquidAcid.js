@@ -1,7 +1,10 @@
-export function liquidAcid(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
+
+export function liquidAcid() {
+
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble();
 
     // ⏳ Optional: fade logic for later enhancements
     if (!window._liquidFadeStartTime) {

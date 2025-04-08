@@ -1,18 +1,34 @@
-// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-//Flor de Fuego
+import {
+    getSmoothedBass,
+    getSmoothedMid,
+    getSmoothedTreble,
+} from "@core/audioRefs";
 
+export function florDeFuego() {
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble();
 
-export function florDeFuego(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
-
-    shape(200, 0.5, 1.5)
-        .scale(() => 0.5 + bass() * 0.4) // 🔊 bass pulse
-        .color(() => 0.5 + mid() * 1.5, 0.3 + mid() * 0.5, 0) // 🎨 mid = richer flame
-        .repeat(2, 2)
-        .modulateScale(osc(() => 3 + treble() * 3, 0.5), () => -0.6 + bass() * 0.2) // ✨ sparkle + distortion
-        .add(o0, 0.5)
-        .scale(() => 0.9 + bass() * 0.05) // soft zooming
+    shape(
+        () => 3 + Math.floor(mid() * 6),   // 🔺 shape morphs: triangle → hexagon
+        () => 0.15 + bass() * 0.05,        // 🌀 radius pulses with bass
+        () => 1.5 + treble() * 1           // ✨ smooth edges
+    )
+        .scale(() => 0.2 + bass() * 0.1) // 📏 much smaller scale
+        .color(
+            () => 0.6 + mid() * 0.4,       // 🌈 morphs to warm hues
+            () => 0.2 + treble() * 0.6,
+            () => 0.1 + Math.sin(time * 0.5 + treble() * 2) * 0.3
+        )
+        .repeat(3.5, 3.5) // 🟣 tight grid of smaller dots
+        .modulateScale(
+            osc(() => 2 + treble() * 2, 0.2),
+            () => -0.2 + bass() * 0.1
+        )
+        .rotate(() => time * 0.02 + mid() * 0.1) // 🌀 gentle spiral drift
+        .add(o0, 0.35)
+        .scale(() => 0.8 + bass() * 0.03)
+        .saturate(() => 1.2 + treble() * 0.6)
         .out();
 }
+
