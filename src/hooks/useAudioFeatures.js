@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 
 export function useAudioFeatures({
-                                     amplitudeGain = 5,
                                      bassGain = 5,
                                      midGain = 5,
                                      trebleGain = 5,
@@ -12,8 +11,13 @@ export function useAudioFeatures({
         let audioContext;
         let analyser;
         let dataArray;
-        const smoothingFactor = 0.1;
-        let smoothed = 0;
+
+        // 🥁 Beat/BPM detection
+        let lastBeatTime = 0;
+        let bpm = 0;
+        let bpmBuffer = [];
+
+        const minInterval = 300;
 
         channelRef.current = new BroadcastChannel("animus-control");
 
@@ -55,19 +59,41 @@ export function useAudioFeatures({
                     const rawBass = getBandEnergy(dataArray, 20, 140);
                     const rawMid = getBandEnergy(dataArray, 140, 400);
                     const rawTreble = getBandEnergy(dataArray, 400, 2000);
-                    const avg = (rawBass + rawMid + rawTreble) / 3;
 
-                    smoothed += smoothingFactor * (avg - smoothed);
-                    const amplitude = boosted(smoothed, amplitudeGain, 0.1);
+                    const bass = boosted(rawBass, bassGain);
+                    const mid = boosted(rawMid, midGain);
+                    const treble = boosted(rawTreble, trebleGain);
+
+                    const now = performance.now();
+                    const beatThreshold = 0.3 + 0.05 * (1 / bassGain);
+
+                    if (bass > beatThreshold && now - lastBeatTime > minInterval) {
+                        const interval = now - lastBeatTime;
+                        lastBeatTime = now;
+
+                        // Send beat trigger
+                        try {
+                            channelRef.current?.postMessage({ type: "beatDetected" });
+                        } catch (err) {
+                            console.warn("⚠️ Beat postMessage failed:", err);
+                        }
+
+                        // Estimate BPM
+                        const currentBPM = 60000 / interval;
+                        bpmBuffer.push(currentBPM);
+                        if (bpmBuffer.length > 5) bpmBuffer.shift();
+
+                        bpm = Math.round(bpmBuffer.reduce((sum, val) => sum + val, 0) / bpmBuffer.length);
+                    }
 
                     try {
                         channelRef.current?.postMessage({
                             type: "audioFeatures",
                             value: {
-                                amplitude,
-                                bass: boosted(rawBass, bassGain),
-                                mid: boosted(rawMid, midGain),
-                                treble: boosted(rawTreble, trebleGain),
+                                bass,
+                                mid,
+                                treble,
+                                bpm,
                             },
                         });
                     } catch (err) {
@@ -93,5 +119,5 @@ export function useAudioFeatures({
                 audioContext.close().catch(() => {});
             }
         };
-    }, [amplitudeGain, bassGain, midGain, trebleGain]);
+    }, [bassGain, midGain, trebleGain]);
 }

@@ -7,7 +7,12 @@ export default function SettingsPanel() {
     const [bassSensitivity, setBassSensitivity] = useState(5);
     const [midSensitivity, setMidSensitivity] = useState(5);
     const [trebleSensitivity, setTrebleSensitivity] = useState(5);
-    const [features, setFeatures] = useState({ bass: 0, mid: 0, treble: 0 });
+    const [features, setFeatures] = useState({
+        bass: 0,
+        mid: 0,
+        treble: 0,
+        bpm: 0,
+    });
 
     const channelRef = useRef(null);
 
@@ -30,7 +35,6 @@ export default function SettingsPanel() {
         return () => ch.close();
     }, []);
 
-    // ✅ Send preset ID instead of function
     const handlePresetSelect = (preset) => {
         if (preset?.id) {
             channelRef.current?.postMessage({ type: "selectPreset", id: preset.id });
@@ -53,6 +57,13 @@ export default function SettingsPanel() {
                 <label className="block mb-1">Treble: {trebleSensitivity.toFixed(1)}</label>
                 <input type="range" min="0.1" max="10" step="0.1" value={trebleSensitivity}
                        onChange={(e) => setTrebleSensitivity(parseFloat(e.target.value))} className="w-full mb-3" />
+            </div>
+
+            <div className="mb-6">
+                <h2 className="text-lg font-bold mb-2">🕒 Detected BPM</h2>
+                <div className="text-xl font-mono text-green-400">
+                    {features.bpm ? `${features.bpm} BPM` : "Detecting..."}
+                </div>
             </div>
 
             <div className="mb-6">

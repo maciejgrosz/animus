@@ -11,10 +11,12 @@ import {
 export default function App() {
     const [showUI, setShowUI] = useState(true);
     const canvasRef = useRef(null);
+    const currentPresetIndex = useRef(0); // 🔄 Tracks current preset index
     const { initHydra, applyPreset } = useHydra();
 
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
+
         channel.onmessage = (event) => {
             const { type, value, id } = event.data;
 
@@ -26,10 +28,13 @@ export default function App() {
                 const match = presets.find((p) => p.id === id);
                 if (match) {
                     applyPreset(match.fn);
+                    currentPresetIndex.current = presets.findIndex((p) => p.id === id);
                     console.log("🎛️ Switched to preset:", match.name);
                 } else {
                     console.warn("❌ Preset ID not found:", id);
                 }
+            } else if (type === "beatDetected") {
+                triggerNextPreset();
             }
         };
 
@@ -40,10 +45,24 @@ export default function App() {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
             initHydra(canvas);
-            // 🎬 You can apply any default preset here
-            applyPreset(presets[0].fn);
+            applyPreset(presets[0].fn); // 🟢 Initial preset
         }
     }, []);
+    const lastSwitchTime = useRef(0); // 🕒 store last time a preset changed
+    const switchCooldown = 2000; // ⏳ 2 seconds minimum between changes
+    const triggerNextPreset = () => {
+        const now = Date.now();
+        if (now - lastSwitchTime.current < switchCooldown) return; // ⛔ too soon
+        lastSwitchTime.current = now;
+
+        const nextIndex = (currentPresetIndex.current + 1) % presets.length;
+        const nextPreset = presets[nextIndex];
+        if (nextPreset) {
+            applyPreset(nextPreset.fn);
+            currentPresetIndex.current = nextIndex;
+            console.log("🎚️ Auto-switched to preset:", nextPreset.name);
+        }
+    };
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
