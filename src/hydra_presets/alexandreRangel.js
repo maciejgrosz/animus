@@ -42,5 +42,6 @@ export function alexandreRangel(getBass, getMid, getTreble) {
             shape(100, 0.9 + mid() * 0.1, 0.01 + treble() * 0.02)
                 .scale(1, 0.6 + bass() * 0.1, 1)
         )
+        .saturate(() => 1.2 + treble() * 1.5) // ✅ new: dynamic color boost
         .out();
 }
