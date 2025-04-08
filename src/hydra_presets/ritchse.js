@@ -3,10 +3,12 @@
 //by Ritchse
 //instagram.com/ritchse
 //
-export function ritchse(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
+
+export function ritchse() {
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble() *0.1;
 
     voronoi(() => 350 + bass() * 300, 0.15)
         .modulateScale(osc(() => 8 + mid() * 2).rotate(() => Math.sin(time + treble() * 2)), () => 0.5 + bass() * 0.2)
