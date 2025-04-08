@@ -21,7 +21,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/ameba.png", import.meta.url).href,
     },
     {
         id: "alexandreRangel",
@@ -34,7 +34,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/alexandreRangel.png", import.meta.url).href,
     },
     {
         id: "alexandreRangelBright",
@@ -47,7 +47,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/alexandreRangelB.png", import.meta.url).href,
     },
     {
         id: "florDeFuego",
@@ -60,7 +60,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../assets/previews/florDeFuego.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/florDeFuego.png", import.meta.url).href,
     },
     {
         id: "liquidAcid",
@@ -73,7 +73,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/video.png", import.meta.url).href,
     },
     {
         id: "nesso",
@@ -86,7 +86,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/nesso.png", import.meta.url).href,
     },
     {
         id: "oliviaJack",
@@ -99,7 +99,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../assets/previews/oliviaJack1.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/oliviaJack1.png", import.meta.url).href,
     },
     {
         id: "oliviaJack2",
@@ -112,7 +112,7 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
-        preview: new URL("../assets/previews/oliviaJack2.png", import.meta.url).href,
+        preview: new URL("../../public/assets/textures/oliviaJack2.png", import.meta.url).href,
     },
     {
         id: "paintingReactive",

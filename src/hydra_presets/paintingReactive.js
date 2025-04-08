@@ -1,18 +1,24 @@
-// src/hydra_presets/paintingReactive.js
+// paintingReactive — painterly visual with bass/mid/treble reactivity
+// bazant.jpg flows gently with the music
 
-export function paintingReactive(getAmplitude) {
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
+
+export function paintingReactive(getBass, getMid, getTreble) {
     s0.initImage("/assets/textures/bazant.jpg");
 
-    const amp = () => getAmplitude?.() ?? 0;
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble();
 
     src(s0)
-        .scrollY(() => Math.sin(time * 0.1) * (0.01 + amp() * 0.02))         // vertical drift + audio lift
-        .modulate(noise(3, 0.1), () => 0.03 + amp() * 0.1)                  // stronger distortion with volume
-        .scale(() => 1 + 0.05 * Math.sin(time * 0.4 + amp() * 5))           // breathing pulse reacts to sound
-        .contrast(1.1)
-        .saturate(1.3)
+        .scrollY(() => Math.sin(time * 0.1) * (0.01 + bass() * 0.02))         // bass lifts gently
+        .modulate(noise(3, 0.1), () => 0.02 + mid() * 0.08)                   // mid = fluid distortion
+        .scale(() => 1 + 0.03 * Math.sin(time * 0.4 + treble() * 5))          // treble pulse breathing
+        .contrast(1.1 + bass() * 0.2)                                         // punch with bass
+        .saturate(() => 1.2 + treble() * 0.4)                                 // high-end sparkle
         .out(o0);
 }
+
 
 
 // export function paintingReactive() {

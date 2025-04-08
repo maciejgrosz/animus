@@ -1,10 +1,12 @@
 // licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
 // by Olivia Jack
 // https://ojack.github.io
-export function oliviaJack(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
+
+export function oliviaJack() {
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble();
 
     osc(6 + bass() * 4, 0, 0.8) // 🥁 bass affects frequency
         .color(1.14 - mid() * 0.5, 0.6 + bass() * 0.2, 0.8 + treble() * 0.3) // 🎨 mid/tone-based tinting
@@ -26,10 +28,10 @@ export function oliviaJack(getBass, getMid, getTreble) {
 
 // src/hydra_presets/oliviaJack2.js
 
-export function oliviaJack2(getBass, getMid, getTreble) {
-    const bass = () => getBass?.() ?? 0;
-    const mid = () => getMid?.() ?? 0;
-    const treble = () => getTreble?.() ?? 0;
+export function oliviaJack2() {
+    const bass = () => getSmoothedBass();
+    const mid = () => getSmoothedMid();
+    const treble = () => getSmoothedTreble();
 
     osc(4, 0.1 + bass() * 0.3, 0.8)
         .color(
@@ -43,5 +45,7 @@ export function oliviaJack2(getBass, getMid, getTreble) {
             () => 20 + mid() * 80
         )
         .modulate(noise(2.5), () => 1.5 * Math.sin(0.08 * time + treble() * 4))
+        .hue(() => time * 0.003 + treble() * 0.01)
+        .add(src(o0).scale(1.01).brightness(-0.02), 0.2)
         .out(o0);
 }
