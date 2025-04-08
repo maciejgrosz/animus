@@ -7,7 +7,9 @@ import { guide } from "@hydra_presets/guide"
 import { waveforms } from "@hydra_presets/waveforms"
 import { blendPrototype } from "@hydra_presets/blendPrototype";
 import { zachKrall } from "@hydra_presets/zachKrall";
-
+import { liquidAcid} from "@hydra_presets/liquidAcid";
+import { alexandreRangel } from "@hydra_presets/alexandreRangel"
+import { nesso } from "@hydra_presets/nesso"
 export const presets = [
     {
         id: "oliviaJack",
@@ -101,6 +103,45 @@ export const presets = [
         mood: "responsive",
         fn: () =>
             waveforms(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
+    },
+    {
+        id: "liquidAcid",
+        name: "liquidAcid",
+        author: "You 🔊",
+        mood: "responsive",
+        fn: () =>
+            liquidAcid(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
+    },
+    {
+        id: "alexandreRangel",
+        name: "alexandreRangel",
+        author: "You 🔊",
+        mood: "responsive",
+        fn: () =>
+            alexandreRangel(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href, // Optional
+    },
+    {
+        id: "nesso",
+        name: "nesso",
+        author: "You 🔊",
+        mood: "responsive",
+        fn: () =>
+            nesso(
                 () => bassRef.current,
                 () => midRef.current,
                 () => trebleRef.current
