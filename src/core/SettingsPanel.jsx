@@ -7,6 +7,7 @@ export default function SettingsPanel() {
     const [bassSensitivity, setBassSensitivity] = useState(5);
     const [midSensitivity, setMidSensitivity] = useState(5);
     const [trebleSensitivity, setTrebleSensitivity] = useState(5);
+    const [autoSwitchEnabled, setAutoSwitchEnabled] = useState(true); // ✅ toggle state
     const [features, setFeatures] = useState({
         bass: 0,
         mid: 0,
@@ -41,6 +42,15 @@ export default function SettingsPanel() {
         }
     };
 
+    const handleToggleAutoSwitch = () => {
+        const newValue = !autoSwitchEnabled;
+        setAutoSwitchEnabled(newValue);
+        channelRef.current?.postMessage({
+            type: "autoSwitchEnabled",
+            value: newValue,
+        });
+    };
+
     return (
         <div className="p-4 text-white bg-black h-screen w-full overflow-y-auto text-sm">
             <div className="mb-6">
@@ -61,9 +71,19 @@ export default function SettingsPanel() {
 
             <div className="mb-6">
                 <h2 className="text-lg font-bold mb-2">🕒 Detected BPM</h2>
-                <div className="text-xl font-mono text-green-400">
+                <div className="text-xl font-mono text-green-400 mb-3">
                     {features.bpm ? `${features.bpm} BPM` : "Detecting..."}
                 </div>
+
+                {/* ✅ Toggle Button */}
+                <button
+                    onClick={handleToggleAutoSwitch}
+                    className={`px-4 py-2 rounded text-white text-sm transition ${
+                        autoSwitchEnabled ? "bg-green-600" : "bg-gray-600"
+                    }`}
+                >
+                    {autoSwitchEnabled ? "Auto-Switch ON" : "Auto-Switch OFF"}
+                </button>
             </div>
 
             <div className="mb-6">

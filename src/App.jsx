@@ -11,8 +11,25 @@ import {
 export default function App() {
     const [showUI, setShowUI] = useState(true);
     const canvasRef = useRef(null);
-    const currentPresetIndex = useRef(0); // 🔄 Tracks current preset index
+    const currentPresetIndex = useRef(0);
+    const lastSwitchTime = useRef(0);
+    const switchCooldown = 2000; // 2 seconds
+    const autoSwitchEnabled = useRef(true); // ✅ Toggle state from Settings
     const { initHydra, applyPreset } = useHydra();
+
+    const triggerNextPreset = () => {
+        const now = Date.now();
+        if (now - lastSwitchTime.current < switchCooldown) return;
+        lastSwitchTime.current = now;
+
+        const nextIndex = (currentPresetIndex.current + 1) % presets.length;
+        const nextPreset = presets[nextIndex];
+        if (nextPreset) {
+            applyPreset(nextPreset.fn);
+            currentPresetIndex.current = nextIndex;
+            console.log("🎚️ Auto-switched to preset:", nextPreset.name);
+        }
+    };
 
     useEffect(() => {
         const channel = new BroadcastChannel("animus-control");
@@ -33,8 +50,13 @@ export default function App() {
                 } else {
                     console.warn("❌ Preset ID not found:", id);
                 }
+            } else if (type === "autoSwitchEnabled") {
+                autoSwitchEnabled.current = !!value;
+                console.log("🔁 Auto-switch now", autoSwitchEnabled.current ? "enabled" : "disabled");
             } else if (type === "beatDetected") {
-                triggerNextPreset();
+                if (autoSwitchEnabled.current) {
+                    triggerNextPreset();
+                }
             }
         };
 
@@ -45,24 +67,9 @@ export default function App() {
         const canvas = document.getElementById("hydra-canvas");
         if (canvas) {
             initHydra(canvas);
-            applyPreset(presets[0].fn); // 🟢 Initial preset
+            applyPreset(presets[0].fn); // Initial preset
         }
     }, []);
-    const lastSwitchTime = useRef(0); // 🕒 store last time a preset changed
-    const switchCooldown = 2000; // ⏳ 2 seconds minimum between changes
-    const triggerNextPreset = () => {
-        const now = Date.now();
-        if (now - lastSwitchTime.current < switchCooldown) return; // ⛔ too soon
-        lastSwitchTime.current = now;
-
-        const nextIndex = (currentPresetIndex.current + 1) % presets.length;
-        const nextPreset = presets[nextIndex];
-        if (nextPreset) {
-            applyPreset(nextPreset.fn);
-            currentPresetIndex.current = nextIndex;
-            console.log("🎚️ Auto-switched to preset:", nextPreset.name);
-        }
-    };
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
