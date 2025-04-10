@@ -14,6 +14,16 @@ import {AFALFL} from "@hydra_presets/AFALFL";
 
 export const presets = [
     {
+        id: "threeBloomIcosphere",
+        name: "Bloom Icosphere",
+        description: "Wireframe bloom + audio-reactive icosphere",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "threeBloomIcosphere" });
+        },
+        preview: new URL("../../public/assets/textures/threejsBloom.png", import.meta.url).href,
+    },
+    {
         id: "threeTunnel",
         name: "Three.js Tunnel",
         description: "A GLSL-based tunnel with audio reactivity",
