@@ -5,11 +5,87 @@ import { paintingReactive } from "@hydra_presets/paintingReactive"
 import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs";
 import { waveforms } from "@hydra_presets/waveforms"
 import { zachKrall } from "@hydra_presets/zachKrall";
-import { liquidAcid} from "@hydra_presets/liquidAcid";
+import { khoparzi, khoparziAquatic } from "@hydra_presets/khoparzi";
 import { alexandreRangel, alexandreRangelBright } from "@hydra_presets/alexandreRangel"
-import { nesso } from "@hydra_presets/nesso"
+import {nesso, nessoRandom} from "@hydra_presets/nesso"
 import { ameba } from "@hydra_presets/ameba"
+import { velvetPool } from "@hydra_presets/velvetPool"
+import {AFALFL} from "@hydra_presets/AFALFL";
+
 export const presets = [
+    {
+        id: "threeTunnel",
+        name: "Three.js Tunnel",
+        description: "A GLSL-based tunnel with audio reactivity",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "threeTunnel" }); // ✅ Send only selectThree
+        },
+        preview: new URL("../../public/assets/textures/threejs.png", import.meta.url).href,
+    },
+     {
+        id: 'AFALFL',
+        name: 'AFALFL',
+        description: 'A net-like oscilloscope grid modulated by bass, mid, and treble',
+         fn: () =>
+             AFALFL(
+                 () => bassRef.current,
+                 () => midRef.current,
+                 () => trebleRef.current
+             ),
+        thumbnail: 'thumbnails/oscilloscopeNet.png', // optional
+    },
+    {
+        id: "khoparzi",
+        name: "khoparzi",
+        author: "You 🔊",
+        mood: "glitchy, techno",
+        fn: () =>
+            khoparzi(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/khoparzi.png", import.meta.url).href,
+    },
+    {
+        id: "khoparziAquatic",
+        name: "khoparziAquatic",
+        author: "You 🔊",
+        mood: "glitchy, techno",
+        fn: () =>
+            khoparziAquatic(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/khoparzi.png", import.meta.url).href,
+    },
+    {
+        id: "velvetPool",
+        name: "Velvet Pool",
+        author: "Mahalia H-R",
+        mood: "velvety, fluid, layered",
+        fn: () => velvetPool(
+            () => bassRef.current,
+            () => midRef.current,
+            () => trebleRef.current
+        ),
+        preview: new URL("../../public/assets/textures/guide.png", import.meta.url).href,
+    },
+    {
+        id: "nesso",
+        name: "Nesso",
+        author: "You 🔊",
+        mood: "glitchy, techno",
+        fn: () =>
+            nesso(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        preview: new URL("../../public/assets/textures/nesso.png", import.meta.url).href,
+    },
     {
         id: "ameba",
         name: "Ameba",
@@ -62,26 +138,27 @@ export const presets = [
             ),
         preview: new URL("../../public/assets/textures/florDeFuego.png", import.meta.url).href,
     },
+    // {
+    //     id: "liquidAcid",
+    //     name: "Liquid Acid",
+    //     author: "You 🔊",
+    //     mood: "fluid, responsive",
+    //     fn: () =>
+    //         liquidAcid(
+    //             () => bassRef.current,
+    //             () => midRef.current,
+    //             () => trebleRef.current
+    //         ),
+    //     preview: new URL("../../public/assets/textures/video.png", import.meta.url).href,
+    // },
+
     {
-        id: "liquidAcid",
-        name: "Liquid Acid",
-        author: "You 🔊",
-        mood: "fluid, responsive",
-        fn: () =>
-            liquidAcid(
-                () => bassRef.current,
-                () => midRef.current,
-                () => trebleRef.current
-            ),
-        preview: new URL("../../public/assets/textures/video.png", import.meta.url).href,
-    },
-    {
-        id: "nesso",
-        name: "Nesso",
+        id: "nessoRandom",
+        name: "Nesso Random",
         author: "You 🔊",
         mood: "glitchy, techno",
         fn: () =>
-            nesso(
+            nessoRandom(
                 () => bassRef.current,
                 () => midRef.current,
                 () => trebleRef.current

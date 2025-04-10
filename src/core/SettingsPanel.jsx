@@ -7,7 +7,7 @@ export default function SettingsPanel() {
     const [bassSensitivity, setBassSensitivity] = useState(5);
     const [midSensitivity, setMidSensitivity] = useState(5);
     const [trebleSensitivity, setTrebleSensitivity] = useState(5);
-    const [autoSwitchEnabled, setAutoSwitchEnabled] = useState(true); // ✅ toggle state
+    const [autoSwitchEnabled, setAutoSwitchEnabled] = useState(true);
     const [features, setFeatures] = useState({
         bass: 0,
         mid: 0,
@@ -51,6 +51,11 @@ export default function SettingsPanel() {
         });
     };
 
+    const handleRandomize = () => {
+        window.__RANDOMIZE?.();
+        channelRef.current?.postMessage({ type: "randomizePreset" });
+    };
+
     return (
         <div className="p-4 text-white bg-black h-screen w-full overflow-y-auto text-sm">
             <div className="mb-6">
@@ -75,7 +80,6 @@ export default function SettingsPanel() {
                     {features.bpm ? `${features.bpm} BPM` : "Detecting..."}
                 </div>
 
-                {/* ✅ Toggle Button */}
                 <button
                     onClick={handleToggleAutoSwitch}
                     className={`px-4 py-2 rounded text-white text-sm transition ${
@@ -83,6 +87,13 @@ export default function SettingsPanel() {
                     }`}
                 >
                     {autoSwitchEnabled ? "Auto-Switch ON" : "Auto-Switch OFF"}
+                </button>
+
+                <button
+                    onClick={handleRandomize}
+                    className="w-full mt-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition text-sm"
+                >
+                    🎲 Randomize Visual
                 </button>
             </div>
 
