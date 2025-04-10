@@ -18,7 +18,7 @@ export default function App() {
     const currentPresetIndex = useRef(0);
     const lastSwitchTime = useRef(0);
     const switchCooldown = 2000;
-    const autoSwitchEnabled = useRef(true);
+    const autoSwitchEnabled = useRef(false);
     const { initHydra, applyPreset } = useHydra();
 
     const triggerNextPreset = () => {
