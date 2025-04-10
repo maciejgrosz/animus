@@ -7,14 +7,18 @@ import {
     midRef,
     trebleRef,
 } from "@core/audioRefs";
+import ThreeCanvas from "@core/ThreeCanvas";
 
 export default function App() {
     const [showUI, setShowUI] = useState(true);
+    const [useThree, setUseThree] = useState(false);
+    const [selectedThreeId, setSelectedThreeId] = useState("threeTunnel");
     const canvasRef = useRef(null);
+    const hydraInitialized = useRef(false);
     const currentPresetIndex = useRef(0);
     const lastSwitchTime = useRef(0);
-    const switchCooldown = 2000; // 2 seconds
-    const autoSwitchEnabled = useRef(true); // ✅ Toggle state from Settings
+    const switchCooldown = 2000;
+    const autoSwitchEnabled = useRef(true);
     const { initHydra, applyPreset } = useHydra();
 
     const triggerNextPreset = () => {
@@ -24,8 +28,15 @@ export default function App() {
 
         const nextIndex = (currentPresetIndex.current + 1) % presets.length;
         const nextPreset = presets[nextIndex];
+
         if (nextPreset) {
-            applyPreset(nextPreset.fn);
+            if (nextPreset.id === "threeTunnel") {
+                setUseThree(true);
+                setSelectedThreeId("threeTunnel");
+            } else {
+                setUseThree(false);
+                applyPreset(nextPreset.fn);
+            }
             currentPresetIndex.current = nextIndex;
             console.log("🎚️ Auto-switched to preset:", nextPreset.name);
         }
@@ -44,18 +55,36 @@ export default function App() {
             } else if (type === "selectPreset" && id) {
                 const match = presets.find((p) => p.id === id);
                 if (match) {
-                    applyPreset(match.fn);
+                    if (match.id === "threeTunnel") {
+                        setUseThree(true);
+                        setSelectedThreeId("threeTunnel");
+                    } else {
+                        setUseThree(false);
+                        applyPreset(match.fn);
+                    }
                     currentPresetIndex.current = presets.findIndex((p) => p.id === id);
                     console.log("🎛️ Switched to preset:", match.name);
                 } else {
                     console.warn("❌ Preset ID not found:", id);
                 }
+            } else if (type === "selectThree") {
+                setUseThree(true);
+                if (id) setSelectedThreeId(id);
+                currentPresetIndex.current = -1;
+                console.log("🎥 Switched to Three.js shader:", id);
             } else if (type === "autoSwitchEnabled") {
                 autoSwitchEnabled.current = !!value;
                 console.log("🔁 Auto-switch now", autoSwitchEnabled.current ? "enabled" : "disabled");
             } else if (type === "beatDetected") {
                 if (autoSwitchEnabled.current) {
                     triggerNextPreset();
+                }
+            } else if (type === "randomizePreset") {
+                if (typeof window.__RANDOMIZE === "function") {
+                    window.__RANDOMIZE();
+                    console.log("🎲 Randomized preset parameters");
+                } else {
+                    console.warn("⚠️ This preset doesn't support randomization");
                 }
             }
         };
@@ -64,16 +93,28 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        const canvas = document.getElementById("hydra-canvas");
-        if (canvas) {
-            initHydra(canvas);
-            applyPreset(presets[0].fn); // Initial preset
+        if (!useThree) {
+            const canvas = document.getElementById("hydra-canvas");
+
+            if (canvas && !hydraInitialized.current) {
+                initHydra(canvas);
+                hydraInitialized.current = true;
+            }
+
+            const currentPreset = presets[currentPresetIndex.current];
+            if (currentPreset && currentPreset.fn) {
+                // 🕐 Delay re-applying preset slightly to ensure Hydra has taken control of canvas
+                setTimeout(() => {
+                    console.log("🔁 Re-applying Hydra preset:", currentPreset.name);
+                    applyPreset(currentPreset.fn);
+                }, 50); // 50ms is usually enough
+            }
         }
-    }, []);
+    }, [useThree]);
 
     const handleStart = () => {
         const canvas = document.getElementById("hydra-canvas");
-        if (canvas) {
+        if (canvas || useThree) {
             setShowUI(false);
         } else {
             console.warn("❌ Canvas not found!");
@@ -86,11 +127,14 @@ export default function App() {
 
     return (
         <div className="relative w-screen h-screen overflow-hidden">
-            <canvas
-                ref={canvasRef}
-                id="hydra-canvas"
-                className="fixed top-0 left-0 w-full h-full z-0"
-            />
+            {useThree ? (
+                <ThreeCanvas selectedPreset={selectedThreeId} />
+            ) : (
+                <HydraCanvas
+                    key={`hydra-${currentPresetIndex.current}`}
+                    presetFn={presets[currentPresetIndex.current]?.fn}
+                />
+            )}
 
             <button
                 onClick={handleOpenSettings}

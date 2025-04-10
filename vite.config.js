@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import polyfillNode from 'rollup-plugin-polyfill-node'
+// import fragmentShader from "../shaders/tunnel.frag?raw";
 
 export default defineConfig({
   plugins: [react()],
