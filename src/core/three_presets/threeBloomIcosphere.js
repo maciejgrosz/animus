@@ -5,7 +5,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
 import vertexShader from "../../shaders/basic.vert?raw";
 import fragmentShader from "../../shaders/net.frag?raw";
-import { bassRef } from "../audioRefs";
+import {bassRef, midRef, trebleRef} from "../audioRefs";
 
 export function createThreeBloomIcosphere(canvas) {
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
@@ -20,10 +20,13 @@ export function createThreeBloomIcosphere(canvas) {
     const uniforms = {
         u_time: { value: 0.0 },
         u_bass: { value: 0.0 },
-        u_red: { value: 0.9 },
-        u_green: { value: 0.9 },
+        u_mid: { value: 0.0 },
+        u_treble: { value: 0.0 },
+        u_red: { value: 0.5 },
+        u_green: { value: 0.6 },
         u_blue: { value: 0.9 },
     };
+
 
     const geometry = new THREE.IcosahedronGeometry(4, 50); // ✅ Less complex sphere
     const material = new THREE.ShaderMaterial({
@@ -34,6 +37,7 @@ export function createThreeBloomIcosphere(canvas) {
     });
 
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.scale.set(0.5, 0.5, 0.5); // scales the whole sphere to 50%
     scene.add(mesh);
 
     const composer = new EffectComposer(renderer);
@@ -46,9 +50,11 @@ export function createThreeBloomIcosphere(canvas) {
     function animate() {
         uniforms.u_time.value = clock.getElapsedTime();
         uniforms.u_bass.value = bassRef.current;
+        uniforms.u_mid.value = midRef.current;
+        uniforms.u_treble.value = trebleRef.current;
 
         camera.lookAt(scene.position);
-        composer.render();
+        renderer.render(scene, camera);
         frameId = requestAnimationFrame(animate);
     }
     animate();
