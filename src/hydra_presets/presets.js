@@ -15,6 +15,7 @@ import {AFALFL} from "@hydra_presets/AFALFL";
 export const presets = [
     {
         id: "threeBloomIcosphere",
+        engine: "threejs",
         name: "Bloom Icosphere",
         description: "Wireframe bloom + audio-reactive icosphere",
         fn: () => {
@@ -25,28 +26,31 @@ export const presets = [
     },
     {
         id: "threeTunnel",
+        engine: "threejs",
         name: "Three.js Tunnel",
         description: "A GLSL-based tunnel with audio reactivity",
         fn: () => {
             const channel = new BroadcastChannel("animus-control");
-            channel.postMessage({ type: "selectThree", id: "threeTunnel" }); // ✅ Send only selectThree
+            channel.postMessage({ type: "selectThree", id: "threeTunnel" });
         },
         preview: new URL("../../public/assets/textures/threejs.png", import.meta.url).href,
     },
-     {
+    {
         id: 'AFALFL',
+        engine: "hydra",
         name: 'AFALFL',
         description: 'A net-like oscilloscope grid modulated by bass, mid, and treble',
-         fn: () =>
-             AFALFL(
-                 () => bassRef.current,
-                 () => midRef.current,
-                 () => trebleRef.current
-             ),
-        thumbnail: 'thumbnails/oscilloscopeNet.png', // optional
+        fn: () =>
+            AFALFL(
+                () => bassRef.current,
+                () => midRef.current,
+                () => trebleRef.current
+            ),
+        thumbnail: 'thumbnails/oscilloscopeNet.png',
     },
     {
         id: "khoparzi",
+        engine: "hydra",
         name: "khoparzi",
         author: "You 🔊",
         mood: "glitchy, techno",
@@ -60,6 +64,7 @@ export const presets = [
     },
     {
         id: "khoparziAquatic",
+        engine: "hydra",
         name: "khoparziAquatic",
         author: "You 🔊",
         mood: "glitchy, techno",
@@ -73,6 +78,7 @@ export const presets = [
     },
     {
         id: "velvetPool",
+        engine: "hydra",
         name: "Velvet Pool",
         author: "Mahalia H-R",
         mood: "velvety, fluid, layered",
@@ -85,6 +91,7 @@ export const presets = [
     },
     {
         id: "nesso",
+        engine: "hydra",
         name: "Nesso",
         author: "You 🔊",
         mood: "glitchy, techno",
@@ -98,6 +105,7 @@ export const presets = [
     },
     {
         id: "ameba",
+        engine: "hydra",
         name: "Ameba",
         author: "Alexandre Rangel",
         mood: "dreamy, biological, trippy",
@@ -111,6 +119,7 @@ export const presets = [
     },
     {
         id: "alexandreRangel",
+        engine: "hydra",
         name: "Alexandre Rangel",
         author: "Alexandre Rangel",
         mood: "dreamy, biological, trippy",
@@ -124,6 +133,7 @@ export const presets = [
     },
     {
         id: "alexandreRangelBright",
+        engine: "hydra",
         name: "Alexandre Rangel Bright",
         author: "Alexandre Rangel",
         mood: "dreamy, vibrant",
@@ -137,6 +147,7 @@ export const presets = [
     },
     {
         id: "florDeFuego",
+        engine: "hydra",
         name: "Flor de Fuego",
         author: "Unknown",
         mood: "dreamy",
@@ -148,22 +159,9 @@ export const presets = [
             ),
         preview: new URL("../../public/assets/textures/florDeFuego.png", import.meta.url).href,
     },
-    // {
-    //     id: "liquidAcid",
-    //     name: "Liquid Acid",
-    //     author: "You 🔊",
-    //     mood: "fluid, responsive",
-    //     fn: () =>
-    //         liquidAcid(
-    //             () => bassRef.current,
-    //             () => midRef.current,
-    //             () => trebleRef.current
-    //         ),
-    //     preview: new URL("../../public/assets/textures/video.png", import.meta.url).href,
-    // },
-
     {
         id: "nessoRandom",
+        engine: "hydra",
         name: "Nesso Random",
         author: "You 🔊",
         mood: "glitchy, techno",
@@ -177,6 +175,7 @@ export const presets = [
     },
     {
         id: "oliviaJack",
+        engine: "hydra",
         name: "Olivia Jack 1",
         author: "Olivia Jack",
         mood: "psychedelic",
@@ -190,6 +189,7 @@ export const presets = [
     },
     {
         id: "oliviaJack2",
+        engine: "hydra",
         name: "Olivia Jack 2",
         author: "Olivia Jack",
         mood: "glitchy",
@@ -203,6 +203,7 @@ export const presets = [
     },
     {
         id: "paintingReactive",
+        engine: "hydra",
         name: "Psychedelic Paint Pour",
         author: "Alexander Grey",
         mood: "trippy, colorful",
@@ -211,6 +212,7 @@ export const presets = [
     },
     {
         id: "ritchse",
+        engine: "hydra",
         name: "Ritchse",
         author: "Ritchse",
         mood: "sci-fi, alien",
@@ -224,6 +226,7 @@ export const presets = [
     },
     {
         id: "waveforms",
+        engine: "hydra",
         name: "Waveform Zones",
         author: "You 🔊",
         mood: "responsive",
@@ -237,6 +240,7 @@ export const presets = [
     },
     {
         id: "zachKrall",
+        engine: "hydra",
         name: "Zach Krall",
         author: "Zach Krall",
         mood: "audio-reactive, waveform",
