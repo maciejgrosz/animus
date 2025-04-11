@@ -18,9 +18,11 @@ export function createThreeBloomIcosphere(canvas) {
     const geometry = new THREE.IcosahedronGeometry(2.2, 5);
     const colors = [];
     const randomOffsets = [];
+    const randomStretch = [];
     for (let i = 0; i < geometry.attributes.position.count; i++) {
-        colors.push(1, 1, 1); // domyślnie jasny kolor (biały)
+        colors.push(1, 1, 1);
         randomOffsets.push(Math.random() * Math.PI * 2);
+        randomStretch.push(Math.random());
     }
     geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
 
@@ -145,16 +147,22 @@ export function createThreeBloomIcosphere(canvas) {
     let pulseTimer = 0;
 
     function deformSphere(time) {
+        // Adjusted bass response curve to match desired perceptual mapping
+        const bass = bassRef.current;
+        const normalizedBass = Math.pow(Math.max(0, (bass - 0.2) / 0.8), 1.5); // nonlinear
+        const bassBoost = normalizedBass * 3.5;
+
         for (let i = 0; i < position.count; i++) {
             const ix = i * 3;
             const iy = ix + 1;
             const iz = ix + 2;
             const offset = randomOffsets[i];
-            const wave = Math.sin(time * 2.5 + offset * 4.0);
-            const factor = 1.0 + wave * 0.1 * (0.5 + bassRef.current);
-            position.array[ix] = initialPositions[ix] * factor;
-            position.array[iy] = initialPositions[iy] * factor;
-            position.array[iz] = initialPositions[iz] * factor;
+
+            const dynamicPulse = 1.0 + Math.sin(time * 10 + offset) * 0.4 * bassBoost;
+
+            position.array[ix] = initialPositions[ix] * dynamicPulse;
+            position.array[iy] = initialPositions[iy] * dynamicPulse;
+            position.array[iz] = initialPositions[iz] * dynamicPulse;
         }
         position.needsUpdate = true;
     }
@@ -162,7 +170,7 @@ export function createThreeBloomIcosphere(canvas) {
     function animate() {
         const time = clock.getElapsedTime();
 
-        if (trebleRef.current > 0.8 && trebleRef.current - lastTreble > 0.05) {
+        if (trebleRef.current > 0.6 && trebleRef.current - lastTreble > 0.05) {
             pulseActive = true;
             pulseTimer = time;
         }
@@ -171,7 +179,7 @@ export function createThreeBloomIcosphere(canvas) {
         deformSphere(time);
 
         for (let i = 0; i < colorAttr.count; i++) {
-            let r = 0.7, g = 0.8, b = 1.0;
+            let r = 1.0, g = 1.0, b = 1.0;
             if (pulseActive && time - pulseTimer < 0.5) {
                 r = 0.5 + 0.5 * Math.sin(i + time * 10);
                 g = 0.5 + 0.5 * Math.sin(i + time * 10 + 2);
