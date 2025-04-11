@@ -1,17 +1,17 @@
 import { presets } from "@hydra_presets/presets";
 
-export default function PresetGrid({ onSelect, thumbnailSize = "normal" }) {
+export default function PresetGrid({ onSelect, thumbnailSize = "normal", presets: filteredPresets = [] }) {
     const previewClass =
         thumbnailSize === "small"
             ? "h-[80px] object-cover mb-2 rounded-md"
             : "aspect-video object-cover mb-2 rounded-lg";
 
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-2">
-            {presets.map((preset) => (
+        <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-4 p-2">
+            {filteredPresets.map((preset) => (
                 <button
                     key={preset.id}
-                    onClick={() => onSelect(preset)} // ✅ pass full preset object
+                    onClick={() => onSelect(preset)}
                     className="bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl backdrop-blur border border-white/10 transition flex flex-col"
                 >
                     {preset.preview ? (
