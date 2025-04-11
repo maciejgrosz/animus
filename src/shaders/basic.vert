@@ -1,15 +1,14 @@
 uniform float u_time;
 uniform float u_bass;
 
-varying vec3 vNormal;
+varying vec3 vPosition;
 
 void main() {
-    vNormal = normal;
+    vPosition = position;
 
-    // Stronger, fluid-like deformation
-    float wave = sin(u_time + position.y * 4.0) * (0.1 + u_bass * 1.5);
+    float displacement = sin(u_time * 2.0 + position.y * 8.0 + position.x * 8.0) * u_bass * 1.0;
 
-    vec3 newPosition = position + normal * wave;
+    vec3 newPosition = position + normal * displacement;
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
 }
