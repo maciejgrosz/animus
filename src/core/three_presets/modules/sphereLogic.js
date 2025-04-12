@@ -2,7 +2,7 @@
 import * as THREE from "three";
 
 export function setupSphereGeometry() {
-    const geometry = new THREE.IcosahedronGeometry(2.2, 5);
+    const geometry = new THREE.IcosahedronGeometry(2.2, 1);
     const colors = [];
     const randomOffsets = [];
     const scatterDirections = [];
@@ -64,7 +64,7 @@ export function deformSphere({
 
         let dynamicPulse = 1.0 + Math.sin(time * 10 + offset) * 0.4 * bassBoost;
 
-        if (bass > 0.85) {
+        if (bass > 0.75) {
             const scatter = bass * 2.0;
             const dir = scatterDirections[i];
             position.array[ix] = initialPositions[ix] * dynamicPulse + dir.x * scatter;

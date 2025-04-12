@@ -42,7 +42,7 @@ export function createThreeBloomIcosphere(canvas) {
     function animate() {
         const time = clock.getElapsedTime();
 
-        if (trebleRef.current > 0.8 && trebleRef.current - lastTreble > 0.05) {
+        if (bassRef.current > 0.7 && trebleRef.current - lastTreble > 0.05) {
             pulseActive = true;
             pulseTimer = time;
         }
@@ -61,8 +61,8 @@ export function createThreeBloomIcosphere(canvas) {
             treble: trebleRef.current,
         });
 
-        mesh.rotation.y += 0.002 + midRef.current * 0.01;
-        mesh.rotation.x += 0.001 + midRef.current * 0.005;
+        mesh.rotation.y += 0.0002 + midRef.current * 0.001;
+        mesh.rotation.x += 0.0001 + midRef.current * 0.005;
 
         const waveFrequency = 2.0 + bassRef.current * 6.0;
         [leftColumn, rightColumn].forEach((col) => {
@@ -76,7 +76,7 @@ export function createThreeBloomIcosphere(canvas) {
             pos.needsUpdate = true;
         });
 
-        particleSystem.rotation.y += 0.001;
+        particleSystem.rotation.y += 0.001 - 0.0001 * bassRef.current;
 
         camera.lookAt(scene.position);
         composer.render();
