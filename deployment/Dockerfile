@@ -1,22 +1,20 @@
-# Dockerfile
-FROM python:3.9-slim
-
-# Prevent Python from writing .pyc files and enable unbuffered logging
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory
+# ========== Builder stage ==========
+FROM node:18 AS builder
 WORKDIR /app
 
-# Copy and install Python dependencies from the repository root
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy package.json and lock file first to install dependencies
+COPY ../package*.json ./
 
-# Copy the entire repository (build context) into the container
-COPY . /app/
+# Install dependencies
+RUN npm install
 
-# Expose the port that Gunicorn will use
-EXPOSE 8000
+# Copy rest of the project files
+COPY ../ ./
 
-# Start Gunicorn with 3 worker processes serving your Flask app
-CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "-m", "007", "app:app"]
+# Build the React app
+RUN npm run build
+
+# ========== Output stage (used in docker-compose via volume) ==========
+FROM alpine AS output
+WORKDIR /output
+COPY --from=builder /app/dist ./
