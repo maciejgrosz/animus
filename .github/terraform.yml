@@ -1,39 +1,47 @@
-name: Terraform Deploy
+name: Deploy IaC
 
 on:
   push:
     branches:
-      - main  # Trigger on push to main branch
-  pull_request:
-    branches:
-      - main  # Trigger on pull request to main branch
+      - main
+    paths:
+      - 'deployment/**'
+  workflow_dispatch: # allows manual trigger
 
 jobs:
-  terraform:
+  deploy:
+    name: Deploy Infrastructure
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: deployment
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: "1.10.0"
+          terraform_version: 1.5.7 # or your desired version
 
       - name: Terraform Init
-        run: |
-          cd deployment 
-          terraform init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
 
       - name: Terraform Plan
-        run: |
-          cd deployment  
-          terraform plan
-      - name: Terraform Apply
-        if: github.event_name == 'push'
-        run: |
-          cd deployment  
-          terraform apply -auto-approve
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply (Auto-Approved)
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
