@@ -1,28 +1,50 @@
-# React + Vite
+# Animus VJ Tool - Technical Documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This document provides technical details about the **Animus** VJ Tool, including setup instructions, dependencies, and contribution guidelines.
 
-Currently, two official plugins are available:
+## Setup:
+To run the project locally, follow the steps below:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/maciejgrosz/animus.git
+    cd animus
+    ```
 
-## Expanding the ESLint configuration
+2. **Install Dependencies**:
+   If you are using `npm`, run the following command:
+    ```bash
+    npm install
+    ```
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+3. **Start the Development Server**:
+   After installing the dependencies, start the development server:
+    ```bash
+    npm run dev
+    ```
+   This will start the app on `http://localhost:5173`.
 
+## Project Structure:
+- **public/**: Contains static assets like the `README.md` file and other resources.
+- **src/**: Contains the main React application code, including components like `HydraCanvas`, `ThreeCanvas`, and custom hooks like `useHydra`.
+- **core/**: Contains reusable functions and modules like `createAmbientSphere.js` for 3D effects.
 
+## Dependencies:
+- **React**: Frontend framework for building the user interface.
+- **Three.js**: JavaScript library for creating 3D graphics. Used for rendering the VJ visuals.
+- **Hydra**: Tool for creating generative visuals that react to audio input. We use it in combination with Three.js to generate complex visuals.
 
---- future enhancements ---
+## Audio Features:
+- **Mic Input**: The app uses the browser's `getUserMedia` API to access the microphone. This input is processed to extract frequency bands (bass, mid, treble), which are then used to control the visuals in real-time.
+- **Audio Analysis**: The frequency analysis is done in the backend using the Web Audio API, where we break down the audio signal into different frequency bands to control visual elements.
 
+## Contributing:
+Feel free to fork the project and contribute to its development. Here's how you can contribute:
+1. **Fork the repo** and clone it to your local machine.
+2. Create a **branch** (`git checkout -b feature-name`).
+3. Make your changes, and **commit** (`git commit -am 'Added feature'`).
+4. **Push** to your forked repo (`git push origin feature-name`).
+5. Create a **Pull Request** with a description of your changes.
 
-
-
-🎛️ WebSocket-Based Control Panel (Remote App)
-
-If you ever want to control Animus from your phone, iPad, or another machine, you could:
-
-Run a local server
-Serve a remote UI on your phone (http://192.168.0.x:5173/settings)
-Use WebSocket or HTTP to control the live visuals
-Very powerful for club setups or performances.
+## License:
+This project is licensed under the MIT License. See the `LICENSE` file for more information.

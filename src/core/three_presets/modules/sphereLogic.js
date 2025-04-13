@@ -2,7 +2,7 @@
 import * as THREE from "three";
 
 export function setupSphereGeometry() {
-    const geometry = new THREE.IcosahedronGeometry(2.2, 1);
+    const geometry = new THREE.IcosahedronGeometry(2.2, 2);
     const colors = [];
     const randomOffsets = [];
     const scatterDirections = [];

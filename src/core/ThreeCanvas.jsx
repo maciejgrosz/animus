@@ -1,7 +1,7 @@
-// src/core/ThreeCanvas.jsx
 import { useRef, useEffect } from "react";
 import { createTunnel } from "./three_presets/threeTunnel";
 import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere";
+import { createAmbientSphere } from "./three_presets/createAmbientSphere"; // ✅ Import the new preset
 
 export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
     const canvasRef = useRef();
@@ -11,10 +11,13 @@ export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
         if (!canvas) return;
 
         let cleanup = () => {};
+
         if (selectedPreset === "threeTunnel") {
             cleanup = createTunnel(canvas);
         } else if (selectedPreset === "threeBloomIcosphere") {
             cleanup = createThreeBloomIcosphere(canvas);
+        } else if (selectedPreset === "ambientSphere") {
+            cleanup = createAmbientSphere(canvas); // ✅ Handle new preset
         }
 
         return () => {

@@ -14,6 +14,17 @@ import {AFALFL} from "@hydra_presets/AFALFL";
 
 export const presets = [
     {
+        id: "ambientSphere",
+        engine: "threejs",
+        name: "Ambient Sphere",
+        description: "Gentle ambient-style 3D sphere with soft color shifts and fluid motion",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "ambientSphere" });
+        },
+        preview: new URL("../../public/assets/textures/ambientSphere.png", import.meta.url).href, // Update if you have a thumbnail
+    },
+    {
         id: "threeBloomIcosphere",
         engine: "threejs",
         name: "Bloom Icosphere",

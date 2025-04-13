@@ -4,7 +4,6 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass";
 import { bassRef, midRef, trebleRef } from "../audioRefs";
-import { createFixedSpringColumn } from "./modules/springColumns";
 import { createParticleHalo } from "./modules/particleHalo";
 import { setupSphereGeometry, deformSphere } from "./modules/sphereLogic";
 
@@ -24,10 +23,17 @@ export function createThreeBloomIcosphere(canvas) {
     scene.add(mesh);
 
     const particleSystem = createParticleHalo();
+    const particlePositions = particleSystem.geometry.attributes.position.array;
+    const baseParticlePositions = particlePositions.slice();
     scene.add(particleSystem);
 
-    const leftColumn = createFixedSpringColumn(-6, scene);
-    const rightColumn = createFixedSpringColumn(6, scene);
+    // Add ambient light and point light for better visibility
+    const ambientLight = new THREE.AmbientLight(0x555555);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0xffffff, 1.2);
+    pointLight.position.set(0, 0, 10);
+    scene.add(pointLight);
 
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
@@ -38,6 +44,8 @@ export function createThreeBloomIcosphere(canvas) {
     let lastTreble = 0;
     let pulseActive = false;
     let pulseTimer = 0;
+
+    let currentHue = 0;
 
     function animate() {
         const time = clock.getElapsedTime();
@@ -61,20 +69,27 @@ export function createThreeBloomIcosphere(canvas) {
             treble: trebleRef.current,
         });
 
+        // 🌈 Gentle neon shifting color effect based on mic input
+        const targetHue = (time * 0.05 + bassRef.current * 1.5 + trebleRef.current * 2) % 1.0;
+        currentHue += (targetHue - currentHue) * 0.05; // Smooth transition
+        mesh.material.color.setHSL(currentHue, 1, 0.6);
+
+        // Animate particles if bass is high
+        const bass = bassRef.current;
+        const positions = particleSystem.geometry.attributes.position.array;
+        for (let i = 0; i < positions.length; i += 3) {
+            const bx = baseParticlePositions[i];
+            const by = baseParticlePositions[i + 1];
+            const bz = baseParticlePositions[i + 2];
+            const boost = 1 + Math.sin(time * 10 + i) * 0.05 * bass * 10;
+            positions[i] = bx * boost;
+            positions[i + 1] = by * boost;
+            positions[i + 2] = bz * boost;
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+
         mesh.rotation.y += 0.0002 + midRef.current * 0.001;
         mesh.rotation.x += 0.0001 + midRef.current * 0.005;
-
-        const waveFrequency = 2.0 + bassRef.current * 6.0;
-        [leftColumn, rightColumn].forEach((col) => {
-            const pos = col.geometry.attributes.position;
-            for (let j = 0; j < pos.count; j++) {
-                const y = col.userData.basePositions[j * 3 + 1];
-                const angle = y * waveFrequency + time * 2.0;
-                const z = Math.sin(angle) * 0.3;
-                pos.setXYZ(j, col.userData.xOffset, y, z);
-            }
-            pos.needsUpdate = true;
-        });
 
         particleSystem.rotation.y += 0.001 - 0.0001 * bassRef.current;
 

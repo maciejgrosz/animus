@@ -125,6 +125,10 @@ export default function App() {
         window.open("/settings", "_blank", "width=400,height=600");
     };
 
+    const handleOpenReadme = () => {
+        window.open("/README", "_blank", "width=800,height=600"); // Adjust the window size for README
+    };
+
     return (
         <div className="relative w-screen h-screen overflow-hidden">
             {useThree ? (
@@ -150,12 +154,20 @@ export default function App() {
                         <p className="text-md text-gray-300 mb-6">
                             Create reactive visuals using sound and code. Welcome to the new era of browser-based VJing.
                         </p>
-                        <button
-                            onClick={handleStart}
-                            className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition"
-                        >
-                            Start Show
-                        </button>
+                        <div className="flex justify-center space-x-4">
+                            <button
+                                onClick={handleStart}
+                                className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition"
+                            >
+                                Start Show
+                            </button>
+                            <button
+                                onClick={handleOpenReadme}
+                                className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-lg transition"
+                            >
+                                README
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
