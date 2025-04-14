@@ -25,7 +25,6 @@ frontend:
             # OR if you want to rebuild it safely:
             rm -rf node_modules package-lock.json
             npm install
-            npm ci
 
             echo "📄 Showing package.json..."
             cat package.json
