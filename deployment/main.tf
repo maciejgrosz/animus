@@ -24,8 +24,8 @@ frontend:
             echo "🔁 Using Node.js v20..."
             nvm use 20
 
-            echo "🛠️ Node version: $(node -v)"
-            echo "📦 NPM version: $(npm -v)"
+            echo "🛠️ Node version: \$(node -v)"
+            echo "📦 NPM version: \$(npm -v)"
 
             echo "📦 Installing dependencies with npm ci..."
             npm ci
@@ -39,8 +39,8 @@ frontend:
             source $NVM_DIR/nvm.sh
             nvm use 20
 
-            echo "🛠️ Using Node version: $(node -v)"
-            echo "📦 Using NPM version: $(npm -v)"
+            echo "🛠️ Using Node version: \$(node -v)"
+            echo "📦 Using NPM version: \$(npm -v)"
             echo "📂 Listing node_modules/.bin:"
             ls -l ./node_modules/.bin
 
@@ -55,6 +55,7 @@ frontend:
     paths:
       - node_modules/**/*
 EOF
+
   environment_variables = {
     NODE_ENV = "production"
   }
