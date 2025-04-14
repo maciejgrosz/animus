@@ -8,32 +8,21 @@ frontend:
   phases:
     preBuild:
       commands:
-        - |
-          bash -c '
-            set -e
-            echo "📥 Installing NVM..."
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-            echo "🌀 Setting up NVM environment..."
-            export NVM_DIR=$HOME/.nvm
-            source $NVM_DIR/nvm.sh
-
-            echo "⬇️ Installing Node.js v20..."
-            nvm install 20
-
-            echo "🔁 Using Node.js v20..."
-            nvm use 20
-
-            echo "🛠️ Node version: \$(node -v)"
-            echo "📦 NPM version: \$(npm -v)"
-
-            echo "📦 Installing dependencies with npm ci..."
-            npm install
-            cat package.json
-            npm run build
-            echo "📂 Listing node_modules/.bin:"
-            ls -l ./node_modules/.bin
-          '
+        - echo "📥 Installing NVM..."
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+        - export NVM_DIR=$HOME/.nvm
+        - source $NVM_DIR/nvm.sh
+        - nvm install 20
+        - nvm use 20
+        - echo "🛠️ Node version: $(node -v)"
+        - echo "📦 NPM version: $(npm -v)"
+        - echo "📦 Installing dependencies..."
+        - npm install
+        - echo "📄 package.json:" && cat package.json
+        - echo "🏗️ Running build..."
+        - npm run build
+        - echo "📂 Listing node_modules/.bin:"
+        - ls -l ./node_modules/.bin
     build:
       commands:
         - |
