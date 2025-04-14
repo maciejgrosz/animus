@@ -24,7 +24,12 @@ frontend:
             export NVM_DIR=$HOME/.nvm &&
             source $NVM_DIR/nvm.sh &&
             nvm use 20 &&
-            npm run build
+            echo "🛠️ Using Node version: $(node -v)" &&
+            echo "📦 Using NPM version: $(npm -v)" &&
+            echo "📂 Listing node_modules/.bin:" &&
+            ls -l ./node_modules/.bin &&
+            echo "🚀 Building with Vite..." &&
+            ./node_modules/.bin/vite build
           '
   artifacts:
     baseDirectory: dist
