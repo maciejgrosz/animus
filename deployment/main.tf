@@ -7,6 +7,8 @@ resource "aws_amplify_app" "animus_app" {
     phases:
       preBuild:
         commands:
+          - nvm install 20
+          - nvm use 20
           - npm ci
       build:
         commands:
