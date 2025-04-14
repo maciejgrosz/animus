@@ -28,10 +28,9 @@ frontend:
             echo "📦 NPM version: \$(npm -v)"
 
             echo "📦 Installing dependencies with npm ci..."
-            npm ci
+            npm run build
             echo "📂 Listing node_modules/.bin:"
             ls -l ./node_modules/.bin
-
           '
     build:
       commands:
