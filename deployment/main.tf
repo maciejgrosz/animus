@@ -7,8 +7,13 @@ resource "aws_amplify_app" "animus_app" {
     phases:
       preBuild:
         commands:
+          - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+          - export NVM_DIR=$HOME/.nvm
+          - source $NVM_DIR/nvm.sh
           - nvm install 20
           - nvm use 20
+          - node -v
+          - npm -v
           - npm ci
       build:
         commands:
@@ -20,7 +25,6 @@ resource "aws_amplify_app" "animus_app" {
     cache:
       paths:
         - node_modules/**/*
-
     EOF
   environment_variables = {
     NODE_ENV = "production"
