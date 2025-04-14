@@ -18,7 +18,7 @@ frontend:
         - echo "📦 NPM version: $(npm -v)"
         - echo "📦 Installing dependencies..."
         - npm install
-        - echo "📄 package.json:" && cat package.json
+        - "echo 📄 package.json: && cat package.json"
         - echo "🏗️ Running build..."
         - npm run build
         - echo "📂 Listing node_modules/.bin:"
