@@ -14,14 +14,14 @@ frontend:
         - source $NVM_DIR/nvm.sh
         - nvm install 20
         - nvm use 20
-        - echo "🛠️ Node version: $(node -v)"
-        - echo "📦 NPM version: $(npm -v)"
+        - echo "🛠️ Node version $(node -v)"
+        - echo "📦 NPM version $(npm -v)"
         - echo "📦 Installing dependencies..."
         - npm install
-        - "echo 📄 package.json: && cat package.json"
+        - "echo 📄 package.json && cat package.json"
         - echo "🏗️ Running build..."
         - npm run build
-        - echo "📂 Listing node_modules/.bin:"
+        - echo "📂 Listing node_modules/.bin"
         - ls -l ./node_modules/.bin
     build:
       commands:
@@ -32,9 +32,9 @@ frontend:
             source $NVM_DIR/nvm.sh
             nvm use 20
 
-            echo "🛠️ Using Node version: \$(node -v)"
-            echo "📦 Using NPM version: \$(npm -v)"
-            echo "📂 Listing node_modules/.bin:"
+            echo "🛠️ Using Node version \$(node -v)"
+            echo "📦 Using NPM version \$(npm -v)"
+            echo "📂 Listing node_modules/.bin"
             ls -l ./node_modules/.bin
 
             echo "🚀 Building with Vite..."
