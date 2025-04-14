@@ -8,7 +8,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - bash -c '
+        - |
+          bash -c '
             set -e
             echo "📥 Installing NVM..."
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -31,15 +32,19 @@ frontend:
           '
     build:
       commands:
-        - bash -c '
-            export NVM_DIR=$HOME/.nvm &&
-            source $NVM_DIR/nvm.sh &&
-            nvm use 20 &&
-            echo "🛠️ Using Node version: $(node -v)" &&
-            echo "📦 Using NPM version: $(npm -v)" &&
-            echo "📂 Listing node_modules/.bin:" &&
-            ls -l ./node_modules/.bin &&
-            echo "🚀 Building with Vite..." &&
+        - |
+          bash -c '
+            set -e
+            export NVM_DIR=$HOME/.nvm
+            source $NVM_DIR/nvm.sh
+            nvm use 20
+
+            echo "🛠️ Using Node version: $(node -v)"
+            echo "📦 Using NPM version: $(npm -v)"
+            echo "📂 Listing node_modules/.bin:"
+            ls -l ./node_modules/.bin
+
+            echo "🚀 Building with Vite..."
             ./node_modules/.bin/vite build
           '
   artifacts:
@@ -50,7 +55,6 @@ frontend:
     paths:
       - node_modules/**/*
 EOF
-
   environment_variables = {
     NODE_ENV = "production"
   }
