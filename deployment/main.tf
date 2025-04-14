@@ -53,9 +53,7 @@ frontend:
     baseDirectory: dist
     files:
       - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
+
 EOF
 
   environment_variables = {
