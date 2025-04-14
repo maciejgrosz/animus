@@ -1,7 +1,7 @@
 resource "aws_amplify_app" "animus_app" {
   name       = "animus"
   repository = "https://github.com/maciejgrosz/animus"
-
+  app_root   = "/"
   build_spec = <<EOF
 version: 1
 frontend:
