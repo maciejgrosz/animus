@@ -46,7 +46,7 @@ frontend:
             echo "📦 Using NPM version: $(npm -v)"
             echo "📂 Listing node_modules/.bin"
             ls -l ./node_modules/.bin
-
+            ls .
             echo "🚀 Building with Vite..."
             ./node_modules/.bin/vite build || npx vite build
           '
