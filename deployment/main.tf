@@ -1,7 +1,6 @@
 resource "aws_amplify_app" "animus_app" {
   name       = "animus"
   repository = "https://github.com/maciejgrosz/animus"
-  app_root   = "/"
   build_spec = <<EOF
 version: 1
 frontend:
@@ -25,7 +24,6 @@ frontend:
             # OR if you want to rebuild it safely:
             rm -rf node_modules package-lock.json
             npm install
-
             echo "📄 Showing package.json..."
             cat package.json
 
