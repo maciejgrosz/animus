@@ -21,12 +21,11 @@ frontend:
             echo "⬇️ Installing Node.js v20..."
             nvm install 20
             nvm use 20
-
-            echo "🛠️ Node version: $(node -v)"
-            echo "📦 NPM version: $(npm -v)"
-
-            echo "📦 Installing dependencies..."
+            npm ls vite
+            # OR if you want to rebuild it safely:
+            rm -rf node_modules package-lock.json
             npm install
+            npm ci
 
             echo "📄 Showing package.json..."
             cat package.json
