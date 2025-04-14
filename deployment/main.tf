@@ -29,6 +29,9 @@ frontend:
 
             echo "📦 Installing dependencies with npm ci..."
             npm ci
+            echo "📂 Listing node_modules/.bin:"
+            ls -l ./node_modules/.bin
+
           '
     build:
       commands:
