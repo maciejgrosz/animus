@@ -6,6 +6,13 @@ import polyfillNode from 'rollup-plugin-polyfill-node'
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      plugins: [polyfillNode()], // 👈 inject polyfills during build
+    }
+  },
   resolve: {
     alias: {
       '@core': path.resolve(__dirname, 'src/core'),
@@ -20,10 +27,5 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['hydra-synth'],
-  },
-  build: {
-    rollupOptions: {
-      plugins: [polyfillNode()], // 👈 inject polyfills during build
-    },
   },
 });
