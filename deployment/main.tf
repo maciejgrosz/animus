@@ -22,21 +22,16 @@ frontend:
             nvm install 20
             nvm use 20
 
-            echo "🔍 Checking vite install..."
-            npm ls vite || {
-              echo "⚠️ vite not found in node_modules. Cleaning and reinstalling..."
-              rm -rf node_modules package-lock.json
-              npm install
-            }
+            echo "📦 Installing dependencies using npm ci..."
+            npm ci
 
-            echo "📄 Showing package.json..."
+            echo "📄 package.json content:"
             cat package.json
 
-            echo "📂 node_modules/.bin content:"
-            ls -l ./node_modules/.bin
-
-            echo "📦 vite version check via npx:"
-            npx vite --version || echo "❌ vite still not available via npx"
+            echo "📂 Checking Vite in node_modules/.bin:"
+            ls -l ./node_modules/.bin || true
+            echo "📍 npm list vite:"
+            npm ls vite || true
           '
     build:
       commands:
@@ -47,19 +42,18 @@ frontend:
             source $NVM_DIR/nvm.sh
             nvm use 20
 
-            echo "🛠️ Using Node version: $(node -v)"
-            echo "📦 Using NPM version: $(npm -v)"
-            echo "📂 Listing node_modules/.bin"
-            ls -l ./node_modules/.bin
-            ls -la
+            echo "🛠️ Node version: $(node -v)"
+            echo "📦 NPM version: $(npm -v)"
+            echo "📂 node_modules/.bin content:"
+            ls -l ./node_modules/.bin || true
 
             if [ ! -f ./node_modules/.bin/vite ]; then
-              echo "❌ vite binary not found in node_modules/.bin. Failing build."
+              echo "❌ Vite binary not found. Aborting build."
               exit 1
             fi
 
             echo "🚀 Building with Vite..."
-            ./node_modules/.bin/vite build
+            npm run build
           '
   artifacts:
     baseDirectory: dist
@@ -71,7 +65,6 @@ EOF
     NODE_ENV = "production"
   }
 }
-
 resource "aws_amplify_branch" "main_branch" {
   app_id            = aws_amplify_app.animus_app.id
   branch_name       = "main"
