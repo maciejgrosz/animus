@@ -31,6 +31,13 @@ EOF
   environment_variables = {
     NODE_ENV = "production"
   }
+
+  custom_rule {
+    source = "/<*>"
+    target = "/index.html"
+    status = "200"
+  }
+
 }
 
 resource "aws_amplify_branch" "main_branch" {
