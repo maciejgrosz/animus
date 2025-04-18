@@ -8,7 +8,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "⬇️ Installing Node.js v20..."
+        - export NVM_DIR="$HOME/.nvm"
+        - [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
         - nvm install 20
         - nvm use 20
         - echo "📦 Installing all dependencies including Vite..."
