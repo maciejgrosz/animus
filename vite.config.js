@@ -1,16 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import polyfillNode from 'rollup-plugin-polyfill-node';
 import path from 'path';
-import polyfillNode from 'rollup-plugin-polyfill-node'
-// import fragmentShader from "../shaders/tunnel.frag?raw";
 
 export default defineConfig({
   plugins: [react()],
+  base: '/', // important for correct asset resolution in Amplify
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      plugins: [polyfillNode()], // 👈 inject polyfills during build
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
+      plugins: [polyfillNode()]
     }
   },
   resolve: {
@@ -23,9 +26,9 @@ export default defineConfig({
     },
   },
   define: {
-    global: {}, // 👈 Vite will replace "global" with "globalThis"
+    global: {}, // for packages that expect a Node.js-like global
   },
   optimizeDeps: {
-    include: ['hydra-synth'],
+    include: ['hydra-synth'], // pre-bundles this package for dev
   },
 });

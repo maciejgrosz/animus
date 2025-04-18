@@ -27,12 +27,22 @@ EOF
   environment_variables = {
     NODE_ENV = "production"
   }
-
+  #
+  # custom_rule {
+  #   source = "/index.html"
+  #   target = "/index.html"
+  #   status = "200"
+  # }
+  #
+  # custom_rule {
+  #   source = "/<*>"
+  #   target = "/index.html"
+  #   status = "404"
+  # }
   custom_rule {
     source = "/<*>"
     target = "/index.html"
     status = "200"
-    condition = "not file"
   }
 
 }
