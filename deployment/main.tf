@@ -9,7 +9,7 @@ frontend:
     preBuild:
       commands:
         - export NVM_DIR="$HOME/.nvm"
-        - [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        - "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\""
         - nvm install 20
         - nvm use 20
         - echo "📦 Installing all dependencies including Vite..."
@@ -29,11 +29,12 @@ EOF
     NODE_ENV = "production"
   }
 
-  # custom_rule {
-  #   source = "/<*>"
-  #   target = "/index.html"
-  #   status = "200"
-  # }
+  custom_rule {
+    source = "/<*>"
+    target = "/index.html"
+    status = "200"
+    condition = "not file"
+  }
 
 }
 
