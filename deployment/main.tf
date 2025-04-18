@@ -29,11 +29,11 @@ EOF
     NODE_ENV = "production"
   }
 
-  custom_rule {
-    source = "/<*>"
-    target = "/index.html"
-    status = "200"
-  }
+  # custom_rule {
+  #   source = "/<*>"
+  #   target = "/index.html"
+  #   status = "200"
+  # }
 
 }
 
