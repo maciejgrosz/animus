@@ -8,10 +8,6 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "📥 Installing NVM..."
-        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        - export NVM_DIR=\$HOME/.nvm
-        - source \$NVM_DIR/nvm.sh
         - echo "⬇️ Installing Node.js v20..."
         - nvm install 20
         - nvm use 20
