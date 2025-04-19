@@ -21,6 +21,14 @@ export const initEngine = async (container = document.body) => {
     renderer.domElement.style.display = 'block'
 
     container.appendChild(renderer.domElement)
+    renderer.domElement.style.position = 'absolute'
+    renderer.domElement.style.top = '0'
+    renderer.domElement.style.left = '0'
+    renderer.domElement.style.zIndex = '0'
+    renderer.domElement.style.width = '100%'
+    renderer.domElement.style.height = '100%'
+    renderer.domElement.style.display = 'block'
+
 }
 
 export const useScene = () => scene

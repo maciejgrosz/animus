@@ -16,20 +16,18 @@ export async function test(container) {
     const camera = useCamera()
     const renderer = useRenderer()
 
-    scene.background = new THREE.Color(0xf0f0f0)
+    scene.background = new THREE.Color(0x000000)
 
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshBasicMaterial({
         color: 0xff0000,
-        wireframe: true
+        wireframe: false
     })
+
     const cube = new THREE.Mesh(geometry, material)
     cube.position.set(0, 0, 0)
+    cube.scale.set(3, 3, 3)
     scene.add(cube)
-
-    // 💡 Add grid for sanity
-    const grid = new THREE.GridHelper(10, 10)
-    scene.add(grid)
 
     // ✅ Camera should be in front of cube, looking at it
     camera.position.set(0, 0, 5)
@@ -45,8 +43,6 @@ export async function test(container) {
     label.style.zIndex = 9999
     container.appendChild(label)
 
-    // 📐 Debug render size
-    console.log('📐 Canvas size:', renderer.domElement.width, renderer.domElement.height)
 
     const animate = () => {
         cube.rotation.x += 0.01
