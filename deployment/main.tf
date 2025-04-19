@@ -28,11 +28,29 @@ EOF
     NODE_ENV = "production"
   }
 
-  # custom_rule {
-  #   source = "/<*>"
-  #   target = "/index.html"
-  #   status = "200"
-  # }
+  custom_rule {
+    source = "/assets/<*>"
+    target = "/assets/<*>"
+    status = "200"
+  }
+
+  custom_rule {
+    source = "/<*>.js"
+    target = "/<*>.js"
+    status = "200"
+  }
+
+  custom_rule {
+    source = "/<*>.css"
+    target = "/<*>.css"
+    status = "200"
+  }
+
+  custom_rule {
+    source = "/<*>"
+    target = "/index.html"
+    status = "200"
+  }
 }
 
 resource "aws_amplify_branch" "main_branch" {

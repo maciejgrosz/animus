@@ -14,6 +14,17 @@ import {AFALFL} from "@hydra_presets/AFALFL";
 
 export const presets = [
     {
+        id: "test",
+        engine: "threejs",
+        name: "test",
+        description: "test",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "test" });
+        },
+        preview: new URL("../../public/assets/textures/ambientSphere.png", import.meta.url).href, // Update if you have a thumbnail
+    },
+    {
         id: "ambientSphere",
         engine: "threejs",
         name: "Ambient Sphere",
