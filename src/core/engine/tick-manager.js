@@ -4,7 +4,7 @@ import {
     useControls,
     useRenderer,
     useScene,
-    useStats,
+    // useStats,
 } from './init.js'
 
 // local state for frame tracking
@@ -27,12 +27,13 @@ class TickManager extends EventTarget {
     }
 
     startLoop() {
+        console.log('🚀 TickManager: startLoop() called')
         const composer = useComposer()
         const renderer = useRenderer()
         const scene = useScene()
         const camera = useCamera()
         const controls = useControls()
-        const stats = useStats()
+        // const stats = useStats()
 
         if (!renderer) {
             throw new Error('Renderer is not initialized')
@@ -41,6 +42,7 @@ class TickManager extends EventTarget {
         let lastTimestamp = performance.now()
 
         const animate = (timestamp, frame) => {
+
             this.timestamp = timestamp ?? performance.now()
             this.timeDiff = timestamp - lastTimestamp
             lastTimestamp = timestamp
@@ -57,7 +59,7 @@ class TickManager extends EventTarget {
             this.tick(timestamp, timeDiffCapped, frame)
 
             // FPS monitor
-            stats?.update()
+            // stats?.update()
         }
 
         renderer.setAnimationLoop(animate)

@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure full height for Three.js and Hydra */
+html, body, #root {
+  @apply h-full w-full overflow-hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Optional: Remove focus ring from Hydra canvas */
+canvas:focus {
+  outline: none;
+  display: block;
+}
+
+/* Base styles */
 a {
   font-weight: 500;
   color: #646cff;
@@ -35,6 +52,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Light mode overrides */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

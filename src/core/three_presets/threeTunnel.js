@@ -6,7 +6,7 @@ import { bassRef, midRef, trebleRef } from "../audioRefs";
 export function createTunnel(canvas) {
     const scene = new THREE.Scene();
     const camera = new THREE.Camera();
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true })
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     const uniforms = {
