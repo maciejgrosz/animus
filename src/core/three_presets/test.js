@@ -33,16 +33,6 @@ export async function test(container) {
     camera.position.set(0, 0, 5)
     camera.lookAt(0, 0, 0)
 
-    // 👁 Sanity check label
-    const label = document.createElement('div')
-    label.innerText = '👁'
-    label.style.position = 'absolute'
-    label.style.top = '10px'
-    label.style.left = '10px'
-    label.style.color = 'lime'
-    label.style.zIndex = 9999
-    container.appendChild(label)
-
 
     const animate = () => {
         cube.rotation.x += 0.01
