@@ -5,7 +5,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/', // important for correct asset resolution in Amplify
+  base: './', // important for correct asset resolution in Amplify
   build: {
     outDir: 'dist',
     emptyOutDir: true,
