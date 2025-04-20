@@ -2,14 +2,16 @@ import {
     initEngine,
     useScene,
     useCamera,
-    useTick,
     useComposer,
+    useTick,
 } from '@core/engine/init.js'
 
 import * as THREE from 'three'
+import vertexShader from '../../shaders/vision.vert?raw'
+import fragmentShader from '../../shaders/vision.frag?raw'
 
 export async function test(container) {
-    console.log('🧪 Final sanity test with audio reactivity')
+    console.log('🧪 Shader-based test with audio reactivity')
 
     await initEngine(container)
 
@@ -17,43 +19,46 @@ export async function test(container) {
     const camera = useCamera()
     const composer = useComposer()
 
+    // 🎯 Background + lighting
     scene.background = new THREE.Color(0x000000)
 
-    // 🔺 Create cube
-    const geometry = new THREE.BoxGeometry(1, 1, 1)
-    const material = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(0x00ffcc),
-        emissive: new THREE.Color(0x001111),
-        metalness: 0.5,
-        roughness: 0.3,
+    const ambientLight = new THREE.AmbientLight(0x333333)
+    const pointLight = new THREE.PointLight(0xffffff, 1)
+    pointLight.position.set(10, 10, 10)
+    scene.add(ambientLight, pointLight)
+
+    // 🔺 Geometry
+    const geometry = new THREE.IcosahedronGeometry(1, 5)
+
+    const uniforms = {
+        uTime: { value: 0 },
+    }
+
+    const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms,
+        wireframe: false,
     })
 
     const cube = new THREE.Mesh(geometry, material)
     cube.scale.set(3, 3, 3)
     scene.add(cube)
 
-    // 🎯 Camera setup
+    // 🎥 Camera
     camera.position.set(0, 0, 5)
     camera.lookAt(cube.position)
 
-    // 💡 Light for StandardMaterial
-    const light = new THREE.PointLight(0xffffff, 1)
-    light.position.set(10, 10, 10)
-    scene.add(light)
+    // 🎵 Tick-based animation
+    useTick(({ time, bass, mid, treble }) => {
+        uniforms.uTime.value = time
 
-    const ambient = new THREE.AmbientLight(0x333333)
-    scene.add(ambient)
+        // cube.rotation.x += 0.01 + mid * 0.05
+        // cube.rotation.y += 0.01 + treble * 0.02
 
-    // 🎵 Audio-reactive tick
-    useTick(({ bass, mid, treble, time }) => {
+        // Optional: scale cube for dramatic bass pulse
         const scale = 2 + bass
         cube.scale.set(scale, scale, scale)
-
-        cube.rotation.x += 0.01 + mid * 0.05
-        cube.rotation.y += 0.01 + treble * 0.02
-        // Color shift based on time + treble
-        const hue = (time * 0.1 + treble * 0.5) % 1
-        material.color.setHSL(hue, 0.7, 0.5)
 
         composer.render()
     })
