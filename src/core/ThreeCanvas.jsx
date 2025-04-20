@@ -1,29 +1,46 @@
-import { useRef, useEffect } from "react";
-import { createTunnel } from "./three_presets/threeTunnel";
-import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere";
-import { createAmbientSphere } from "./three_presets/createAmbientSphere"; // ✅ Import the new preset
+import { useRef, useEffect } from "react"
+import { createTunnel } from "./three_presets/threeTunnel"
+import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
+import { createAmbientSphere } from "./three_presets/createAmbientSphere"
+import { test } from "./three_presets/test"
 
 export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
-    const canvasRef = useRef();
+    const containerRef = useRef(null)
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+        const container = containerRef.current
+        if (!container) return
 
-        let cleanup = () => {};
+        let cleanup = () => {}
 
         if (selectedPreset === "threeTunnel") {
-            cleanup = createTunnel(canvas);
+            cleanup = createTunnel(container)
         } else if (selectedPreset === "threeBloomIcosphere") {
-            cleanup = createThreeBloomIcosphere(canvas);
+            cleanup = createThreeBloomIcosphere(container)
         } else if (selectedPreset === "ambientSphere") {
-            cleanup = createAmbientSphere(canvas); // ✅ Handle new preset
+            cleanup = createAmbientSphere(container)
+        } else if (selectedPreset === "test") {
+            cleanup = test(container)
         }
 
         return () => {
-            if (typeof cleanup === "function") cleanup();
-        };
-    }, [selectedPreset]);
+            if (typeof cleanup === "function") cleanup()
+        }
+    }, [selectedPreset])
 
-    return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full z-0" />;
+    return (
+        <div
+            ref={containerRef}
+            id="three-container"
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                zIndex: 0,
+                overflow: 'hidden',
+            }}
+        />
+    )
 }
