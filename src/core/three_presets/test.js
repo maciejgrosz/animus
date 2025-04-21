@@ -56,9 +56,16 @@ export function test(container) {
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
+    controls.enableZoom = false
+    controls.enablePan = false
 
     let model = null
     const orbitSkulls = []
+    const shockwaveRings = []
+
+    let currentHue = 0
+    let cameraAngle = 0
+    let cameraRadius = 6
 
     const loader = new GLTFLoader()
     loader.load(
@@ -73,8 +80,8 @@ export function test(container) {
                     const isEye = child.name.toLowerCase().includes('eye') || child.position.y > 1.2
 
                     child.material = new THREE.MeshStandardMaterial({
-                        color: isEye ? new THREE.Color(0x111111) : new THREE.Color(0x00ffff),
-                        emissive: isEye ? new THREE.Color(0x000000) : new THREE.Color(0x111144),
+                        color: new THREE.Color().setHSL(currentHue, 1, 0.55),
+                        emissive: new THREE.Color().setHSL(currentHue, 0.5, 0.25),
                         roughness: 0.4,
                         metalness: 0.2,
                         wireframe: !isEye,
@@ -84,9 +91,16 @@ export function test(container) {
             model.scale.set(0.8, 0.8, 0.8)
             scene.add(model)
 
-            orbitSkulls.forEach((skull, index) => {
+            orbitSkulls.forEach((skull) => {
                 const clone = model.clone(true)
                 clone.scale.set(0.1, 0.1, 0.1)
+                clone.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.color.setHSL(currentHue, 1, 0.55)
+                        child.material.emissive.setHSL(currentHue, 1, 0.3)
+                        child.material.wireframe = true
+                    }
+                })
                 skull.add(clone)
                 skull.userData.mesh = clone
                 scene.add(skull)
@@ -144,11 +158,64 @@ export function test(container) {
         composer.setSize(container.clientWidth, container.clientHeight)
     })
 
+    function createShockwaveRing() {
+        const geometry = new THREE.RingGeometry(1.5, 0.82, 64)
+        const material = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(currentHue, 1, 0.6),
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.4,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+        })
+        const ring = new THREE.Mesh(geometry, material)
+        ring.rotation.x = -Math.PI / 2
+        ring.position.y = 0
+        scene.add(ring)
+        shockwaveRings.push({ ring, scale: 5 })
+    }
+
+    let lastBassTrigger = 0
+
     function animate() {
         requestAnimationFrame(animate)
         controls.update()
 
         const time = performance.now() / 1000
+        const bass = bassRef.current
+        const mid = midRef.current
+        const treble = trebleRef.current
+
+        // 🔄 Color shift
+        const targetHue = (time * 0.05 + treble * 1.5) % 1.0
+        currentHue += (targetHue - currentHue) * 0.05
+
+        // 🎥 Dynamic camera rotation — stay in front of skull
+        cameraAngle += 0.01 + treble * 0.0005
+        cameraRadius = 7
+
+        const camX = Math.sin(cameraAngle) * cameraRadius
+        const camZ = Math.cos(cameraAngle) * cameraRadius // keep front half
+        const camY = 1.5 + Math.sin(time * 0.6) * 0.4 * mid
+
+        camera.position.set(camX, camY, camZ)
+        camera.lookAt(new THREE.Vector3(0, 1, 0))
+
+        if (bass > 0.6 && time - lastBassTrigger > 0.5) {
+            createShockwaveRing()
+            lastBassTrigger = time
+        }
+
+        shockwaveRings.forEach((entry, index) => {
+            entry.scale += 0.02
+            entry.ring.scale.set(entry.scale, entry.scale, entry.scale)
+            entry.ring.material.opacity *= 0.96
+            entry.ring.material.color.setHSL(currentHue, 1, 0.6)
+            if (entry.ring.material.opacity < 0.01) {
+                scene.remove(entry.ring)
+                shockwaveRings.splice(index, 1)
+            }
+        })
 
         electronLayers.forEach((orbit, index) => {
             orbit.rotation.y = time * (0.2 + index * 0.05)
@@ -171,30 +238,21 @@ export function test(container) {
             skull.position.set(x, y, z)
             skull.rotation.y = t
 
-            const hue = (time * 0.1 + i * 0.05) % 1
-            skull.traverse((child) => {
-                if (child.isMesh && child.material) {
-                    const color = new THREE.Color().setHSL(hue, 1, 0.55)
-                    const emissive = new THREE.Color().setHSL(hue, 0.8, 0.3)
-                    child.material.color.copy(color)
-                    child.material.emissive.copy(emissive)
-                }
-            })
+            if (skull.userData.mesh) {
+                skull.userData.mesh.traverse((child) => {
+                    if (child.isMesh && child.material) {
+                        child.material.color.setHSL(currentHue, 1, 0.55)
+                        child.material.emissive.setHSL(currentHue, 1, 0.3)
+                    }
+                })
+            }
         })
 
         if (model) {
-            const bass = bassRef.current
-            const mid = midRef.current
-            const treble = trebleRef.current
-
             model.traverse((child) => {
                 if (child.isMesh && child.material && child.material.color && !child.material.wireframe) {
-                    const wave = Math.sin(time * 0.5 + child.position.x * 2.5) * 0.5 + 0.5
-                    const hue = (treble * 0.8 + wave * 0.2 + time * 0.05) % 1
-                    const color = new THREE.Color().setHSL(hue, 0.8, 0.55)
-                    const emissive = new THREE.Color().setHSL(hue, 0.5, 0.25)
-                    child.material.color.copy(color)
-                    child.material.emissive.copy(emissive)
+                    child.material.color.setHSL(currentHue, 0.8, 0.55)
+                    child.material.emissive.setHSL(currentHue, 0.5, 0.25)
                 }
 
                 if (child.isMesh && child.geometry.attributes.position) {
