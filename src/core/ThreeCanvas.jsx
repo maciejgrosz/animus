@@ -2,7 +2,7 @@ import { useRef, useEffect } from "react"
 import { createTunnel } from "./three_presets/threeTunnel"
 import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
 import { createAmbientSphere } from "./three_presets/createAmbientSphere"
-import { test } from "./three_presets/test"
+import { test } from "./three_presets/test.js"
 import { skull } from "./three_presets/skull"
 
 export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {

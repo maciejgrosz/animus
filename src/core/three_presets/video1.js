@@ -1,8 +1,8 @@
 import * as THREE from 'three'
-import fragmentShader from '../../shaders/rayMarchingOctahedrons.frag?raw'
-import { bassRef } from '@core/audioRefs'
+import { bassRef, midRef, trebleRef } from '@core/audioRefs'
+import fragmentShader from '../../shaders/glslFlowReactive.frag?raw'
 
-export function test(container) {
+export function video1(container) {
     const scene = new THREE.Scene()
 
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)
@@ -15,8 +15,9 @@ export function test(container) {
     const uniforms = {
         iResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
         iTime: { value: 0 },
-        bass: { value: 0 },
-        smoothedBass: { value: 0 } // for smoother color transitions
+        uBass: { value: 0 },
+        uMid: { value: 0 },
+        uTreble: { value: 0 },
     }
 
     const material = new THREE.ShaderMaterial({
@@ -40,15 +41,10 @@ export function test(container) {
     function animate() {
         requestAnimationFrame(animate)
 
-        const time = clock.getElapsedTime()
-        uniforms.iTime.value = time
-
-        // Smooth bass value using exponential moving average
-        const currentBass = bassRef.current
-        uniforms.bass.value = currentBass
-
-        const smoothingFactor = 0.05
-        uniforms.smoothedBass.value += (currentBass - uniforms.smoothedBass.value) * smoothingFactor
+        uniforms.iTime.value = clock.getElapsedTime()
+        uniforms.uBass.value = bassRef.current
+        uniforms.uMid.value = midRef.current
+        uniforms.uTreble.value = trebleRef.current
 
         renderer.render(scene, camera)
     }
