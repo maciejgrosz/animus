@@ -3,7 +3,7 @@ uniform float iTime;
 uniform float smoothedBass;
 // 2D rotation function
 mat2 rot2D(float a) {
-    return mat2(cos(a), -sin(a), sin(a), cos(a));
+        return mat2(cos(a), -sin(a), sin(a), cos(a));
 }
 
 // Custom gradient - https://iquilezles.org/articles/palettes/
@@ -17,15 +17,28 @@ float sdOctahedron(vec3 p, float s) {
     return (p.x + p.y + p.z - s) * 0.57735027;
 }
 
+float sdSphere(vec3 p, float r) {
+    return length(p) - r;
+}
+
+float sdTorus(vec3 p, vec2 t) {
+    vec2 q = vec2(length(p.xz) - t.x, p.y);
+    return length(q) - t.y;
+}
+
 // Scene distance
 float map(vec3 p) {
-    p.z += iTime * .4;
+    p.z += iTime * 0.4;
 
     // Space repetition
-    p.xy = fract(p.xy) - .5;
-    p.z = mod(p.z, .25) - .125;
+    p.xy = fract(p.xy) - 0.4;
+    p.z = mod(p.z, 0.25) - .125;
 
-    return sdOctahedron(p, .15);
+//    return sdOctahedron(p, .015); // distance to nearest octahedron
+    return sdOctahedron(p, .15); // distance to nearest octahedron
+//    return sdTorus(p, vec2(0.2, 0.05));
+//    return sdSphere(p, 0.15); // 0.15 is the sphere radius — adjust if needed
+
 }
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
-import { bassRef, midRef, trebleRef } from '@core/audioRefs'
-import fragmentShader from '../../shaders/test.frag?raw'
+import fragmentShader from '../../shaders/rayMarchingOctahedrons.frag?raw'
+import { bassRef } from '@core/audioRefs'
 
 export function test(container) {
     const scene = new THREE.Scene()
@@ -15,9 +15,8 @@ export function test(container) {
     const uniforms = {
         iResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
         iTime: { value: 0 },
-        uBass: { value: 0 },
-        uMid: { value: 0 },
-        uTreble: { value: 0 },
+        bass: { value: 0 },
+        smoothedBass: { value: 0 } // for smoother color transitions
     }
 
     const material = new THREE.ShaderMaterial({
@@ -41,10 +40,15 @@ export function test(container) {
     function animate() {
         requestAnimationFrame(animate)
 
-        uniforms.iTime.value = clock.getElapsedTime()
-        uniforms.uBass.value = bassRef.current
-        uniforms.uMid.value = midRef.current
-        uniforms.uTreble.value = trebleRef.current
+        const time = clock.getElapsedTime()
+        uniforms.iTime.value = time
+
+        // Smooth bass value using exponential moving average
+        const currentBass = bassRef.current
+        uniforms.bass.value = currentBass
+
+        const smoothingFactor = 0.05
+        uniforms.smoothedBass.value += (currentBass - uniforms.smoothedBass.value) * smoothingFactor
 
         renderer.render(scene, camera)
     }

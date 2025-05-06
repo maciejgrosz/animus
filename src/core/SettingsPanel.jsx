@@ -3,6 +3,7 @@ import { useAudioFeatures } from "@hooks/useAudioFeatures";
 import LiveAudioChart from "@components/LiveAudioChart";
 import PresetGrid from "@core/PresetGrid";
 import { presets as allPresets } from "@hydra_presets/presets";
+import useMIDI from "@hooks/useMIDI.js";
 
 export default function SettingsPanel() {
     const [bassSensitivity, setBassSensitivity] = useState(5);
@@ -19,7 +20,37 @@ export default function SettingsPanel() {
         midGain: midSensitivity,
         trebleGain: trebleSensitivity,
     });
+    useMIDI((message) => {
+        const [status, data1, data2] = message.data;
 
+        if (status === 144 && data2 > 0) {
+            // pad pressed
+            console.log(`Pad pressed: ${data1}`);
+
+            // Example: Map pad numbers to preset IDs
+            const padToPreset = {
+                36: "waveform",     // Pad 1
+                37: "kaleidoscope", // Pad 2
+                38: "ambient",      // Pad 3
+            };
+
+            const presetId = padToPreset[data1];
+            if (presetId) {
+                channelRef.current?.postMessage({ type: "selectPreset", id: presetId });
+            }
+        }
+
+        if (status === 176) {
+            // knob turned
+            console.log(`Knob moved: ${data1}, value: ${data2}`);
+
+            // Example: Map knob to blend amount
+            if (data1 === 1) {
+                const blend = data2 / 127; // Normalize to 0-1
+                channelRef.current?.postMessage({ type: "blendAmount", value: blend });
+            }
+        }
+    });
     useEffect(() => {
         const ch = new BroadcastChannel("animus-control");
         channelRef.current = ch;
