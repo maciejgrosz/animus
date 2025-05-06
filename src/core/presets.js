@@ -1,16 +1,16 @@
-import { ritchse } from "@hydra_presets/ritchse";
-import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack";
-import { florDeFuego } from "@hydra_presets/florDeFuego";
-import { paintingReactive } from "@hydra_presets/paintingReactive"
-import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs";
-import { waveforms } from "@hydra_presets/waveforms"
-import { zachKrall } from "@hydra_presets/zachKrall";
-import { khoparzi, khoparziAquatic } from "@hydra_presets/khoparzi";
-import { alexandreRangel, alexandreRangelBright } from "@hydra_presets/alexandreRangel"
-import {nesso, nessoRandom} from "@hydra_presets/nesso"
-import { ameba } from "@hydra_presets/ameba"
-import { velvetPool } from "@hydra_presets/velvetPool"
-import {AFALFL} from "@hydra_presets/AFALFL";
+import { ritchse } from "@hydra_presets/ritchse.js";
+import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack.js";
+import { florDeFuego } from "@hydra_presets/florDeFuego.js";
+import { paintingReactive } from "@hydra_presets/paintingReactive.js"
+import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs.js";
+import { waveforms } from "@hydra_presets/waveforms.js"
+import { zachKrall } from "@hydra_presets/zachKrall.js";
+import { khoparzi, khoparziAquatic } from "@hydra_presets/khoparzi.js";
+import { alexandreRangel, alexandreRangelBright } from "@hydra_presets/alexandreRangel.js"
+import {nesso, nessoRandom} from "@hydra_presets/nesso.js"
+import { ameba } from "@hydra_presets/ameba.js"
+import { velvetPool } from "@hydra_presets/velvetPool.js"
+import {AFALFL} from "@hydra_presets/AFALFL.js";
 
 export const presets = [
     {
@@ -285,4 +285,5 @@ export const presets = [
             ),
         preview: new URL("../assets/previews/blendPrototype.png", import.meta.url).href,
     },
+
 ];

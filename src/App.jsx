@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import HydraCanvas from "@core/HydraCanvas";
 import { useHydra } from "@hooks/useHydra";
-import { presets } from "@hydra_presets/presets";
+import { presets } from "@core/presets.js";
 import {
     bassRef,
     midRef,
