@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 import { bassRef, midRef, trebleRef } from '@core/audioRefs'
-import fragmentShader from '../../shaders/test.frag?raw'
+import fragmentShader from '../../shaders/glslFlowReactive.frag?raw'
 
-export function test(container) {
+export function video1(container) {
     const scene = new THREE.Scene()
 
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)

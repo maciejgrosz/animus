@@ -25,6 +25,17 @@ export const presets = [
         preview: new URL("../../public/assets/textures/ambientSphere.png", import.meta.url).href, // Update if you have a thumbnail
     },
     {
+        id: "skull",
+        engine: "threejs",
+        name: "skull",
+        description: "skull",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "skull" });
+        },
+        preview: new URL("../../public/assets/textures/ambientSphere.png", import.meta.url).href, // Update if you have a thumbnail
+    },
+    {
         id: "ambientSphere",
         engine: "threejs",
         name: "Ambient Sphere",
