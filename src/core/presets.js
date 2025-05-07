@@ -286,4 +286,18 @@ export const presets = [
         preview: new URL("../assets/previews/blendPrototype.png", import.meta.url).href,
     },
 
+{
+  id: "zippyZaps",
+  engine: "threejs",
+  name: "Zippy Zaps",
+  author: "SnoopethDuckDuck",
+  mood: "",
+  fn: () => {
+    const channel = new BroadcastChannel("animus-control");
+    channel.postMessage({ type: "selectThree", id: "zippyZaps" });
+  },
+  preview: new URL("../../public/assets/textures/zippyZaps.png", import.meta.url).href
+},
+
+
 ];

@@ -1,5 +1,3 @@
-import { presets } from "@core/presets.js";
-
 export default function PresetGrid({ onSelect, thumbnailSize = "normal", presets: filteredPresets = [] }) {
     const previewClass =
         thumbnailSize === "small"

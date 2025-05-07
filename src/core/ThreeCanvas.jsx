@@ -4,7 +4,8 @@ import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
 import { createAmbientSphere } from "./three_presets/createAmbientSphere"
 import { test } from "./three_presets/test.js"
 import { skull } from "./three_presets/skull"
-
+import { zippyZaps } from "./three_presets/zippyZaps.js";
+import {maja} from "./three_presets/maja";
 export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
     const containerRef = useRef(null)
 
@@ -24,6 +25,10 @@ export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
             cleanup = test(container)
         } else if (selectedPreset === "skull") {
             cleanup = skull(container)
+        }else if (selectedPreset === "zippyZaps") {
+            cleanup = zippyZaps(container);
+        }else if (selectedPreset === "maja") {
+            cleanup = maja(container);
         }
 
         return () => {
