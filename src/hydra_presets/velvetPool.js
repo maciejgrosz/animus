@@ -1,45 +1,43 @@
-// licensed with CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
-// Velvet Pool — by Mahalia H-R (IG: mm_hr_)
-
-import {
-    getSmoothedBass,
-    getSmoothedMid,
-    getSmoothedTreble,
-} from "@core/audioRefs";
+import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
 
 export function velvetPool() {
     const bass = () => getSmoothedBass();
     const mid = () => getSmoothedMid();
     const treble = () => getSmoothedTreble();
 
-    noise()
-        .color(() => treble() * 2, 0, 0.6)
-        .modulate(noise(() => bass() * 10))
-        .scale(() => treble() * 5)
-        .layer(
-            src(o0)
-                .mask(osc(10).modulateRotate(osc(), 90, 0))
-                .scale(() => bass() * 2)
-                .luma(0.2, 0.3)
+    // Base warped waveform portal
+    const portal = osc(100, -0.0015, 0.2)
+        .diff(
+            osc(20, 0.00006).rotate(Math.PI / 0.00003)
         )
-        .blend(o0)
+        .modulateScale(
+            noise(1.5, 0.15)
+                .modulateScale(osc(13).rotate(() => Math.sin(time / 22))),
+            () => 2 + bass() * 1.5
+        )
+        .color(
+            () => 0.8 + bass() * 0.3,
+            () => 0.2 + mid() * 0.4,
+            () => 0.3 + treble() * 0.3
+        )
+        .contrast(() => 1.2 + bass() * 0.3)
+        .brightness(0.03)
+        .modulateScale(osc(2), () => -0.1 - treble() * 0.2)
+        .rotate(() => 0.1 + treble() * 0.05)
+        .posterize(50)
+        .invert(0)
+        .blend(o0, 0.85); // dreamy trail blend
+
+    // Optional soft grain overlay
+    const grain = noise(3, 0.3)
+        .color(0.1, 0.1, 0.1)
+        .brightness(0.02)
+        .scale(1.3)
+        .rotate(() => time * 0.005);
+
+    portal
+        .blend(grain, 0.15)
         .out(o0);
 
-    osc()
-        .modulate(noise(() => mid() + 5))
-        .color(1, 0, 0)
-        .out(o1);
-
-    src(o0)
-        .modulate(o1)
-        .layer(
-            src(o1)
-                .mask(o1)
-                .saturate(7)
-        )
-        .modulateRotate(o1)
-        .rotate(() => time % 360 * 0.05)
-        .out(o2);
-
-    // render(o2);
 }
+
