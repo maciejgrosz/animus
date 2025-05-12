@@ -1,5 +1,3 @@
-import { presets } from "@hydra_presets/presets";
-
 export default function PresetGrid({ onSelect, thumbnailSize = "normal", presets: filteredPresets = [] }) {
     const previewClass =
         thumbnailSize === "small"

@@ -2,8 +2,11 @@ import { useRef, useEffect } from "react"
 import { createTunnel } from "./three_presets/threeTunnel"
 import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
 import { createAmbientSphere } from "./three_presets/createAmbientSphere"
-import { test } from "./three_presets/test.js"
+import { blueVortex } from "./three_presets/blueVortex.js"
 import { skull } from "./three_presets/skull"
+import { zippyZaps } from "./three_presets/zippyZaps.js";
+import {maja} from "./three_presets/maja";
+import {test997420} from "./three_presets/test997420";
 
 export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
     const containerRef = useRef(null)
@@ -20,10 +23,16 @@ export default function ThreeCanvas({ selectedPreset = "threeTunnel" }) {
             cleanup = createThreeBloomIcosphere(container)
         } else if (selectedPreset === "ambientSphere") {
             cleanup = createAmbientSphere(container)
-        } else if (selectedPreset === "test") {
-            cleanup = test(container)
+        } else if (selectedPreset === "blueVortex") {
+            cleanup = blueVortex(container)
         } else if (selectedPreset === "skull") {
             cleanup = skull(container)
+        }else if (selectedPreset === "zippyZaps") {
+            cleanup = zippyZaps(container);
+        }else if (selectedPreset === "maja") {
+            cleanup = maja(container);
+        }else if (selectedPreset === "test997420") {
+            cleanup = test997420(container);
         }
 
         return () => {

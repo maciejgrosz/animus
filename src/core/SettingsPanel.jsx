@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAudioFeatures } from "@hooks/useAudioFeatures";
 import LiveAudioChart from "@components/LiveAudioChart";
 import PresetGrid from "@core/PresetGrid";
-import { presets as allPresets } from "@hydra_presets/presets";
+import { presets as allPresets } from "@core/presets.js";
 import useMIDI from "@hooks/useMIDI.js";
 
 export default function SettingsPanel() {
