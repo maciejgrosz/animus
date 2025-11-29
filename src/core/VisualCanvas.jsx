@@ -109,21 +109,46 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
                     break
             }
         } else if (selectedEngine === "hydra") {
+            console.log("[VisualCanvas] Loading Hydra preset:", selectedPreset);
+            
             // Load Hydra preset from presets array
             const canvas = hydraCanvasRef.current
             const hydraPreset = presets.find((preset) => preset.id === selectedPreset)
 
+            console.log("[VisualCanvas] Hydra setup:", {
+                hasCanvas: !!canvas,
+                presetFound: !!hydraPreset,
+                presetEngine: hydraPreset?.engine,
+                presetId: selectedPreset
+            });
+
             if (!canvas) {
-                console.warn("[Hydra] Canvas not found. Hydra will not initialize.")
+                console.warn("[VisualCanvas] ⚠️ Canvas not found. Hydra will not initialize.")
                 return () => {}
             }
 
+            // Check if preset is actually a Hydra preset (not Three.js)
+            if (hydraPreset && hydraPreset.engine === "threejs") {
+                console.warn("[VisualCanvas] ⚠️ Attempted to load Three.js preset in Hydra engine:", selectedPreset)
+                return () => {}
+            }
+
+            console.log("[VisualCanvas] Calling initHydra...");
             initHydra(canvas)
 
+            // Clear previous Hydra preset before applying new one
+            if (typeof globalThis.hush === "function") {
+                console.log("[VisualCanvas] Calling hush() before applying preset");
+                globalThis.hush()
+            } else {
+                console.log("[VisualCanvas] ⚠️ globalThis.hush not available");
+            }
+
             if (typeof hydraPreset?.fn === "function") {
+                console.log("[VisualCanvas] Calling applyPreset...");
                 applyPreset(hydraPreset.fn)
             } else {
-                console.warn("[Hydra] Preset not found or invalid:", selectedPreset)
+                console.warn("[VisualCanvas] ⚠️ Preset not found or invalid:", selectedPreset)
             }
         }
 

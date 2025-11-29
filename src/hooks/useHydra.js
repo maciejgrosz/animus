@@ -5,6 +5,12 @@ export function useHydra() {
     const hydraRef = useRef(null);
 
     const initHydra = (canvas) => {
+        console.log("[Hydra] initHydra called", { 
+            hasCanvas: !!canvas, 
+            hasInstance: !!hydraRef.current,
+            hasGlobalHush: typeof globalThis.hush === "function"
+        });
+
         if (!canvas) {
             console.warn("⚠️ Hydra canvas not found");
             return;
@@ -12,7 +18,14 @@ export function useHydra() {
 
         canvas.classList.remove("hidden");
 
+        // Only create instance if it doesn't exist (but don't return early)
         if (!hydraRef.current) {
+            console.log("[Hydra] Creating NEW instance");
+            
+            // Don't call hush() here - it might be from a disposed instance
+            // VisualCanvas will call hush() after init if needed
+
+            // Create new Hydra instance
             hydraRef.current = new Hydra({
                 canvas,
                 detectAudio: false,
@@ -21,14 +34,22 @@ export function useHydra() {
 
             hydraRef.current.setResolution(window.innerWidth, window.innerHeight);
 
-            console.log("[Hydra] Initialized", {
-                osc: globalThis.osc,
-                noise: globalThis.noise,
+            console.log("[Hydra] ✅ New instance created", {
+                osc: typeof globalThis.osc,
+                noise: typeof globalThis.noise,
+                hush: typeof globalThis.hush
             });
+        } else {
+            console.log("[Hydra] ♻️ Reusing existing instance");
         }
     };
 
      const applyPreset = (presetFn) => {
+        console.log("[Hydra] applyPreset called", { 
+            isFunction: typeof presetFn === "function",
+            name: presetFn?.name || "anonymous"
+        });
+
         if (typeof presetFn !== "function") {
             console.warn("⚠️ Invalid preset function", presetFn);
             return;
@@ -37,16 +58,17 @@ export function useHydra() {
         // Wait for hydra globals like `osc` to become available
         const waitUntilHydraReady = () => {
             if (typeof globalThis.osc !== "function") {
-                console.log("[Hydra] Waiting for Hydra globals...");
+                console.log("[Hydra] ⏳ Waiting for Hydra globals...");
                 requestAnimationFrame(waitUntilHydraReady);
                 return;
             }
 
-            console.log("✅ Applying Hydra preset:", presetFn.name || "anonymous");
+            console.log("[Hydra] ✅ Applying preset:", presetFn.name || "anonymous");
             try {
-                presetFn(globalThis); // Optional, if preset uses globalThis
+                presetFn(globalThis);
+                console.log("[Hydra] ✅ Preset applied successfully");
             } catch (err) {
-                console.error("💥 Error running preset:", err);
+                console.error("[Hydra] 💥 Error running preset:", err);
             }
         };
 
@@ -54,23 +76,25 @@ export function useHydra() {
     };
 
     const disposeHydra = () => {
+        console.log("[Hydra] disposeHydra called", { hasInstance: !!hydraRef.current });
+
         if (hydraRef.current) {
-            console.log("[Hydra] Disposing hydra instance");
+            console.log("[Hydra] 🗑️ Disposing instance");
 
             try {
-                if (typeof hydraRef.current.stop === "function") {
-                    hydraRef.current.stop();
+                // Just call hush to stop animations
+                if (typeof hydraRef.current.hush === "function") {
+                    console.log("[Hydra] Calling hush() on instance");
+                    hydraRef.current.hush();
                 }
             } catch (e) {
-                console.warn("[Hydra] Error while stopping:", e);
+                console.warn("[Hydra] ⚠️ Error while stopping:", e);
             }
 
             hydraRef.current = null;
-
-            const canvas = document.getElementById("hydra-canvas");
-            if (canvas?.parentNode) {
-                canvas.parentNode.removeChild(canvas);
-            }
+            console.log("[Hydra] ✅ Instance disposed, ref set to null");
+        } else {
+            console.log("[Hydra] No instance to dispose");
         }
     };
 
