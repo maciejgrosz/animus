@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
-import { initEngine, disposeEngine } from "@core/engine/init.js"
+import { initEngine, disposeEngine, resetThreeState } from "@core/engine/init.js"
 import { useHydra } from "@hooks/useHydra"
+import { presets } from "@core/presets.js"
 import { createTunnel } from "./three_presets/threeTunnel"
 import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
 import { ambientSphere } from "./three_presets/ambientSphere"
@@ -44,6 +45,8 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
         let cleanup = () => {}
 
         if (selectedEngine === "three") {
+            resetThreeState()
+
             switch (selectedPreset) {
                 case "threeTunnel":
                     cleanup = createTunnel()
@@ -74,13 +77,19 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
             }
         } else if (selectedEngine === "hydra") {
             const canvas = hydraCanvasRef.current
-            console.log("[Hydra] Canvas reference:", canvas)
-            console.log("[Hydra] Engine ready:", engineReady, "Selected Engine:", selectedEngine, "Preset:", selectedPreset)
-            if (canvas) {
-                initHydra(canvas)
-                applyPreset(selectedPreset)
-            } else {
+            const hydraPreset = presets.find((preset) => preset.id === selectedPreset)
+
+            if (!canvas) {
                 console.warn("[Hydra] Canvas not found. Hydra will not initialize.")
+                return () => {}
+            }
+
+            initHydra(canvas)
+
+            if (typeof hydraPreset?.fn === "function") {
+                applyPreset(hydraPreset.fn)
+            } else {
+                console.warn("[Hydra] Preset not found or invalid:", selectedPreset)
             }
         }
 
@@ -89,9 +98,6 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
         return () => {
             if (typeof cleanupRef.current === "function") {
                 cleanupRef.current()
-            }
-            if (selectedEngine === "hydra") {
-                disposeHydra()
             }
         }
     }, [engineReady, selectedEngine, selectedPreset])
@@ -102,7 +108,7 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
                 ref={containerRef}
                 id="three-container"
                 style={{
-                    position: selectedEngine === "three" ? "absolute" : "hidden",
+                    position: "absolute",
                     top: 0,
                     left: 0,
                     width: '100vw',
@@ -115,7 +121,7 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
                 id="hydra-canvas"
                 ref={hydraCanvasRef}
                 style={{
-                    position: selectedEngine === "hydra" ? "absolute" : "hidden",
+                    position: "absolute",
                     top: 0,
                     left: 0,
                     width: '100vw',

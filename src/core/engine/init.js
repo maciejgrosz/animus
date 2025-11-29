@@ -5,7 +5,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import TickManager from './tick-manager.js'
 import { bassRef, midRef, trebleRef } from '../audioRefs.js'
 
-let scene, camera, renderer, composer, controls
+let scene, camera, renderer, composer, controls, baseRenderPass
 let renderWidth, renderHeight, renderAspectRatio
 let initialized = false
 
@@ -45,8 +45,8 @@ export const initEngine = async (container = document.body) => {
     container.appendChild(renderer.domElement)
 
     composer = new EffectComposer(renderer)
-    const renderPass = new RenderPass(scene, camera)
-    composer.addPass(renderPass)
+    baseRenderPass = new RenderPass(scene, camera)
+    composer.addPass(baseRenderPass)
 
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
@@ -78,6 +78,39 @@ export const useCamera = () => camera
 export const useControls = () => controls
 export const useComposer = () => composer
 export const addPass = (pass) => composer?.addPass(pass)
+
+export const resetThreeState = () => {
+    if (scene) {
+        scene.traverse((obj) => {
+            if (!obj.isMesh && !obj.isPoints && !obj.isLine) return
+
+            if (obj.geometry) {
+                obj.geometry.dispose()
+            }
+
+            if (obj.material) {
+                if (Array.isArray(obj.material)) {
+                    obj.material.forEach((mat) => mat?.dispose?.())
+                } else {
+                    obj.material.dispose?.()
+                }
+            }
+        })
+
+        while (scene.children.length > 0) {
+            scene.remove(scene.children[0])
+        }
+    }
+
+    if (composer) {
+        composer.passes.forEach((pass, index) => {
+            if (index === 0) return
+            pass.dispose?.()
+        })
+
+        composer.passes.length = Math.min(composer.passes.length, 1)
+    }
+}
 
 export const useTick = (fn) => {
     if (!renderTickManager) return () => {}
@@ -124,6 +157,7 @@ export const disposeEngine = () => {
     renderer = null
     composer = null
     controls = null
+    baseRenderPass = null
     renderWidth = null
     renderHeight = null
     renderAspectRatio = null
