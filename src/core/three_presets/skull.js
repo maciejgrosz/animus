@@ -195,9 +195,57 @@ export function skull() {
 
     return () => {
         cleanupTick()
+        controls.dispose()
+        
+        // Dispose model (GLTF) geometries and materials
+        if (model) {
+            model.traverse((child) => {
+                if (child.isMesh) {
+                    if (child.geometry) child.geometry.dispose()
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(mat => mat.dispose())
+                        } else {
+                            child.material.dispose()
+                        }
+                    }
+                }
+            })
+            scene.remove(model)
+        }
+        
+        // Dispose electron layers (orbit visualizations)
+        electronLayers.forEach(orbit => {
+            orbit.geometry.dispose()
+            orbit.material.dispose()
+            scene.remove(orbit)
+        })
+        
+        // Dispose shockwave rings
+        shockwaveRings.forEach(entry => {
+            entry.ring.geometry.dispose()
+            entry.ring.material.dispose()
+            scene.remove(entry.ring)
+        })
+        
+        // Remove lights
+        scene.remove(light)
+        scene.remove(ambient)
+        
+        // Dispose background texture
+        if (scene.background && scene.background.dispose) {
+            scene.background.dispose()
+        }
+        
+        // Clear scene and reset state
         scene.clear()
-        // 🧼 Explicitly clear background and fog
         scene.background = null
         scene.fog = null
+        
+        // Dispose post-processing passes
+        composer.passes.forEach(pass => {
+            if (pass.dispose) pass.dispose()
+        })
+        composer.passes.length = 0
     }
 }

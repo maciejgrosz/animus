@@ -110,6 +110,7 @@ export function createThreeBloomIcosphere() {
     return () => {
         cleanupTick()
 
+        // Dispose geometries and materials
         geometry.dispose()
         mesh.material.dispose()
         scene.remove(mesh)
@@ -120,5 +121,11 @@ export function createThreeBloomIcosphere() {
 
         scene.remove(ambientLight)
         scene.remove(pointLight)
+
+        // Dispose post-processing passes
+        composer.passes.forEach(pass => {
+            if (pass.dispose) pass.dispose()
+        })
+        composer.passes.length = 0
     }
 }

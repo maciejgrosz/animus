@@ -135,9 +135,30 @@ export async function ambientSphere(container) {
     return () => {
         cleanupTick()
         window.removeEventListener('resize', resizeHandler)
+        
+        // Dispose main mesh
         geometry.dispose()
         material.dispose()
+        scene.remove(mesh)
+        
+        // Dispose ground
+        ground.geometry.dispose()
+        ground.material.dispose()
+        scene.remove(ground)
+        
+        // Dispose particle system
         particleSystem.geometry.dispose()
         particleSystem.material.dispose()
+        scene.remove(particleSystem)
+        
+        // Remove lights
+        scene.remove(scene.children.find(child => child.type === 'AmbientLight'))
+        scene.remove(directionalLight)
+        
+        // Dispose post-processing passes
+        composer.passes.forEach(pass => {
+            if (pass.dispose) pass.dispose()
+        })
+        composer.passes.length = 0
     }
 }
