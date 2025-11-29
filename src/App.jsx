@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import HydraCanvas from "@core/HydraCanvas";
+// import HydraCanvas from "@core/HydraCanvas";
 import { useHydra } from "@hooks/useHydra";
 import { presets } from "@core/presets.js";
 import {
@@ -7,7 +7,8 @@ import {
     midRef,
     trebleRef,
 } from "@core/audioRefs";
-import ThreeCanvas from "@core/ThreeCanvas";
+// import ThreeCanvas from "@core/ThreeCanvas";
+import VisualCanvas from "@core/VisualCanvas";
 
 export default function App() {
     const [showUI, setShowUI] = useState(true);
@@ -113,13 +114,22 @@ export default function App() {
     }, [useThree]);
 
     const handleStart = () => {
-        const canvas = document.getElementById("hydra-canvas");
-        if (canvas || useThree) {
+        const hydra = document.getElementById("hydra-canvas");
+        const three = document.getElementById("three-container");
+        if (hydra || three) {
             setShowUI(false);
         } else {
-            console.warn("❌ Canvas not found!");
+            console.warn("❌ No canvas found!");
         }
     };
+//     const handleStart = () => {
+//         const canvas = document.getElementById("hydra-canvas");
+//         if (canvas || useThree) {
+//             setShowUI(false);
+//         } else {
+//             console.warn("❌ Canvas not found!");
+//         }
+//     };
 
     const handleOpenSettings = () => {
         window.open("/settings", "_blank", "width=400,height=600");
@@ -129,16 +139,17 @@ export default function App() {
         window.open("/README", "_blank", "width=800,height=600"); // Adjust the window size for README
     };
 
-    return (
-        <div className="relative w-screen h-screen overflow-hidden">
-            {useThree ? (
-                <ThreeCanvas selectedPreset={selectedThreeId} />
-            ) : (
-                <HydraCanvas
-                    key={`hydra-${currentPresetIndex.current}`}
-                    presetFn={presets[currentPresetIndex.current]?.fn}
-                />
-            )}
+return (
+    <div className="relative w-screen h-screen overflow-hidden">
+        <>
+            <VisualCanvas
+                selectedEngine={useThree ? "three" : "hydra"}
+                selectedPreset={
+                    useThree
+                        ? selectedThreeId
+                        : presets[currentPresetIndex.current]?.id || "defaultHydra"
+                }
+            />
 
             <button
                 onClick={handleOpenSettings}
@@ -171,6 +182,7 @@ export default function App() {
                     </div>
                 </div>
             )}
-        </div>
-    );
+        </>
+    </div>
+);
 }

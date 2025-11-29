@@ -7,11 +7,15 @@ import { bassRef, midRef, trebleRef } from '../audioRefs.js'
 
 let scene, camera, renderer, composer, controls
 let renderWidth, renderHeight, renderAspectRatio
+let initialized = false
 
 const renderTickManager = new TickManager()
 
-// 🚀 Engine init
+// 🚀 Engine init (called only once)
 export const initEngine = async (container = document.body) => {
+    if (initialized) return
+    initialized = true
+
     scene = new THREE.Scene()
 
     container.style.position = 'relative'
@@ -22,13 +26,11 @@ export const initEngine = async (container = document.body) => {
     renderAspectRatio = renderWidth / renderHeight
 
     camera = new THREE.PerspectiveCamera(75, renderAspectRatio, 0.1, 100)
-    camera.position.z = 5
 
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(renderWidth, renderHeight)
     renderer.setPixelRatio(window.devicePixelRatio)
 
-    // Style for canvas visibility
     Object.assign(renderer.domElement.style, {
         position: 'absolute',
         top: '0',
@@ -42,61 +44,90 @@ export const initEngine = async (container = document.body) => {
 
     container.appendChild(renderer.domElement)
 
-    // 📦 Post-processing
     composer = new EffectComposer(renderer)
     const renderPass = new RenderPass(scene, camera)
     composer.addPass(renderPass)
 
-    // 🎮 Optional camera controls
     controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
 
-    // 📀 Responsive resizing
-    window.addEventListener('resize', () => {
-        const bounds = container.getBoundingClientRect()
-        renderWidth = bounds.width
-        renderHeight = bounds.height
-        renderAspectRatio = renderWidth / renderHeight
-
-        renderer.setSize(renderWidth, renderHeight)
-        composer.setSize(renderWidth, renderHeight)
-
-        camera.aspect = renderAspectRatio
-        camera.updateProjectionMatrix()
-    })
+    window.addEventListener('resize', handleResize)
 
     renderTickManager.startLoop()
 }
 
-// 🧪 Hooks
+const handleResize = () => {
+    const bounds = renderer.domElement.parentNode?.getBoundingClientRect()
+    if (!bounds) return
+
+    renderWidth = bounds.width
+    renderHeight = bounds.height
+    renderAspectRatio = renderWidth / renderHeight
+
+    renderer.setSize(renderWidth, renderHeight)
+    composer.setSize(renderWidth, renderHeight)
+
+    camera.aspect = renderAspectRatio
+    camera.updateProjectionMatrix()
+}
+
 export const useRenderer = () => renderer
 export const useRenderSize = () => ({ width: renderWidth, height: renderHeight })
 export const useScene = () => scene
 export const useCamera = () => camera
 export const useControls = () => controls
 export const useComposer = () => composer
-
-// 🧹 Add postprocessing passes
 export const addPass = (pass) => composer?.addPass(pass)
 
-// 🌀 Hook into animation loop
 export const useTick = (fn) => {
-    if (renderTickManager) {
-        const _tick = (e) => {
-            const { timestamp, timeDiff, frame } = e.data
-            const time = performance.now() / 1000
+    if (!renderTickManager) return () => {}
 
-            fn({
-                bass: bassRef.current,
-                mid: midRef.current,
-                treble: trebleRef.current,
-                time,
-                timestamp,
-                timeDiff,
-                frame,
-            })
-        }
+    const _tick = (e) => {
+        const { timestamp, timeDiff, frame } = e.data
+        const time = performance.now() / 1000
 
-        renderTickManager.addEventListener('tick', _tick)
+        fn({
+            bass: bassRef.current,
+            mid: midRef.current,
+            treble: trebleRef.current,
+            time,
+            timestamp,
+            timeDiff,
+            frame,
+        })
     }
+
+    renderTickManager.addEventListener('tick', _tick)
+
+    return () => {
+        renderTickManager.removeEventListener('tick', _tick)
+    }
+}
+
+export const disposeEngine = () => {
+    if (renderer) {
+        if (renderer.domElement?.parentNode) {
+            renderer.domElement.parentNode.removeChild(renderer.domElement)
+        }
+        renderer.dispose()
+    }
+
+    if (composer) {
+        composer.passes.forEach(pass => pass.dispose?.())
+        composer.passes.length = 0
+    }
+
+    window.removeEventListener('resize', handleResize)
+
+    scene = null
+    camera = null
+    renderer = null
+    composer = null
+    controls = null
+    renderWidth = null
+    renderHeight = null
+    renderAspectRatio = null
+    initialized = false
+
+    console.log('[Engine] Disposed engine and cleaned up WebGL context.')
 }

@@ -7,7 +7,8 @@
     "dev": "npx serve dist -s",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vite"
   },
   "dependencies": {
     "chart.js": "^4.4.8",
