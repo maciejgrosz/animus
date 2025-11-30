@@ -27,9 +27,9 @@ export default function App() {
     // STATE: Engine & Preset Selection
     // ═══════════════════════════════════════════════════════════════
     const [showUI, setShowUI] = useState(true);  // Welcome screen visibility
-    const [useThree, setUseThree] = useState(false);  // false = Hydra, true = Three.js
-    const [selectedThreeId, setSelectedThreeId] = useState("threeTunnel");  // Active Three.js preset
-    const [selectedHydraId, setSelectedHydraId] = useState("velvetPool");  // Active Hydra preset
+    const [useThree, setUseThree] = useState(true);  // false = Hydra, true = Three.js
+    const [selectedThreeId, setSelectedThreeId] = useState("threeBloomIcosphere");  // Active Three.js preset
+    const [selectedHydraId, setSelectedHydraId] = useState("nesso");  // Active Hydra preset
     
     // ═══════════════════════════════════════════════════════════════
     // REFS: Persistent values that don't trigger re-renders
