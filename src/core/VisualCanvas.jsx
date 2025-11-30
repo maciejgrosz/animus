@@ -4,10 +4,8 @@ import { useHydra } from "@hooks/useHydra"
 import { presets } from "@core/presets.js"
 import { createTunnel } from "./three_presets/threeTunnel"
 import { createThreeBloomIcosphere } from "./three_presets/threeBloomIcosphere"
-import { ambientSphere } from "./three_presets/ambientSphere"
 import { blueVortex } from "./three_presets/blueVortex.js"
 import { skull } from "./three_presets/skull"
-import { zippyZaps } from "./three_presets/zippyZaps.js"
 import { maja } from "./three_presets/maja"
 import { test997420 } from "./three_presets/test997420"
 
@@ -87,17 +85,11 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
                 case "threeBloomIcosphere":
                     cleanup = createThreeBloomIcosphere()
                     break
-                case "ambientSphere":
-                    cleanup = ambientSphere()
-                    break
                 case "blueVortex":
                     cleanup = blueVortex()
                     break
                 case "skull":
                     cleanup = skull()
-                    break
-                case "zippyZaps":
-                    cleanup = zippyZaps()
                     break
                 case "maja":
                     cleanup = maja()

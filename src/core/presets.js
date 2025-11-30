@@ -8,7 +8,6 @@ import { khoparzi, khoparziAquatic } from "@hydra_presets/khoparzi.js";
 import { alexandreRangel, alexandreRangelBright } from "@hydra_presets/alexandreRangel.js"
 import {nesso, nessoRandom} from "@hydra_presets/nesso.js"
 import { ameba } from "@hydra_presets/ameba.js"
-import {velvetPool} from "@hydra_presets/velvetPool.js";
 
 export const presets = [
     {
@@ -45,17 +44,6 @@ export const presets = [
         preview: new URL("../../public/assets/textures/skull.png", import.meta.url).href, // Update if you have a thumbnail
     },
     {
-        id: "ambientSphere",
-        engine: "threejs",
-        name: "Ambient Sphere",
-        description: "Gentle ambient-style 3D sphere with soft color shifts and fluid motion",
-        fn: () => {
-            const channel = new BroadcastChannel("animus-control");
-            channel.postMessage({ type: "selectThree", id: "ambientSphere" });
-        },
-        preview: new URL("../../public/assets/textures/ambientSphere.png", import.meta.url).href, // Update if you have a thumbnail
-    },
-    {
         id: "threeBloomIcosphere",
         engine: "threejs",
         name: "Bloom Icosphere",
@@ -65,14 +53,6 @@ export const presets = [
             channel.postMessage({ type: "selectThree", id: "threeBloomIcosphere" });
         },
         preview: new URL("../../public/assets/textures/bloomIcosphere.png", import.meta.url).href,
-    },
-    {
-        id: 'velvetPool',
-        engine: "hydra",
-        name: 'Velvet Pool',
-        description: 'A net-like oscilloscope grid modulated by bass, mid, and treble',
-        fn: () => velvetPool(),
-        preview: new URL("../../public/assets/textures/velvetPool.png", import.meta.url).href,
     },
     {
         id: "khoparzi",
@@ -251,20 +231,6 @@ export const presets = [
             ),
         preview: new URL("../../public/assets/textures/zachKrall.png", import.meta.url).href,
     },
-
-{
-  id: "zippyZaps",
-  engine: "threejs",
-  name: "Zippy Zaps",
-  author: "SnoopethDuckDuck",
-  mood: "",
-  fn: () => {
-    const channel = new BroadcastChannel("animus-control");
-    channel.postMessage({ type: "selectThree", id: "zippyZaps" });
-  },
-  preview: new URL("../../public/assets/textures/tunnelClouds.png", import.meta.url).href
-},
-
 
 {
   id: "test997420",
