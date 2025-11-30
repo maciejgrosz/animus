@@ -1,6 +1,14 @@
-# Animus VJ Tool - Technical Documentation
+# 🎛️ Animus VJ Tool
 
-This document provides technical details about the **Animus** VJ Tool, including setup instructions, dependencies, and contribution guidelines.
+Browser-based VJ tool for creating real-time audio-reactive visuals using Three.js and Hydra.
+
+## 📚 Documentation
+
+- **[Quick Start Guide](./QUICK_START.md)** - Get up and running
+- **[Architecture Overview](./docs/ARCHITECTURE.md)** - System design and components
+- **[Flow Diagrams](./docs/FLOW_DIAGRAMS.md)** - Visual flow diagrams
+- **[Three.js Preset Guide](./src/core/three_presets/README.md)** - Create custom presets
+- **[Roadmap](./ROADMAP.md)** - Planned improvements and tasks
 
 ## Setup:
 To run the project locally, follow the steps below:

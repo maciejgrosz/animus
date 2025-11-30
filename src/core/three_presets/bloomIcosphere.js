@@ -1,8 +1,10 @@
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 
 import {
+    initEngine,
     useRenderer,
     useScene,
     useCamera,
@@ -15,14 +17,15 @@ import { bassRef, midRef, trebleRef } from '@core/audioRefs'
 import { createParticleHalo } from './modules/particleHalo'
 import { setupSphereGeometry, deformSphere } from './modules/sphereLogic'
 
-export function createThreeBloomIcosphere() {
+export async function createThreeBloomIcosphere(container) {
+    await initEngine(container)
+
     const renderer = useRenderer()
     const scene = useScene()
     const camera = useCamera()
     const composer = useComposer()
     const { width, height } = useRenderSize()
 
-    scene.clear()
     camera.position.set(0, 0, 10)
     scene.fog = new THREE.Fog(0x000000, 8, 16)
 
@@ -49,9 +52,10 @@ export function createThreeBloomIcosphere() {
     pointLight.position.set(0, 0, 10)
     scene.add(pointLight)
 
-    composer.passes.length = 0 // Clear previous passes
-    composer.addPass(new RenderPass(scene, camera))
-    composer.addPass(new OutputPass())
+    const renderPass = new RenderPass(scene, camera)
+    const outputPass = new OutputPass()
+    composer.addPass(renderPass)
+    composer.addPass(outputPass)
 
     const clock = new THREE.Clock()
     let lastTreble = 0
@@ -59,7 +63,8 @@ export function createThreeBloomIcosphere() {
     let pulseTimer = 0
     let currentHue = 0
 
-    const cleanupTick = useTick(() => {
+    let cleanupTick = () => {}
+    const maybeCleanup = useTick(() => {
         const time = clock.getElapsedTime()
 
         if (bassRef.current > 0.7 && trebleRef.current - lastTreble > 0.05) {
@@ -106,26 +111,31 @@ export function createThreeBloomIcosphere() {
         camera.lookAt(scene.position)
         composer.render()
     })
+    if (typeof maybeCleanup === 'function') {
+        cleanupTick = maybeCleanup
+    }
+
+    const resizeHandler = () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        composer.setSize(window.innerWidth, window.innerHeight)
+    }
+    window.addEventListener('resize', resizeHandler)
 
     return () => {
         cleanupTick()
+        window.removeEventListener('resize', resizeHandler)
 
-        // Dispose geometries and materials
         geometry.dispose()
         mesh.material.dispose()
-        scene.remove(mesh)
 
         particleSystem.geometry.dispose()
         particleSystem.material.dispose()
-        scene.remove(particleSystem)
 
-        scene.remove(ambientLight)
-        scene.remove(pointLight)
-
-        // Dispose post-processing passes
-        composer.passes.forEach(pass => {
-            if (pass.dispose) pass.dispose()
-        })
+        renderPass.dispose?.()
+        outputPass.dispose?.()
         composer.passes.length = 0
+        renderer.dispose()
     }
 }

@@ -1,27 +1,30 @@
 import * as THREE from 'three'
 import fragmentShader from '../../shaders/tunnel.frag?raw'
 import {
-    initEngine,
     useRenderer,
     useScene,
-    useTick,
     useRenderSize,
+    useTick
 } from '@core/engine/init.js'
-
 import { bassRef, midRef, trebleRef } from '@core/audioRefs'
 
-export async function createTunnel(container) {
-    await initEngine(container)
-
+export function createTunnel() {
     const renderer = useRenderer()
     const scene = useScene()
     const { width, height } = useRenderSize()
 
-    // 📷 Use orthographic camera for full-screen quad
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+    // 🧹 Clean scene before use
     scene.clear()
+    scene.background = null
+    scene.fog = null
+
+    // 🧭 Orthographic camera to keep shader centered
+    const aspect = width / height
+    const camera = new THREE.OrthographicCamera(-aspect, aspect, 1, -1, 0.1, 10)
+    camera.position.z = 1
     scene.add(camera)
 
+    // 🎛️ Shader uniforms
     const uniforms = {
         u_time: { value: 0 },
         u_resolution: { value: new THREE.Vector2(width, height) },
@@ -39,10 +42,9 @@ export async function createTunnel(container) {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // 🕒 Time & audio-reactive updates
     const clock = new THREE.Clock()
 
-    useTick(() => {
+    const cleanupTick = useTick(() => {
         uniforms.u_time.value = clock.getElapsedTime()
         uniforms.u_bass.value = bassRef.current
         uniforms.u_mid.value = midRef.current
@@ -51,19 +53,11 @@ export async function createTunnel(container) {
         renderer.render(scene, camera)
     })
 
-    // 📐 Handle responsive resize
-    const onResize = () => {
-        const { width, height } = useRenderSize()
-        uniforms.u_resolution.value.set(width, height)
-        renderer.setSize(width, height)
-    }
-    window.addEventListener('resize', onResize)
-
-    // 🔁 Return cleanup
     return () => {
-        window.removeEventListener('resize', onResize)
+        cleanupTick()
         geometry.dispose()
         material.dispose()
-        renderer.dispose()
+        scene.remove(mesh)
+        scene.remove(camera)
     }
 }

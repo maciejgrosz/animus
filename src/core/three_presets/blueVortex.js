@@ -1,19 +1,37 @@
 import * as THREE from 'three'
 import { bassRef, midRef, trebleRef } from '@core/audioRefs'
 import fragmentShader from '../../shaders/blueVortex.frag?raw'
+import {
+    useRenderer,
+    useScene,
+    useRenderSize,
+    useTick
+} from '@core/engine/init.js'
 
-export function blueVortex(container) {
-    const scene = new THREE.Scene()
+export function blueVortex() {
+    const renderer = useRenderer()
+    const scene = useScene()
+    const { width, height } = useRenderSize()
 
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)
+    if (!scene || !renderer) {
+        console.warn('[blueVortex] Renderer or scene not initialized')
+        return () => {}
+    }
+
+    // 🧹 Clear previous state
+    scene.clear()
+    scene.background = null
+    scene.fog = null
+
+    // 🎥 Centered orthographic camera
+    // const aspect = width / height
+    const camera = new THREE.OrthographicCamera(0, 0, 1, -1000, 0.1, 10)
     camera.position.z = 1
+    scene.add(camera)
 
-    const renderer = new THREE.WebGLRenderer()
-    renderer.setSize(container.clientWidth, container.clientHeight)
-    container.appendChild(renderer.domElement)
-
+    // 🎛️ Shader uniforms
     const uniforms = {
-        iResolution: { value: new THREE.Vector2(container.clientWidth, container.clientHeight) },
+        iResolution: { value: new THREE.Vector2(width, height) },
         iTime: { value: 0 },
         uBass: { value: 0 },
         uMid: { value: 0 },
@@ -38,20 +56,20 @@ export function blueVortex(container) {
 
     const clock = new THREE.Clock()
 
-    function animate() {
-        requestAnimationFrame(animate)
-
+    const cleanupTick = useTick(() => {
         uniforms.iTime.value = clock.getElapsedTime()
         uniforms.uBass.value = bassRef.current
         uniforms.uMid.value = midRef.current
         uniforms.uTreble.value = trebleRef.current
 
         renderer.render(scene, camera)
-    }
-    animate()
+    })
 
     return () => {
-        renderer.dispose()
-        container.removeChild(renderer.domElement)
+        cleanupTick()
+        scene.remove(mesh)
+        scene.remove(camera)
+        geometry.dispose()
+        material.dispose()
     }
 }

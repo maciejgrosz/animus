@@ -1,18 +1,14 @@
-import {getSmoothedBass, getSmoothedMid, getSmoothedTreble} from "@core/audioRefs.js";
-
-export function velvetPool() {
+export function velvetPool(h) {
     const bass = () => getSmoothedBass();
     const mid = () => getSmoothedMid();
     const treble = () => getSmoothedTreble();
 
-    // Base warped waveform portal
+    const { osc, noise, time, o0 } = h;
+
     const portal = osc(100, -0.0015, 0.2)
-        .diff(
-            osc(20, 0.00006).rotate(Math.PI / 0.00003)
-        )
+        .diff(osc(20, 0.00006).rotate(Math.PI / 0.00003))
         .modulateScale(
-            noise(1.5, 0.15)
-                .modulateScale(osc(13).rotate(() => Math.sin(time / 22))),
+            noise(1.5, 0.15).modulateScale(osc(13).rotate(() => Math.sin(time / 22))),
             () => 2 + bass() * 1.5
         )
         .color(
@@ -26,9 +22,8 @@ export function velvetPool() {
         .rotate(() => 0.1 + treble() * 0.05)
         .posterize(50)
         .invert(0)
-        .blend(o0, 0.85); // dreamy trail blend
+        .blend(o0, 0.85);
 
-    // Optional soft grain overlay
     const grain = noise(3, 0.3)
         .color(0.1, 0.1, 0.1)
         .brightness(0.02)
@@ -38,6 +33,4 @@ export function velvetPool() {
     portal
         .blend(grain, 0.15)
         .out(o0);
-
 }
-

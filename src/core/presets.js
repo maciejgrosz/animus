@@ -23,6 +23,17 @@ export const presets = [
         preview: new URL("../../public/assets/textures/blueVortex.png", import.meta.url).href, // Update if you have a thumbnail
     },
     {
+        id: "threeTunnel",
+        engine: "threejs",
+        name: "Three.js Tunnel",
+        description: "A GLSL-based tunnel with audio reactivity",
+        fn: () => {
+            const channel = new BroadcastChannel("animus-control");
+            channel.postMessage({ type: "selectThree", id: "threeTunnel" });
+        },
+        preview: new URL("../../public/assets/textures/tunnel.png", import.meta.url).href,
+    },
+    {
         id: "skull",
         engine: "threejs",
         name: "skull",
@@ -54,17 +65,6 @@ export const presets = [
             channel.postMessage({ type: "selectThree", id: "threeBloomIcosphere" });
         },
         preview: new URL("../../public/assets/textures/bloomIcosphere.png", import.meta.url).href,
-    },
-    {
-        id: "threeTunnel",
-        engine: "threejs",
-        name: "Three.js Tunnel",
-        description: "A GLSL-based tunnel with audio reactivity",
-        fn: () => {
-            const channel = new BroadcastChannel("animus-control");
-            channel.postMessage({ type: "selectThree", id: "threeTunnel" });
-        },
-        preview: new URL("../../public/assets/textures/tunnel.png", import.meta.url).href,
     },
     {
         id: 'velvetPool',

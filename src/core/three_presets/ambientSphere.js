@@ -14,7 +14,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 
-export async function createAmbientSphere(container) {
+export async function ambientSphere(container) {
     await initEngine(container)
 
     const renderer = useRenderer()
@@ -93,7 +93,8 @@ export async function createAmbientSphere(container) {
 
     const clock = new THREE.Clock()
 
-    useTick(() => {
+    // ✅ Capture the tick cleanup function
+    const cleanupTick = useTick(() => {
         const time = clock.getElapsedTime()
 
         const smoothBass = Math.pow(bassRef.current, 1.3)
@@ -130,11 +131,34 @@ export async function createAmbientSphere(container) {
     }
     window.addEventListener('resize', resizeHandler)
 
+    // ✅ Call cleanupTick on cleanup
     return () => {
+        cleanupTick()
         window.removeEventListener('resize', resizeHandler)
+        
+        // Dispose main mesh
         geometry.dispose()
         material.dispose()
+        scene.remove(mesh)
+        
+        // Dispose ground
+        ground.geometry.dispose()
+        ground.material.dispose()
+        scene.remove(ground)
+        
+        // Dispose particle system
         particleSystem.geometry.dispose()
         particleSystem.material.dispose()
+        scene.remove(particleSystem)
+        
+        // Remove lights
+        scene.remove(scene.children.find(child => child.type === 'AmbientLight'))
+        scene.remove(directionalLight)
+        
+        // Dispose post-processing passes
+        composer.passes.forEach(pass => {
+            if (pass.dispose) pass.dispose()
+        })
+        composer.passes.length = 0
     }
 }
