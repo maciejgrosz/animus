@@ -14,9 +14,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 
-export async function ambientSphere(container) {
-    await initEngine(container)
-
+export function ambientSphere() {
     const renderer = useRenderer()
     const scene = useScene()
     const camera = useCamera()
@@ -111,11 +109,11 @@ export async function ambientSphere(container) {
         }
         position.needsUpdate = true
 
-        const hue = (time * 0.015 + bassRef.current * 0.05 + midRef.current * 0.02) % 1
+        const hue = (time * 0.15 + bassRef.current * 0.05 + midRef.current * 0.02) % 1
         material.color.setHSL(hue, 0.5, 0.6)
         material.emissive.setHSL(hue, 0.6, 0.3)
 
-        mesh.rotation.y += 0.00012 + midRef.current * 0.0003
+        mesh.rotation.y += 0.00002 + midRef.current * 0.003
         mesh.rotation.x += 0.00008 + trebleRef.current * 0.0002
 
         particleSystem.rotation.y += 0.0001

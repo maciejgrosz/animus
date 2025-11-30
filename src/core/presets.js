@@ -71,12 +71,7 @@ export const presets = [
         engine: "hydra",
         name: 'Velvet Pool',
         description: 'A net-like oscilloscope grid modulated by bass, mid, and treble',
-        fn: () =>
-            velvetPool(
-                () => bassRef.current,
-                () => midRef.current,
-                () => trebleRef.current
-            ),
+        fn: () => velvetPool(),
         preview: new URL("../../public/assets/textures/velvetPool.png", import.meta.url).href,
     },
     {

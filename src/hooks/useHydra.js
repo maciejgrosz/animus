@@ -82,11 +82,19 @@ export function useHydra() {
             console.log("[Hydra] 🗑️ Disposing instance");
 
             try {
-                // Just call hush to stop animations
+                // Stop all Hydra animations
                 if (typeof hydraRef.current.hush === "function") {
                     console.log("[Hydra] Calling hush() on instance");
                     hydraRef.current.hush();
                 }
+                
+                // Clear all output buffers (o0, o1, o2, o3) to prevent fog
+                for (let i = 0; i < 4; i++) {
+                    if (hydraRef.current.o && hydraRef.current.o[i]) {
+                        hydraRef.current.o[i].clear();
+                    }
+                }
+                console.log("[Hydra] Cleared all output buffers");
             } catch (e) {
                 console.warn("[Hydra] ⚠️ Error while stopping:", e);
             }

@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npx serve dist -s",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vite"
+    "serve": "npx serve dist -s"
   },
   "dependencies": {
     "chart.js": "^4.4.8",

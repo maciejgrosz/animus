@@ -7,7 +7,7 @@ let smoothBass = 0;
 let smoothMid = 0;
 let smoothTreble = 0;
 
-const alpha = 0.05; // smoothing strength
+const alpha = 0.2; // smoothing strength (0.2 = faster response, 0.05 = slower)
 
 export const getSmoothedBass = () => {
     const raw = bassRef.current ?? 0;

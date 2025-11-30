@@ -1,9 +1,9 @@
-export function velvetPool(h) {
+import { getSmoothedBass, getSmoothedMid, getSmoothedTreble } from "@core/audioRefs.js";
+
+export function velvetPool() {
     const bass = () => getSmoothedBass();
     const mid = () => getSmoothedMid();
     const treble = () => getSmoothedTreble();
-
-    const { osc, noise, time, o0 } = h;
 
     const portal = osc(100, -0.0015, 0.2)
         .diff(osc(20, 0.00006).rotate(Math.PI / 0.00003))
@@ -22,7 +22,7 @@ export function velvetPool(h) {
         .rotate(() => 0.1 + treble() * 0.05)
         .posterize(50)
         .invert(0)
-        .blend(o0, 0.85);
+        .blend(o0, 0.5);  // Reduced from 0.85 to 0.5 for faster stabilization
 
     const grain = noise(3, 0.3)
         .color(0.1, 0.1, 0.1)
