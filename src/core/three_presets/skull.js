@@ -15,7 +15,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { bassRef, trebleRef, midRef } from '@core/audioRefs'
 
-export function skull() {
+export async function skull() {
     const scene = useScene()
     const camera = useCamera()
     const renderer = useRenderer()
@@ -30,12 +30,15 @@ export function skull() {
     camera.aspect = width / height
     camera.updateProjectionMatrix()
 
-    // Set background
+    // Set background and wait for it to load
     const loaderBG = new THREE.TextureLoader()
-    loaderBG.load('/assets/textures/56.43.png', (texture) => {
-        texture.mapping = THREE.EquirectangularReflectionMapping
-        texture.colorSpace = THREE.SRGBColorSpace
-        scene.background = texture
+    await new Promise((resolve) => {
+        loaderBG.load('/assets/textures/56.43.png', (texture) => {
+            texture.mapping = THREE.EquirectangularReflectionMapping
+            texture.colorSpace = THREE.SRGBColorSpace
+            scene.background = texture
+            resolve()
+        })
     })
 
     // Lights
@@ -57,24 +60,27 @@ export function skull() {
     const shockwaveRings = []
 
     const loader = new GLTFLoader()
-    loader.load('/assets/textures/zielona_czacha.glb', (gltf) => {
-        model = gltf.scene
-        model.traverse((child) => {
-            if (child.isMesh) {
-                child.geometry = child.geometry.toNonIndexed().clone()
-                const isEye = child.name.toLowerCase().includes('eye') || child.position.y > 1.2
+    await new Promise((resolve) => {
+        loader.load('/assets/textures/zielona_czacha.glb', (gltf) => {
+            model = gltf.scene
+            model.traverse((child) => {
+                if (child.isMesh) {
+                    child.geometry = child.geometry.toNonIndexed().clone()
+                    const isEye = child.name.toLowerCase().includes('eye') || child.position.y > 1.2
 
-                child.material = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color().setHSL(0, 1, 0.55),
-                    emissive: new THREE.Color().setHSL(0, 0.5, 0.25),
-                    roughness: 0.4,
-                    metalness: 0.2,
-                    wireframe: !isEye,
-                })
-            }
+                    child.material = new THREE.MeshStandardMaterial({
+                        color: new THREE.Color().setHSL(0, 1, 0.55),
+                        emissive: new THREE.Color().setHSL(0, 0.5, 0.25),
+                        roughness: 0.4,
+                        metalness: 0.2,
+                        wireframe: !isEye,
+                    })
+                }
+            })
+            model.scale.set(0.8, 0.8, 0.8)
+            scene.add(model)
+            resolve()
         })
-        model.scale.set(0.8, 0.8, 0.8)
-        scene.add(model)
     })
 
     // Postprocessing

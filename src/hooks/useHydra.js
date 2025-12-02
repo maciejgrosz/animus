@@ -18,13 +18,10 @@ export function useHydra() {
 
         canvas.classList.remove("hidden");
 
-        // Only create instance if it doesn't exist (but don't return early)
+        // Force recreation if instance was disposed
         if (!hydraRef.current) {
             console.log("[Hydra] Creating NEW instance");
             
-            // Don't call hush() here - it might be from a disposed instance
-            // VisualCanvas will call hush() after init if needed
-
             // Create new Hydra instance
             hydraRef.current = new Hydra({
                 canvas,
@@ -41,6 +38,8 @@ export function useHydra() {
             });
         } else {
             console.log("[Hydra] ♻️ Reusing existing instance");
+            // Ensure resolution is correct when reusing
+            hydraRef.current.setResolution(window.innerWidth, window.innerHeight);
         }
     };
 
@@ -64,9 +63,34 @@ export function useHydra() {
             }
 
             console.log("[Hydra] ✅ Applying preset:", presetFn.name || "anonymous");
+            
+            // Log Hydra state before applying
+            console.log("[Hydra] State before preset:", {
+                hasO0: typeof globalThis.o0 !== "undefined",
+                hasO1: typeof globalThis.o1 !== "undefined", 
+                hasO2: typeof globalThis.o2 !== "undefined",
+                hasO3: typeof globalThis.o3 !== "undefined",
+                hasSrc: typeof globalThis.src === "function",
+                hasOsc: typeof globalThis.osc === "function",
+                hasNoise: typeof globalThis.noise === "function",
+                hasVoronoi: typeof globalThis.voronoi === "function",
+                hasSolid: typeof globalThis.solid === "function",
+                hasShape: typeof globalThis.shape === "function",
+                hasGradient: typeof globalThis.gradient === "function",
+                o0Type: typeof globalThis.o0,
+                canvasWidth: hydraRef.current?.canvas?.width,
+                canvasHeight: hydraRef.current?.canvas?.height,
+            });
+            
             try {
                 presetFn(globalThis);
                 console.log("[Hydra] ✅ Preset applied successfully");
+                
+                // Log state after applying
+                console.log("[Hydra] State after preset:", {
+                    o0Exists: !!globalThis.o0,
+                    outputCount: hydraRef.current?.o?.length || 0,
+                });
             } catch (err) {
                 console.error("[Hydra] 💥 Error running preset:", err);
             }
@@ -88,13 +112,14 @@ export function useHydra() {
                     hydraRef.current.hush();
                 }
                 
-                // Clear all output buffers (o0, o1, o2, o3) to prevent fog
-                for (let i = 0; i < 4; i++) {
-                    if (hydraRef.current.o && hydraRef.current.o[i]) {
-                        hydraRef.current.o[i].clear();
-                    }
+                // Clear all output buffers by rendering solid black
+                if (typeof globalThis.solid === "function") {
+                    console.log("[Hydra] Clearing all output buffers");
+                    solid(0, 0, 0, 0).out(o0);
+                    solid(0, 0, 0, 0).out(o1);
+                    solid(0, 0, 0, 0).out(o2);
+                    solid(0, 0, 0, 0).out(o3);
                 }
-                console.log("[Hydra] Cleared all output buffers");
             } catch (e) {
                 console.warn("[Hydra] ⚠️ Error while stopping:", e);
             }

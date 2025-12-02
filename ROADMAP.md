@@ -2,6 +2,36 @@
 
 This roadmap addresses performance issues, architectural improvements, and feature enhancements.
 
+## ✅ Recently Completed
+
+### ✅ Fixed Hydra Feedback Buffer Initialization Bug
+**Date**: December 2, 2025  
+**Label**: `bug`, `critical`, `hydra`
+
+**Problem**: Static noise/garbage pixels when switching Three.js → Hydra presets using feedback loops (`src(o0)`).
+
+**Solution**: Keep Hydra instance alive across engine switches instead of disposing it.
+
+**See**: [BUGFIX_HYDRA_FEEDBACK_BUFFERS.md](./docs/BUGFIX_HYDRA_FEEDBACK_BUFFERS.md) for full details.
+
+**Impact**: All feedback-based Hydra presets (ritchse, nesso, khoparzi) now work immediately on engine switch.
+
+---
+
+### ✅ Improved Audio Reactivity with Attack/Release Envelopes
+**Date**: December 2, 2025  
+**Label**: `enhancement`, `audio`
+
+**Changes**:
+- Added attack/release envelopes (0.7 attack, 0.15 release)
+- Added threshold gating (0.08 minimum)
+- Added dynamic range normalization
+- Added peak detection for transient hits
+
+**Impact**: Bass kicks feel punchier, wider dynamic range (0-1 instead of 0.4-0.5).
+
+---
+
 ## 🚨 Critical Priority (Fix ASAP)
 
 ### 1. Fix Three.js Memory Leaks & Cleanup
@@ -17,16 +47,18 @@ This roadmap addresses performance issues, architectural improvements, and featu
 - Memory accumulates with each preset switch
 
 **Solution**:
-- [ ] Choose ONE pattern: singleton renderer (recommended) OR per-preset renderers
-- [ ] Audit all files in `three_presets/`: threeTunnel, threeBloomIcosphere, ambientSphere, blueVortex, skull, zippyZaps, maja, test997420
-- [ ] Ensure proper disposal: geometries, materials, textures, render passes
-- [ ] Use `resetThreeState()` consistently before each preset
+- [x] Choose ONE pattern: singleton renderer (recommended) OR per-preset renderers
+- [x] Audit all files in `three_presets/`: threeTunnel, threeBloomIcosphere, ambientSphere, blueVortex, skull, zippyZaps, maja, test997420
+- [x] Ensure proper disposal: geometries, materials, textures, render passes
+- [x] Use `resetThreeState()` consistently before each preset
 - [ ] Add memory profiling to verify fixes
 
-**Files to modify**:
+**Files modified**:
 - `src/core/engine/init.js`
 - `src/core/VisualCanvas.jsx`
 - All files in `src/core/three_presets/*.js`
+
+**Status**: Mostly complete, needs final memory profiling verification.
 
 ---
 

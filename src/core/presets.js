@@ -1,6 +1,7 @@
 import { ritchse } from "@hydra_presets/ritchse.js";
 import { oliviaJack, oliviaJack2 } from "@hydra_presets/oliviaJack.js";
 import { florDeFuego } from "@hydra_presets/florDeFuego.js";
+import { florDeFuego2 } from "@hydra_presets/florDeFuego2.js";
 import { paintingReactive } from "@hydra_presets/paintingReactive.js"
 import { amplitudeRef, bassRef, midRef, trebleRef } from "@core/audioRefs.js";
 import { zachKrall } from "@hydra_presets/zachKrall.js";
@@ -150,6 +151,15 @@ export const presets = [
                 () => midRef.current,
                 () => trebleRef.current
             ),
+        preview: new URL("../../public/assets/textures/florDeFuego.png", import.meta.url).href,
+    },
+    {
+        id: "florDeFuego2",
+        engine: "hydra",
+        name: "Flor de Fuego 2",
+        author: "Flor de Fuego",
+        mood: "dreamy, fiery",
+        fn: () => florDeFuego2(),
         preview: new URL("../../public/assets/textures/florDeFuego.png", import.meta.url).href,
     },
     {

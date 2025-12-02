@@ -52,8 +52,12 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
 
         // Cleanup: Dispose entire engine when switching or unmounting
         return () => {
-            disposeEngine()    // Destroys Three.js renderer, scene, tick manager
-            disposeHydra()     // Destroys Hydra instance
+            if (selectedEngine === "three") {
+                // Leaving Three.js - dispose Three.js engine
+                disposeEngine()
+            }
+            // NOTE: Never dispose Hydra here - it persists across switches
+            // Hydra is only disposed when component unmounts (handled separately)
         }
     }, [selectedEngine])  // Only runs when engine type changes
 
@@ -69,84 +73,91 @@ export default function VisualCanvas({ selectedEngine = "three", selectedPreset 
 
         let cleanup = () => {}  // Will hold preset's cleanup function
 
-        if (selectedEngine === "three") {
-            // Safety: Clear scene and dispose any leftover objects
-            resetThreeState()
+        const loadPreset = async () => {
+            if (selectedEngine === "three") {
+                // Safety: Clear scene and dispose any leftover objects
+                resetThreeState()
 
-            // Load selected Three.js preset
-            // Each preset returns a cleanup function that:
-            // - Unsubscribes from tick manager
-            // - Disposes geometries/materials
-            // - Removes objects from scene
-            switch (selectedPreset) {
-                case "threeTunnel":
-                    cleanup = createTunnel()
-                    break
-                case "threeBloomIcosphere":
-                    cleanup = createThreeBloomIcosphere()
-                    break
-                case "blueVortex":
-                    cleanup = blueVortex()
-                    break
-                case "skull":
-                    cleanup = skull()
-                    break
-                case "maja":
-                    cleanup = maja()
-                    break
-                case "test997420":
-                    cleanup = test997420()
-                    break
-                default:
-                    break
+                // Load selected Three.js preset
+                // Each preset returns a cleanup function that:
+                // - Unsubscribes from tick manager
+                // - Disposes geometries/materials
+                // - Removes objects from scene
+                switch (selectedPreset) {
+                    case "threeTunnel":
+                        cleanup = createTunnel()
+                        break
+                    case "threeBloomIcosphere":
+                        cleanup = createThreeBloomIcosphere()
+                        break
+                    case "blueVortex":
+                        cleanup = blueVortex()
+                        break
+                    case "skull":
+                        cleanup = await skull()
+                        break
+                    case "maja":
+                        cleanup = maja()
+                        break
+                    case "test997420":
+                        cleanup = test997420()
+                        break
+                    default:
+                        break
+                }
+            } else if (selectedEngine === "hydra") {
+                console.log("[VisualCanvas] Loading Hydra preset:", selectedPreset);
+                
+                // Load Hydra preset from presets array
+                const canvas = hydraCanvasRef.current
+                const hydraPreset = presets.find((preset) => preset.id === selectedPreset)
+
+                console.log("[VisualCanvas] Hydra setup:", {
+                    hasCanvas: !!canvas,
+                    presetFound: !!hydraPreset,
+                    presetEngine: hydraPreset?.engine,
+                    presetId: selectedPreset
+                });
+
+                if (!canvas) {
+                    console.warn("[VisualCanvas] ⚠️ Canvas not found. Hydra will not initialize.")
+                    return
+                }
+
+                // Check if preset is actually a Hydra preset (not Three.js)
+                if (hydraPreset && hydraPreset.engine === "threejs") {
+                    console.warn("[VisualCanvas] ⚠️ Attempted to load Three.js preset in Hydra engine:", selectedPreset)
+                    return
+                }
+
+                console.log("[VisualCanvas] Calling initHydra...");
+                initHydra(canvas)
+
+                // Clear previous Hydra preset before applying new one
+                if (typeof globalThis.hush === "function") {
+                    console.log("[VisualCanvas] Calling hush() before applying preset");
+                    globalThis.hush()
+                } else {
+                    console.log("[VisualCanvas] ⚠️ globalThis.hush not available");
+                }
+
+                if (typeof hydraPreset?.fn === "function") {
+                    console.log("[VisualCanvas] Calling applyPreset immediately...");
+                    
+                    // Apply preset directly without pre-initialization
+                    // Let the preset handle its own buffer initialization
+                    applyPreset(hydraPreset.fn)
+                } else {
+                    console.warn("[VisualCanvas] ⚠️ Preset not found or invalid:", selectedPreset)
+                }
             }
-        } else if (selectedEngine === "hydra") {
-            console.log("[VisualCanvas] Loading Hydra preset:", selectedPreset);
-            
-            // Load Hydra preset from presets array
-            const canvas = hydraCanvasRef.current
-            const hydraPreset = presets.find((preset) => preset.id === selectedPreset)
 
-            console.log("[VisualCanvas] Hydra setup:", {
-                hasCanvas: !!canvas,
-                presetFound: !!hydraPreset,
-                presetEngine: hydraPreset?.engine,
-                presetId: selectedPreset
-            });
-
-            if (!canvas) {
-                console.warn("[VisualCanvas] ⚠️ Canvas not found. Hydra will not initialize.")
-                return () => {}
-            }
-
-            // Check if preset is actually a Hydra preset (not Three.js)
-            if (hydraPreset && hydraPreset.engine === "threejs") {
-                console.warn("[VisualCanvas] ⚠️ Attempted to load Three.js preset in Hydra engine:", selectedPreset)
-                return () => {}
-            }
-
-            console.log("[VisualCanvas] Calling initHydra...");
-            initHydra(canvas)
-
-            // Clear previous Hydra preset before applying new one
-            if (typeof globalThis.hush === "function") {
-                console.log("[VisualCanvas] Calling hush() before applying preset");
-                globalThis.hush()
-            } else {
-                console.log("[VisualCanvas] ⚠️ globalThis.hush not available");
-            }
-
-            if (typeof hydraPreset?.fn === "function") {
-                console.log("[VisualCanvas] Calling applyPreset...");
-                applyPreset(hydraPreset.fn)
-            } else {
-                console.warn("[VisualCanvas] ⚠️ Preset not found or invalid:", selectedPreset)
-            }
+            // Store cleanup function for React to call on next render
+            // (bridges the gap between renders - remembers old cleanup)
+            cleanupRef.current = cleanup
         }
 
-        // Store cleanup function for React to call on next render
-        // (bridges the gap between renders - remembers old cleanup)
-        cleanupRef.current = cleanup
+        loadPreset()
 
         // React cleanup: Called before next effect run or on unmount
         return () => {
